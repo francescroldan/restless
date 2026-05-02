@@ -1,6 +1,6 @@
 # M0 — Definir el loop del MOC
 
-**Estado:** ⬜ Pendiente  
+**Estado:** ✅ Completado  
 **Hito anterior:** —  
 **Hito siguiente:** [M1 — Setup técnico](M1-Setup-Tecnico.md)
 
@@ -52,15 +52,11 @@ El MOC debe tener el mínimo necesario para que el loop sea jugable y significat
 
 ## Tareas de este hito
 
-- [ ] Leer y sintetizar los documentos de GDD relevantes:
-  - `02_DREAM_MECHANICS/Mecánicas del sueño.md`
-  - `02_DREAM_MECHANICS/Tiempo limitado en el sueño.md`
-  - `02_DREAM_MECHANICS/Sueño lúcido vs sueño profundo.md`
-  - `03_VIGILIA/Selección previa al sueño (builds y preparación).md`
-- [ ] Responder las 4 preguntas de arriba con una decisión clara.
-- [ ] Escribir el **documento de diseño del loop MOC** (ver plantilla abajo).
-- [ ] Definir los **criterios de aceptación de M2** (prototipo gris), para que quede claro qué es lo mínimo que debe funcionar.
-- [ ] Revisar y dar el visto bueno al documento antes de pasar a M1.
+- [x] Leer y sintetizar los documentos de GDD relevantes.
+- [x] Responder las 4 preguntas con una decisión clara.
+- [x] Escribir el documento de diseño del loop MOC → `Docs/GDD/MOC-Loop.md`
+- [x] Definir los criterios de aceptación de M2.
+- [x] Visto bueno al documento.
 
 ---
 
@@ -96,7 +92,7 @@ Al terminar M0, crear `Docs/GDD/MOC-Loop.md` con esta estructura:
 
 ## Criterios de salida de M0
 
-- [ ] El documento `Docs/GDD/MOC-Loop.md` existe y está completo.
-- [ ] Las 4 preguntas tienen una respuesta única y clara (no "puede ser A o B").
-- [ ] El scope del MOC está delimitado: hay una lista de mecánicas que SÍ van y una de mecánicas que NO van.
-- [ ] Los criterios de aceptación de M2 están escritos y son verificables por alguien que no diseñó el juego.
+- [x] El documento `Docs/GDD/MOC-Loop.md` existe y está completo.
+- [x] Las 4 preguntas tienen una respuesta única y clara.
+- [x] El scope del MOC está delimitado.
+- [x] Los criterios de aceptación de M2 están escritos.
