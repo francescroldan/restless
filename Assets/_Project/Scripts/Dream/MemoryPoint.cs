@@ -74,7 +74,12 @@ namespace Restless.Dream
             _state = State.Collected;
             RestlessnessManager.Instance?.SetMinigameActive(false);
             _visionCone?.Unfreeze();
-            DreamInventory.Instance?.TryAddFragment(_fragment);
+
+            // Open manual placement UI if available; fall back to auto-place
+            if (InventoryPlacementUI.Instance != null)
+                InventoryPlacementUI.Instance.Open(_fragment);
+            else
+                DreamInventory.Instance?.TryAddFragment(_fragment);
         }
 
         private void OnExtractionFailure()

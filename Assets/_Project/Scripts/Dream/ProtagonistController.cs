@@ -50,20 +50,24 @@ namespace Restless.Dream
 
         private void UpdateLookDirection()
         {
-            // Gamepad: right stick overrides look direction
+            // Gamepad: only use right stick when the active control is actually a gamepad
             Vector2 stickLook = _lookAction.ReadValue<Vector2>();
-            if (stickLook.sqrMagnitude > 0.25f)
+            bool isGamepadLook = _lookAction.activeControl?.device is Gamepad
+                                 && stickLook.sqrMagnitude > 0.25f;
+            if (isGamepadLook)
             {
                 _lookDirection = Vector2.Lerp(_lookDirection, stickLook.normalized, Time.deltaTime * _lookLerpSpeed);
                 return;
             }
 
-            // Keyboard+Mouse: look towards mouse position
-            if (Mouse.current != null)
+            // Keyboard+Mouse: look towards mouse world position
+            if (Mouse.current != null && Camera.main != null)
             {
                 Vector2 mouseScreen = Mouse.current.position.ReadValue();
-                Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
-                Vector2 toMouse = mouseWorld - (Vector2)transform.position;
+                // Pass z = -Camera.z so ScreenToWorldPoint lands on world z=0
+                Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(
+                    new Vector3(mouseScreen.x, mouseScreen.y, -Camera.main.transform.position.z));
+                Vector2 toMouse = (Vector2)mouseWorld - (Vector2)transform.position;
                 if (toMouse.sqrMagnitude > 0.1f)
                     _lookDirection = Vector2.Lerp(_lookDirection, toMouse.normalized, Time.deltaTime * _lookLerpSpeed);
                 return;

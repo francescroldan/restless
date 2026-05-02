@@ -6,9 +6,11 @@ namespace Restless.Dream
 {
     public class TimingMinigame : MonoBehaviour, IExtractionMinigame
     {
-        [SerializeField] private float _markerSpeed = 1.5f;
+        [SerializeField] private float _markerSpeed = 0.55f;
+        [SerializeField] private float _markerSpeedMax = 1.6f;
         [SerializeField] private float _greenZoneCenter = 0.5f;
         [SerializeField] private float _greenZoneHalfWidth = 0.1f;
+        [SerializeField] private float _greenZoneHalfWidthMin = 0.04f;
         [SerializeField] private int _successesRequired = 3;
         [SerializeField] private int _failuresAllowed = 2;
 
@@ -26,7 +28,7 @@ namespace Restless.Dream
         // Normalized marker position for HUD display (0..1)
         public float MarkerPosition => _markerPosition;
         public float GreenZoneCenter => _greenZoneCenter;
-        public float GreenZoneHalfWidth => _greenZoneHalfWidth;
+        public float GreenZoneHalfWidth { get; private set; }
         public int Successes => _successes;
         public int Failures => _failures;
 
@@ -45,6 +47,7 @@ namespace Restless.Dream
             _markerDirection = 1;
             _successes = 0;
             _failures = 0;
+            GreenZoneHalfWidth = _greenZoneHalfWidth;
             _isActive = true;
         }
 
@@ -57,7 +60,13 @@ namespace Restless.Dream
         {
             if (!_isActive) return;
 
-            _markerPosition += _markerDirection * _markerSpeed * Time.deltaTime;
+            // Scale difficulty with restlessness
+            float restT = RestlessnessManager.Instance != null
+                ? RestlessnessManager.Instance.NormalizedValue : 0f;
+            float speed = Mathf.Lerp(_markerSpeed, _markerSpeedMax, restT);
+            GreenZoneHalfWidth = Mathf.Lerp(_greenZoneHalfWidth, _greenZoneHalfWidthMin, restT);
+
+            _markerPosition += _markerDirection * speed * Time.deltaTime;
 
             if (_markerPosition >= 1f)
             {

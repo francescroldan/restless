@@ -115,6 +115,12 @@ namespace Restless.Dream
             Debug.Log($"[DreamInventory] Placed {fragment.fragmentId} at {origin} (rot {rotations * 90}°)");
         }
 
+        public bool IsCellOccupied(int x, int y) => _occupied != null && _occupied[x, y];
+
+        /// <summary>Places a fragment at an explicit origin with pre-rotated cells (called by InventoryPlacementUI).</summary>
+        public void PlaceFragment(MemoryFragment fragment, Vector2Int[] rotatedCells, Vector2Int origin, int rotations)
+            => Place(fragment, rotatedCells, origin, rotations);
+
         public bool IsFull()
         {
             for (int y = 0; y < _height; y++)
