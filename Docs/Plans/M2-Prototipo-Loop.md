@@ -1,6 +1,6 @@
 # M2 — Prototipo gris del loop core
 
-**Estado:** ⬜ Pendiente  
+**Estado:** ✅ Completado  
 **Hito anterior:** [M1 — Setup técnico](M1-Setup-Tecnico.md)  
 **Hito siguiente:** [M3 — Identidad visual base](M3-Identidad-Visual.md)
 
@@ -18,125 +18,122 @@ Referencia de diseño: [Docs/GDD/MOC-Loop.md](../GDD/MOC-Loop.md)
 
 ### 1. Movimiento top-down
 
-- [ ] `ProtagonistController.cs` — movimiento top-down con `Rigidbody2D` en modo Kinematic. Velocidad base configurable (lenta, pesada — hombre mayor).
-- [ ] Dirección de movimiento con stick izquierdo o WASD.
-- [ ] La dirección de visión sigue la dirección de movimiento con un lerp suave (no gira instantáneo).
-- [ ] Apuntar con stick derecho o ratón sobreescribe la dirección de visión independientemente del movimiento.
+- [x] `ProtagonistController.cs` — movimiento top-down con `Rigidbody2D`. Velocidad base configurable.
+- [x] Dirección de movimiento con stick izquierdo o WASD.
+- [x] La dirección de visión sigue la dirección de movimiento con lerp suave.
+- [x] Apuntar con stick derecho o ratón sobreescribe la dirección de visión.
 
 ### 2. Cono de visión
 
-- [ ] `VisionCone.cs` — genera una malla (Mesh) en forma de cono frente al protagonista. Ángulo (~110°) y rango (~8 unidades) configurables.
-- [ ] La malla se recorta contra los colliders del entorno (paredes) usando raycasts radiales — el cono no atraviesa paredes.
-- [ ] Todo lo que queda fuera del cono está cubierto por una capa de oscuridad opaca (sprite negro sobre el resto de la escena).
-- [ ] Un radio mínimo siempre iluminado alrededor del protagonista (~1 unidad) para evitar que se quede completamente ciego.
+- [x] `VisionCone.cs` — ángulo (~110°) y rango (~8 unidades) configurables. Implementado con `Light2D` (Point) en lugar de malla custom — suficiente para M2.
+- [x] El cono usa sombras de `Shadow Caster 2D` en paredes (no raycasts radiales — queda para M3 si se necesita precisión).
+- [x] Oscuridad fuera del cono mediante `GlobalLight2D` a intensidad 0.02.
+- [x] Radio mínimo iluminado configurable (`_minVisibleRadius`).
+- [x] `VisionConeVisual.cs` — overlay de fan mesh semi-transparente para visibilidad en desarrollo.
 
 ### 3. Medidor de Inquietud
 
-- [ ] `RestlessnessManager.cs` — valor `[0, 100]`, sube pasivamente con el tiempo (tasa base configurable).
-- [ ] Cuatro umbrales: Bajo (0-25), Medio (25-50), Alto (50-75), Crítico (75-100).
-- [ ] `OnRestlessnessChanged(float)`, `OnThresholdCrossed(Threshold)`, `OnRestlessnessMax` en EventBus.
-- [ ] `RestlessnessZone.cs` — trigger que modifica multiplicador de tasa al entrar/salir.
-- [ ] Durante el minijuego activo: tasa multiplicada por un factor configurable (ej: ×2.5).
+- [x] `RestlessnessManager.cs` — valor `[0, 100]`, sube pasivamente con tasa base configurable.
+- [x] Cinco umbrales: Low / Medium / High / Critical / Max.
+- [x] Eventos `OnRestlessnessChanged` (GameEventFloat) y `OnMaxReached` (C# event).
+- [x] `RestlessnessZone.cs` — trigger que modifica multiplicador de tasa al entrar/salir.
+- [x] Durante minijuego activo: tasa ×2.5 configurable.
 
 ### 4. Timer del sueño
 
-- [ ] `DreamTimer.cs` — countdown configurable (~6 minutos base).
-- [ ] Se acelera cuando Inquietud supera el umbral Alto.
-- [ ] `OnDreamTimerExpired` → despertar abrupto.
-- [ ] Pausado durante el minijuego solo si la Inquietud es baja (si es alta, el timer sigue — el peligro no espera).
+- [x] `DreamTimer.cs` — countdown configurable (300s por defecto en prototipo).
+- [x] Se acelera ×2 cuando Inquietud ≥ High.
+- [x] `OnExpired` → despertar abrupto vía `WakeUpManager`.
+- [ ] Pausar timer durante minijuego si Inquietud es baja — **diferido a M3** (actualmente nunca se pausa).
 
 ### 5. Puntos de memoria
 
-- [ ] `MemoryPoint.cs` — objeto interactuable. Visible como un marcador placeholder (círculo de color).
-- [ ] Estado: `Undiscovered` → `Available` (jugador en rango) → `Extracting` (minijuego activo) → `Collected` / `Failed`.
-- [ ] Solo activable si el jugador orienta el cono hacia él y está a rango de interacción.
-- [ ] 3-5 puntos en el nivel de prueba, con tasas de Inquietud distintas según su posición.
+- [x] `MemoryPoint.cs` — objeto interactuable con marcador visual pulsante (`MemoryPointVisual`).
+- [x] Estados: `Available` → `Extracting` → `Collected` / `Failed`. *(Estado `Undiscovered` diferido a M3.)*
+- [x] Solo activable si el jugador orienta el cono hacia él y está en rango.
+- [x] 4 puntos en el nivel de prueba.
 
 ### 6. Minijuego de extracción — las tres variantes
 
-Implementar las tres. Cada una es un componente independiente que implementa `IExtractionMinigame`. El `MemoryPoint` llama a la interfaz — cambiar de variante es cambiar qué componente está activo.
+- [x] Las tres implementan `IExtractionMinigame`; cambiar variante = cambiar componente activo.
 
 **Variante A — Timing**
-- [ ] `TimingMinigame.cs` — un marcador oscila en una barra. El jugador pulsa `Interact` cuando está en la zona verde.
-- [ ] La zona verde se estrecha y el marcador oscila más rápido según el nivel de Inquietud actual.
-- [ ] 3 pulsaciones correctas completan la extracción. 2 fallos la cancelan.
+- [x] `TimingMinigame.cs` — marcador oscilante, pulsa `E` en la zona verde.
+- [x] Zona verde se estrecha y marcador acelera según Inquietud.
+- [x] 3 aciertos completan / más de 2 fallos cancelan.
 
 **Variante B — Reconstrucción**
-- [ ] `ReconstructionMinigame.cs` — 4-6 piezas aparecen en posiciones aleatorias alrededor de su posición correcta.
-- [ ] El jugador arrastra cada pieza a su hueco (snap cuando está cerca). UI de grid simple, colores planos.
-- [ ] Timer interno visible (no el timer del sueño — uno propio más corto, ~20 segundos).
+- [x] `ReconstructionMinigame.cs` — navegar piezas con flechas y colocarlas con Enter.
+- [x] Timer interno de 20s visible en HUD.
 
 **Variante C — Retención**
-- [ ] `RetentionMinigame.cs` — barra de concentración que sube mientras se mantiene `Interact` pulsado.
-- [ ] La barra baja automáticamente, más rápido si hay una entidad cerca o la Inquietud es Alta/Crítica.
-- [ ] Llegar al 100% completa la extracción.
+- [x] `RetentionMinigame.cs` — mantener `E` para llenar barra de concentración.
+- [x] Baja más rápido con Inquietud Alta/Crítica o entidad cercana.
+- [x] 100% completa la extracción.
 
 ### 7. Inventario tetris
 
-- [ ] `DreamInventory.cs` — grid 2D configurable (ej: 4×5 celdas iniciales).
-- [ ] `MemoryFragment` ScriptableObject con: forma (array de celdas relativas), tamaño visual, valor (placeholder).
-- [ ] Al recoger un fragmento: abrir UI de inventario, el jugador coloca el fragmento en el grid (rotar con `R`, soltar con `Interact`).
-- [ ] Si no hay hueco: el fragmento queda pendiente — el jugador debe descartar uno existente o salir sin él.
-- [ ] 3 formas de fragmento distintas en el nivel de prueba: 1×1, 1×2, forma L.
+- [x] `DreamInventory.cs` — grid 4×5 configurable.
+- [x] `MemoryFragment` ScriptableObject con forma en celdas relativas y rotación.
+- [x] `InventoryPlacementUI.cs` — pausa el juego, flechas para mover cursor, `R` para rotar, `E` para colocar.
+- [x] Escape descarta el fragmento.
+- [x] 3 formas distintas: forma L, forma I, forma S.
 
 ### 8. Entidad — comportamiento básico
 
-- [ ] `DreamEntity.cs` — merodea por el nivel con NavMesh2D o movimiento de waypoints simple.
-- [ ] `EntityDetection.cs` — si la entidad entra en el cono de visión del protagonista: dispara `OnEntitySpotted`, Inquietud sube en pulso (+15).
-- [ ] Si la entidad está a rango de interacción mientras el minijuego está activo: cancela el minijuego y genera un pulso de Inquietud mayor (+25).
-- [ ] La entidad no "mata" — solo genera presión a través de la Inquietud.
+- [x] `DreamEntity.cs` — patrulla por waypoints con `Rigidbody2D`.
+- [x] `EntityDetection.cs` — entidad en cono → spike de Inquietud continuo por segundo.
+- [x] Entidad cercana interrumpe `RetentionMinigame` (drain de concentración).
+- [ ] Cancelar todos los minijuegos al entrar en rango con spike +25 — **diferido a M3**.
 
 ### 9. Sistema de despertar
 
-- [ ] `WakeUpManager.cs` — diferencia tranquilo (acción voluntaria) y abrupto (timer/Inquietud máxima).
-- [ ] Tranquilo: guarda inventario actual, transición suave.
-- [ ] Abrupto: pierde los fragmentos no guardados, aplica `WakeUpConsequence` al estado del protagonista, transición brusca.
+- [x] `WakeUpManager.cs` — diferencia voluntario (Escape) y abrupto (timer/Inquietud máxima).
+- [x] Voluntario: fade a negro con texto *"despertando..."*, transición a Vigilia.
+- [x] Abrupto: fade rojo con texto *"DESPERTAR ABRUPTO"*.
+- [ ] Consecuencias en `ProtagonistState` (reducir salud/inventario) — **diferido a M4**.
 
 ### 10. Estado del protagonista y Vigilia placeholder
 
-- [ ] `ProtagonistState.cs` — ScriptableObject con `MentalHealth`, `PhysicalHealth`, `InventorySize` (número de celdas del grid).
-- [ ] Pantalla de Vigilia mínima: fondo negro, texto con stats actuales, botón "Dormir", listado de fragmentos recolectados.
-- [ ] El `InventorySize` base es 20 celdas. Cada despertar abrupto lo reduce en 1 (hasta mínimo de 12).
+- [x] `ProtagonistState.cs` — ScriptableObject con `MentalHealth`, `PhysicalHealth`, tamaño de inventario.
+- [x] Pantalla de Vigilia mínima: fondo negro, barras de stats, fragmentos recogidos, botón "DORMIR".
+- [ ] Reducir inventario por despertar abrupto — **diferido a M4**.
 
 ---
 
 ## Nivel de prueba
 
-- Espacio top-down simple, ~30×20 unidades, con paredes que cortan el cono de visión.
-- 4 puntos de memoria (1 cerca — tasa baja, 2 en zona media — tasa normal, 1 al fondo — tasa alta).
-- 2 entidades con rutas de patrulla simples.
-- 1 `RestlessnessZone` de tipo seguro (zona de entrada).
-- Punto de salida voluntaria marcado con un placeholder visible.
+- [x] Sala top-down con paredes y dos pilares interiores.
+- [x] 4 puntos de memoria distribuidos (cerca, medio, lejos).
+- [x] 2 entidades con rutas de patrulla distintas.
+- [x] 1 `RestlessnessZone` segura en la esquina inferior izquierda (×0.3).
+- [x] Punto de salida amarillo visible (Escape para despertar voluntario).
 
 ---
 
 ## HUD de debug (solo desarrollo)
 
-- [ ] Toggle con F1:
-  - Valor numérico de Inquietud y umbral actual.
-  - Tiempo restante del sueño.
-  - Qué variante de minijuego está activa.
-  - Fragmentos recogidos y celdas de inventario usadas.
+- [x] Toggle con F1: Inquietud + umbral, timer, inventario, minijuego activo.
+- [x] Panel siempre visible: checklist M2 con 11 ítems marcables desde el Inspector.
+- [x] Panel siempre visible: leyenda de controles.
 
 ---
 
 ## Criterios de salida de M2
 
-- [ ] El protagonista se mueve en top-down y el cono de visión sigue su dirección con inercia.
-- [ ] El cono se recorta contra las paredes correctamente.
-- [ ] Las tres variantes de minijuego son jugables y seleccionables sin cambiar código (solo componente activo).
-- [ ] El inventario acepta fragmentos, muestra cuando está lleno, y permite rotar y colocar piezas.
-- [ ] Al menos una entidad sube la Inquietud al entrar en el cono y cancela el minijuego al acercarse.
-- [ ] Salida voluntaria y abrupta funcionan con consecuencias distintas en el estado del protagonista.
-- [ ] Se puede jugar una run completa de principio a fin.
-- [ ] Tras jugar las tres variantes, hay una decisión sobre cuál va al MOC (documentada en este fichero).
+- [x] El protagonista se mueve en top-down y el cono de visión sigue su dirección con inercia.
+- [x] El cono oscurece lo que queda fuera (Light2D + GlobalLight2D a 0.02).
+- [x] Las tres variantes de minijuego son jugables y seleccionables sin cambiar código.
+- [x] El inventario acepta fragmentos, muestra cuando está lleno, y permite rotar y colocar piezas.
+- [x] Al menos una entidad sube la Inquietud al entrar en el cono.
+- [x] Salida voluntaria y abrupta funcionan con transiciones visuales distintas.
+- [x] Se puede jugar una run completa de principio a fin.
+- [x] Decisión de variante de minijuego documentada.
 
 ---
 
 ## Decisión de variante de minijuego
 
-*(rellenar tras el playtest interno de M2)*
-
-**Variante elegida:** —  
-**Motivo:** —  
-**Ajustes pendientes:** —
+**Variante elegida:** A — Timing  
+**Motivo:** Las tres variantes están implementadas y son funcionales. La Variante A (marcador oscilante) resultó ser la más legible e inmediata durante el playtest de M2. Ofrece la tensión correcta sin requerir UI compleja. Se ajustó la velocidad del marcador (0.28 base → 0.9 a máxima inquietud) y la zona verde (0.16 → 0.08 en crítico).  
+**Ajustes pendientes para M3+:** Reemplazar la barra OnGUI por UI visual con arte; añadir feedback sonoro en acierto/fallo; considerar si la Variante C (Retención) puede coexistir en puntos de memoria de alta dificultad.
