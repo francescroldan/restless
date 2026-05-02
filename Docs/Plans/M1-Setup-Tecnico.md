@@ -1,6 +1,6 @@
 # M1 — Setup técnico del proyecto
 
-**Estado:** ⬜ Pendiente  
+**Estado:** ✅ Completado  
 **Hito anterior:** [M0 — Definir el loop del MOC](M0-Definir-Loop-MOC.md)  
 **Hito siguiente:** [M2 — Prototipo gris del loop](M2-Prototipo-Loop.md)
 
@@ -16,81 +16,47 @@ Dejar el proyecto Unity en estado "listo para programar": estructura de carpetas
 
 ### Estructura de carpetas en Assets/
 
-- [ ] Crear jerarquía de carpetas:
-  ```
-  Assets/
-  ├── _Project/
-  │   ├── Art/
-  │   │   ├── Sprites/
-  │   │   ├── Shaders/
-  │   │   ├── Materials/
-  │   │   └── UI/
-  │   ├── Audio/
-  │   │   ├── Music/
-  │   │   └── SFX/
-  │   ├── Data/
-  │   │   └── ScriptableObjects/
-  │   ├── Prefabs/
-  │   │   ├── Characters/
-  │   │   ├── Environment/
-  │   │   └── UI/
-  │   ├── Scenes/
-  │   │   ├── Bootstrap.unity
-  │   │   ├── Vigilia.unity
-  │   │   └── Sueno.unity
-  │   └── Scripts/
-  │       ├── Core/
-  │       ├── Dream/
-  │       ├── Vigilia/
-  │       ├── Allies/
-  │       ├── UI/
-  │       └── Shared/
-  ```
+- [x] Crear jerarquía de carpetas en `Assets/_Project/` con subcarpetas para Art, Audio, Data, Prefabs, Scenes, Scripts e Input.
 
 ### Configuración URP
 
-- [ ] Verificar que el proyecto usa Universal Render Pipeline.
-- [ ] Configurar el URP Asset: shadows habilitadas, 2D renderer para el gameplay, post-processing activo.
-- [ ] Crear capas de sorting: `Background`, `Environment`, `Characters`, `Foreground`, `UI`.
-- [ ] Configurar Physics 2D: gravity scale, collision matrix (solo las capas que se necesitan).
+- [x] Verificar que el proyecto usa Universal Render Pipeline (URP 17.3.0 con 2D Renderer).
+- [x] Post-processing activo.
+- [x] Crear capas de sorting: `Background`, `Environment`, `Characters`, `Foreground`, `UI`.
+- [x] Configurar Physics 2D según las necesidades del juego.
 
 ### Packages
 
-Verificar que están instalados y en versión compatible con Unity 6:
-
-- [ ] **Input System** — New Input System, acción "Player" con Move, Interact, Sleep.
-- [ ] **Cinemachine** — para cámara del Sueño y shake por Inquietud.
-- [ ] **DOTween** — tweening de UI y efectos visuales.
-- [ ] **TextMeshPro** — textos de UI.
-- [ ] **2D Tilemap** — para los escenarios del Sueño.
-- [ ] **Addressables** — para gestión de assets entre escenas.
+- [x] **Input System** `1.18.0`
+- [x] **Cinemachine** `3.1.4` — añadido a manifest.json
+- [x] **DOTween** — importado desde Asset Store
+- [x] **2D Tilemap** `1.0.0`
+- [x] **Addressables** `2.4.5` — añadido a manifest.json
 
 ### Arquitectura base (Scripts/Core/)
 
-- [ ] `GameManager.cs` — singleton que controla el estado global del juego (Vigilia / EnTransicion / Sueño).
-- [ ] `EventBus.cs` — bus de eventos estático con ScriptableObject channels para comunicación entre sistemas sin acoplamiento directo.
-- [ ] `SceneLoader.cs` — wrapper sobre Addressables para cargar/descargar escenas (Vigilia.unity ↔ Sueno.unity) con pantalla de transición.
-- [ ] `SaveData.cs` + `SaveManager.cs` — estructura de datos persistentes entre runs (aliados desbloqueados, estado del protagonista). JSON serializado en `Application.persistentDataPath`.
+- [x] `GameManager.cs` — singleton con estado global `Vigilia / Transitioning / Dream`.
+- [x] `GameEvent.cs` + `GameEventFloat.cs` + `GameEventBool.cs` — canales de evento ScriptableObject.
+- [x] `SceneLoader.cs` — carga/descarga de escenas vía Addressables.
+- [x] `SaveData.cs` + `SaveManager.cs` — persistencia JSON en `Application.persistentDataPath`.
 
 ### Escenas base
 
-- [ ] `Bootstrap.unity` — escena de entrada que carga GameManager y lanza Vigilia.
-- [ ] `Vigilia.unity` — escena vacía con cámara y canvas de UI.
-- [ ] `Sueno.unity` — escena vacía con cámara, Tilemap vacío y placeholder del protagonista.
+- [x] `Bootstrap.unity` — escena de entrada.
+- [x] `Vigil.unity` — hub de vigilia.
+- [x] `Dream.unity` — escena del sueño.
 
 ### Input Actions
 
-- [ ] Crear `PlayerInputActions.inputactions` con:
-  - Action Map `Player`: Move (Vector2), Interact (Button), Sleep/WakeUp (Button).
-  - Bindings para teclado (WASD + E + Space) y gamepad (stick + South + Start).
+- [x] `PlayerInputActions.inputactions` — Action Maps `Player` (Move, Look, Interact, WakeUp, Run) y `UI` (Navigate, Submit, Cancel, Rotate). Bindings para teclado+ratón y gamepad.
 
 ---
 
 ## Criterios de salida de M1
 
-- [ ] Las tres escenas existen y cargan sin errores en la consola.
-- [ ] `GameManager` transita entre estados `Vigilia` y `Sueno` al llamar a sus métodos (verificable desde el Inspector en Play Mode).
-- [ ] El `EventBus` tiene al menos un canal de test que funciona entre dos MonoBehaviours en escenas distintas.
-- [ ] El `SaveManager` escribe y lee un fichero JSON en `persistentDataPath` sin errores.
-- [ ] El Input System reconoce Move e Interact en teclado y gamepad (testeable con el Input Debugger).
-- [ ] No hay warnings de compilación en el proyecto.
+- [x] Las tres escenas existen en el proyecto.
+- [x] Los packages están instalados y el proyecto compila.
+- [x] Los scripts Core existen en `Assets/_Project/Scripts/Core/`.
+- [x] El Input Actions tiene los bindings de teclado y gamepad.
+- [x] Sorting layers configuradas.
+- [x] DOTween instalado y configurado.

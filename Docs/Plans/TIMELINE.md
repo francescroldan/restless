@@ -14,7 +14,7 @@
 | # | Hito | Estado | Plan |
 |---|------|--------|------|
 | M0 | Definir el loop del MOC | ✅ Completado | [M0-Definir-Loop-MOC.md](M0-Definir-Loop-MOC.md) |
-| M1 | Setup técnico del proyecto | ⬜ Pendiente | [M1-Setup-Tecnico.md](M1-Setup-Tecnico.md) |
+| M1 | Setup técnico del proyecto | ✅ Completado | [M1-Setup-Tecnico.md](M1-Setup-Tecnico.md) |
 | M2 | Prototipo gris del loop core | ⬜ Pendiente | [M2-Prototipo-Loop.md](M2-Prototipo-Loop.md) |
 | M3 | Identidad visual base | ⬜ Pendiente | [M3-Identidad-Visual.md](M3-Identidad-Visual.md) |
 | M4 | Hub de Vigilia completo | ⬜ Pendiente | [M4-Hub-Vigilia.md](M4-Hub-Vigilia.md) |
