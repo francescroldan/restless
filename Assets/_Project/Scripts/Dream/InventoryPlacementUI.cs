@@ -24,11 +24,11 @@ namespace Restless.Dream
         private Texture2D _white;
         private GUIStyle _labelCenter;
 
-        private readonly Color _colEmpty     = new Color(0.18f, 0.18f, 0.22f, 0.95f);
-        private readonly Color _colOccupied  = new Color(0.35f, 0.35f, 0.40f, 0.95f);
-        private readonly Color _colPreviewOk = new Color(0.25f, 0.85f, 0.55f, 0.75f);
-        private readonly Color _colPreviewBad= new Color(0.9f,  0.25f, 0.25f, 0.75f);
-        private readonly Color _colCursor    = new Color(1f,    1f,    1f,    0.25f);
+        private readonly Color _colEmpty      = new Color(0.18f, 0.18f, 0.22f, 0.95f);
+        private readonly Color _colOccupied   = new Color(0.45f, 0.38f, 0.20f, 0.95f); // amber-grey, distinct from empty
+        private readonly Color _colPreviewOk  = new Color(0.25f, 0.85f, 0.55f, 0.80f);
+        private readonly Color _colPreviewBad = new Color(0.9f,  0.25f, 0.25f, 0.80f);
+        private readonly Color _colCursorBorder = new Color(1f, 1f, 1f, 0.55f);
 
         private float _inputCooldown;
         private const float INPUT_REPEAT = 0.18f;
@@ -56,6 +56,7 @@ namespace Restless.Dream
             _cursor   = Vector2Int.zero;
             _open     = true;
             Time.timeScale = 0f;
+            ClampCursor(_pending.GetRotated(_rotation));
         }
 
         private void Update()
@@ -67,7 +68,17 @@ namespace Restless.Dream
 
             _inputCooldown -= Time.unscaledDeltaTime;
 
-            // Navigate — arrows or WASD
+            var cells = _pending.GetRotated(_rotation);
+
+            // Rotate
+            if (kb.rKey.wasPressedThisFrame)
+            {
+                _rotation = (_rotation + 1) % 4;
+                cells = _pending.GetRotated(_rotation);
+                ClampCursor(cells);
+            }
+
+            // Navigate
             if (_inputCooldown <= 0f)
             {
                 int dx = 0, dy = 0;
@@ -78,15 +89,13 @@ namespace Restless.Dream
 
                 if (dx != 0 || dy != 0)
                 {
-                    _cursor.x = Mathf.Clamp(_cursor.x + dx, 0, _inventory.Width  - 1);
-                    _cursor.y = Mathf.Clamp(_cursor.y + dy, 0, _inventory.Height - 1);
+                    int maxX, maxY;
+                    GetPieceExtent(cells, out maxX, out maxY);
+                    _cursor.x = Mathf.Clamp(_cursor.x + dx, 0, _inventory.Width  - 1 - maxX);
+                    _cursor.y = Mathf.Clamp(_cursor.y + dy, 0, _inventory.Height - 1 - maxY);
                     _inputCooldown = INPUT_REPEAT;
                 }
             }
-
-            // Rotate
-            if (kb.rKey.wasPressedThisFrame)
-                _rotation = (_rotation + 1) % 4;
 
             // Place
             if (kb.eKey.wasPressedThisFrame || kb.enterKey.wasPressedThisFrame ||
@@ -98,19 +107,38 @@ namespace Restless.Dream
                 Close(placed: false);
         }
 
+        // ── Helpers ───────────────────────────────────────────────────────
+
+        private void ClampCursor(Vector2Int[] cells)
+        {
+            int maxX, maxY;
+            GetPieceExtent(cells, out maxX, out maxY);
+            _cursor.x = Mathf.Clamp(_cursor.x, 0, Mathf.Max(0, _inventory.Width  - 1 - maxX));
+            _cursor.y = Mathf.Clamp(_cursor.y, 0, Mathf.Max(0, _inventory.Height - 1 - maxY));
+        }
+
+        private static void GetPieceExtent(Vector2Int[] cells, out int maxX, out int maxY)
+        {
+            maxX = 0; maxY = 0;
+            foreach (var c in cells)
+            {
+                if (c.x > maxX) maxX = c.x;
+                if (c.y > maxY) maxY = c.y;
+            }
+        }
+
         private void TryPlace()
         {
             var cells = _pending.GetRotated(_rotation);
             if (CanPlace(cells, _cursor))
             {
-                PlaceAt(cells, _cursor);
+                _inventory.PlaceFragment(_pending, cells, _cursor, _rotation);
                 Close(placed: true);
             }
         }
 
         private bool CanPlace(Vector2Int[] cells, Vector2Int origin)
         {
-            // Access DreamInventory grid state via a public helper
             foreach (var c in cells)
             {
                 int x = origin.x + c.x;
@@ -122,18 +150,14 @@ namespace Restless.Dream
             return true;
         }
 
-        private void PlaceAt(Vector2Int[] cells, Vector2Int origin)
-        {
-            _inventory.PlaceFragment(_pending, cells, origin, _rotation);
-        }
-
         private void Close(bool placed)
         {
             _open = false;
+            _pending = null;
             Time.timeScale = 1f;
-            if (!placed)
-                Debug.Log("[InventoryPlacementUI] Fragment discarded.");
         }
+
+        // ── GUI ───────────────────────────────────────────────────────────
 
         private void OnGUI()
         {
@@ -143,15 +167,19 @@ namespace Restless.Dream
 
             float sw = Screen.width, sh = Screen.height;
             var cells = _pending.GetRotated(_rotation);
+            bool previewOk = CanPlace(cells, _cursor);
 
-            // ── Grid panel ───────────────────────────────────────────────
-            float step  = _cellSize + _cellGap;
-            float gridW = _inventory.Width  * step - _cellGap;
-            float gridH = _inventory.Height * step - _cellGap;
+            var previewSet = new System.Collections.Generic.HashSet<Vector2Int>();
+            foreach (var c in cells)
+                previewSet.Add(_cursor + c);
 
-            float panelPad = 24f;
-            float panelW = gridW + panelPad * 2f;
-            float panelH = gridH + panelPad * 2f + 80f;
+            // ── Panel background ──────────────────────────────────────────
+            float step   = _cellSize + _cellGap;
+            float gridW  = _inventory.Width  * step - _cellGap;
+            float gridH  = _inventory.Height * step - _cellGap;
+            float pad    = 24f;
+            float panelW = gridW + pad * 2f;
+            float panelH = gridH + pad * 2f + 80f;
             float panelX = (sw - panelW) * 0.5f;
             float panelY = (sh - panelH) * 0.5f;
 
@@ -159,27 +187,19 @@ namespace Restless.Dream
 
             GUI.color = Color.white;
             GUI.Label(new Rect(panelX, panelY + 10f, panelW, 24f),
-                $"COLOCA EL FRAGMENTO — R para rotar  |  Escape para descartar", _labelCenter);
+                "COLOCA EL FRAGMENTO — R girar  |  Escape descartar", _labelCenter);
 
-            float gridX = panelX + panelPad;
-            float gridY = panelY + panelPad + 36f;
+            float gridX = panelX + pad;
+            float gridY = panelY + pad + 36f;
 
-            // Check if preview is valid at cursor
-            bool previewOk = CanPlace(cells, _cursor);
-
-            // Build set of preview cells
-            var previewSet = new System.Collections.Generic.HashSet<Vector2Int>();
-            foreach (var c in cells)
-                previewSet.Add(_cursor + c);
-
-            // Draw grid cells
+            // ── Grid cells ────────────────────────────────────────────────
             for (int row = 0; row < _inventory.Height; row++)
             {
                 for (int col = 0; col < _inventory.Width; col++)
                 {
                     float cx = gridX + col * step;
                     float cy = gridY + row * step;
-                    var cellRect = new Rect(cx, cy, _cellSize, _cellSize);
+                    var cellRect  = new Rect(cx, cy, _cellSize, _cellSize);
                     var cellCoord = new Vector2Int(col, row);
 
                     Color cellColor;
@@ -191,24 +211,25 @@ namespace Restless.Dream
                         cellColor = _colEmpty;
 
                     DrawRect(cellRect, cellColor);
-
-                    // Cursor highlight
-                    if (cellCoord == _cursor)
-                        DrawRect(new Rect(cx - 2f, cy - 2f, _cellSize + 4f, _cellSize + 4f), _colCursor);
                 }
             }
 
-            // Fragment shape preview (top-right corner)
+            // ── Cursor border (drawn after cells, no overlap bleed) ───────
+            float cx0 = gridX + _cursor.x * step;
+            float cy0 = gridY + _cursor.y * step;
+            DrawBorder(new Rect(cx0, cy0, _cellSize, _cellSize), 2f, _colCursorBorder);
+
+            // ── Fragment shape preview (top-right of panel) ───────────────
             float previewX = gridX + gridW + 16f;
             float previewY = gridY;
             GUI.color = Color.white;
             GUI.Label(new Rect(previewX - 40f, previewY - 24f, 100f, 20f), "Forma:", _labelCenter);
-            float miniCell = 18f;
+            float mini = 18f, miniGap = 2f;
             foreach (var c in cells)
             {
-                float px = previewX + c.x * (miniCell + 2f);
-                float py = previewY + c.y * (miniCell + 2f);
-                DrawRect(new Rect(px, py, miniCell, miniCell), _colPreviewOk);
+                float px = previewX + c.x * (mini + miniGap);
+                float py = previewY + c.y * (mini + miniGap);
+                DrawRect(new Rect(px, py, mini, mini), _colPreviewOk);
             }
 
             GUI.color = Color.white;
@@ -218,6 +239,15 @@ namespace Restless.Dream
         {
             GUI.color = color;
             GUI.DrawTexture(rect, _white);
+        }
+
+        private void DrawBorder(Rect rect, float thickness, Color color)
+        {
+            GUI.color = color;
+            GUI.DrawTexture(new Rect(rect.x,                         rect.y,                          rect.width, thickness), _white);
+            GUI.DrawTexture(new Rect(rect.x,                         rect.y + rect.height - thickness, rect.width, thickness), _white);
+            GUI.DrawTexture(new Rect(rect.x,                         rect.y,                          thickness, rect.height), _white);
+            GUI.DrawTexture(new Rect(rect.x + rect.width - thickness, rect.y,                          thickness, rect.height), _white);
         }
 
         private void EnsureStyles()

@@ -31,7 +31,7 @@ namespace Restless.Dream
             }
         }
 
-        /// <summary>Returns cells rotated 90° clockwise.</summary>
+        /// <summary>Returns cells rotated clockwise, always normalized so min x=0, min y=0.</summary>
         public Vector2Int[] GetRotated(int rotations)
         {
             Vector2Int[] current = cells;
@@ -48,6 +48,13 @@ namespace Restless.Dream
             var result = new Vector2Int[input.Length];
             for (int i = 0; i < input.Length; i++)
                 result[i] = new Vector2Int(maxY - input[i].y, input[i].x);
+
+            // Normalize so min x and min y are always 0
+            int minX = int.MaxValue, minY = int.MaxValue;
+            foreach (var c in result) { minX = Mathf.Min(minX, c.x); minY = Mathf.Min(minY, c.y); }
+            for (int i = 0; i < result.Length; i++)
+                result[i] = new Vector2Int(result[i].x - minX, result[i].y - minY);
+
             return result;
         }
     }

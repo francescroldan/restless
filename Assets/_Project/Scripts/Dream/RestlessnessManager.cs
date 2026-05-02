@@ -17,7 +17,7 @@ namespace Restless.Dream
         [SerializeField] private GameEvent _onRestlessnessMax;
 
         [Header("Rates (units/sec)")]
-        [SerializeField] private float _baseRate = 2f;
+        [SerializeField] private float _baseRate = 0.5f;
         [SerializeField] private float _minigameMultiplier = 2.5f;
 
         private float _value;
