@@ -26,12 +26,13 @@ Esta mecánica está inspirada en sensaciones reales: esa ansiedad creciente en 
 
 ## 🎮 Factores que aumentan la inquietud
 
-- Proximidad a entidades hostiles o perturbadoras.
+- **Una entidad entra en el cono de visión del protagonista** — pulso brusco de Inquietud.
+- **Una entidad interrumpe el minijuego de extracción** — pulso mayor.
+- **Estar en zonas profundas o inestables del nivel** — tasa base más alta.
+- **Ejecutar el minijuego de extracción** — tasa multiplicada mientras dura.
 - Ruido, caos o zonas con geometría imposible.
-- Fallo en rituales o manipulación de sigilos inestables.
-- Uso excesivo de habilidades especiales o consumibles peligrosos.
+- Fallo en rituales o manipulación de sigilos inestables (post-MOC).
 - Presencia prolongada en zonas inestables del sueño.
-- Determinadas decisiones narrativas o interacciones con NPCs.
 
 ---
 

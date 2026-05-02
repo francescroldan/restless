@@ -28,12 +28,13 @@ El arte de *Restless* busca sumergir al jugador en una experiencia onírica, dec
 
 - Hombre de unos 60 años, frágil, intelectual, vestido como un profesor universitario de los años 20.
 - Silueta negra con detalles mínimos, animaciones expresivas (sprite de **32×32 píxeles**).
+- Vista top-down: el sprite tiene variantes para 4 u 8 direcciones de movimiento.
 - Animaciones clave:
-    - Idle / respiración entrecortada
-    - Caminar / correr encorvado
-    - Saltar / trepar / caer
-    - Arrastrarse / gatear
-    - Lanzar / interactuar
+    - Idle (4 u 8 dir.) / respiración entrecortada
+    - Caminar (4 u 8 dir.) / paso lento y pesado
+    - Correr (4 u 8 dir.) / encorvado, agitado
+    - Interactuar / extraer memoria (animación de concentración, manos extendidas)
+    - En cama (vigilia) / respiración, 2 frames
 
 ### Aliados y enemigos
 

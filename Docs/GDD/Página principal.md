@@ -18,12 +18,13 @@ El juego se desarrolla en dos planos interconectados: el **sueño** y la **vigil
 
 ## 🛌 El mundo de los sueños
 
-- Es donde ocurre la acción principal: niveles 2D con plataformas, puzles, enemigos y caminos ocultos.
+- Es donde ocurre la acción principal: espacio top-down oscuro que el protagonista explora con visión limitada a un cono frontal.
 - El tiempo dentro del sueño es limitado. Cuanto más permanezcas, más descubres… pero más arriesgas.
-- Hay distintos tipos de sueño: lúcido (controlado) y profundo (más estable pero limitado).
+- El objetivo es localizar y extraer **fragmentos de memoria** del hijo mediante un minijuego de concentración.
+- Los fragmentos se almacenan en un **inventario finito** (grid tipo tetris): cuando se llena, hay que decidir si salir o arriesgar más.
 - El entorno cambia en función del estado mental del protagonista.
-- Existen puzles que requieren observar, interpretar símbolos o volver atrás con nuevas habilidades.
-- Durante los sueños aparecen aliados o entidades con los que se puede interactuar y que tendrán impacto en la vigilia.
+- Presencias hostiles merodean por el nivel: entrar en el cono de visión del jugador dispara pulsos de Inquietud.
+- Durante los sueños aparecen aliados con los que se puede interactuar y que tendrán impacto en la vigilia.
 - La barra de “inquietud” mide la estabilidad del sueño: si se llena, el protagonista se despierta bruscamente y puede sufrir consecuencias.
 
 ---

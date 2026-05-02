@@ -62,6 +62,14 @@ Este medidor representa **la estabilidad del sueño**. Cuanto más lleno está, 
 
 ---
 
+## 🎒 El inventario como segunda presión de retorno
+
+Además del timer y la Inquietud, el jugador tiene una tercera razón para volver: **el inventario se llena**. Cada fragmento de memoria ocupa un espacio con forma específica en un grid finito (estilo tetris). Cuando no quedan huecos, el jugador no puede recoger más.
+
+Esto crea una decisión triple antes de salir: ¿me queda tiempo? ¿puedo aguantar la Inquietud? ¿cabe algo más en el inventario?
+
+---
+
 ## 🧩 Inquietud como mecánica estratégica
 
 La inquietud no es un castigo constante, sino un **recurso que puede usarse estratégicamente**. Algunos retos del juego requerirán alcanzar un nivel específico de inquietud para poder completarse.

@@ -1,10 +1,10 @@
 # Sueño lúcido vs sueño profundo
 
 ## Descripción breve
-(Por completar)
+Dos modos de sueño con distinto riesgo y recompensa: el lúcido da más control y acceso a secretos, pero consume recursos más rápido; el profundo es más estable pero más limitado.
 
 ## Contexto
-(Por completar)
+⚠️ **Fuera de scope del MOC.** Esta mecánica está diseñada pero no se implementa hasta el post-MOC. En el MOC solo existe un tipo de sueño.
 
 ## Contenido original
 

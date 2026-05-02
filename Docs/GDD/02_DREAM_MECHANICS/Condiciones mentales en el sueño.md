@@ -1,10 +1,10 @@
 # Condiciones mentales en el sueño
 
 ## Descripción breve
-(Por completar)
+Las enfermedades mentales del protagonista modifican activamente el mundo onírico: rutas que desaparecen, ilusiones, distorsiones de percepción.
 
 ## Contexto
-(Por completar)
+⚠️ **Fuera de scope del MOC.** El sistema de condiciones mentales en el sueño se diseña e implementa en el post-MOC. En el MOC, los despertares abruptos degradan el estado del protagonista pero sin efectos específicos de condición mental sobre el nivel.
 
 ## Contenido original
 
