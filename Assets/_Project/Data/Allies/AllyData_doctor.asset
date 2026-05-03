@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c8feafcff6d906439030892be92ec35, type: 3}
+  m_Name: AllyData_doctor
+  m_EditorClassIdentifier: Assembly-CSharp::Restless.Vigil.AllyData
+  id: doctor
+  displayName: "M\xE9dico"
+  archetype: 0
+  roomSprite: {fileID: -5461496712832900230, guid: 3411ec9e281bea54f86f54f2e4b8cd53, type: 3}
+  iconSprite: {fileID: 9056222241006368102, guid: 1942f9e67f046b84ab0870d91a88bd4a, type: 3}
+  lightColor: {r: 1, g: 0.85, b: 0.55, a: 1}
+  lightIntensity: 0.9
+  lightRadius: 3.5
+  passiveDescription: 
+  dreamDurationBonus: 0
+  restlessnessRateModifier: -0.15

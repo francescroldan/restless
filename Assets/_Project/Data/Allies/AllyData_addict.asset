@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c8feafcff6d906439030892be92ec35, type: 3}
+  m_Name: AllyData_addict
+  m_EditorClassIdentifier: Assembly-CSharp::Restless.Vigil.AllyData
+  id: addict
+  displayName: Drogadicto
+  archetype: 3
+  roomSprite: {fileID: -1056043060781423478, guid: 7a6a9660179455d4e82d836854fc0cd2, type: 3}
+  iconSprite: {fileID: -2519410100895172313, guid: 4de7268c2f244dd409350f5295646942, type: 3}
+  lightColor: {r: 0.35, g: 0.8, b: 0.4, a: 1}
+  lightIntensity: 0.6
+  lightRadius: 2.5
+  passiveDescription: 
+  dreamDurationBonus: 20
+  restlessnessRateModifier: 0.1

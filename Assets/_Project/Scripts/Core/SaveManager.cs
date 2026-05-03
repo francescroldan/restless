@@ -41,5 +41,23 @@ namespace Restless.Core
             Data = new SaveData();
             Debug.Log("[SaveManager] Save deleted.");
         }
+
+        // ── Ally helpers ───────────────────────────────────────────────────
+
+        public bool IsAllyUnlocked(string id) =>
+            Data.unlockedAllyIds.Contains(id);
+
+        public void UnlockAlly(string id)
+        {
+            if (Data.unlockedAllyIds.Contains(id)) return;
+            Data.unlockedAllyIds.Add(id);
+            Save();
+        }
+
+        public void LockAlly(string id)
+        {
+            if (!Data.unlockedAllyIds.Remove(id)) return;
+            Save();
+        }
     }
 }
