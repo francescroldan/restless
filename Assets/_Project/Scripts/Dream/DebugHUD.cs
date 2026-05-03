@@ -50,6 +50,7 @@ namespace Restless.Dream
             EnsureStyles();
             DrawChecklist();
             DrawKeyLegend();
+            DrawProximity();
             if (_visible) DrawStats();
         }
 
@@ -213,6 +214,40 @@ namespace Restless.Dream
                 y += lineH;
             }
 
+            GUI.color = Color.white;
+        }
+
+        // ── Proximity indicator (always visible, bottom-left) ───────────────
+
+        private void DrawProximity()
+        {
+            var protagonist = GameObject.FindWithTag("Player");
+            if (protagonist == null) return;
+
+            var memoryPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
+            float closest = float.MaxValue;
+            MemoryPoint closestMp = null;
+            foreach (var mp in memoryPoints)
+            {
+                if (mp.CurrentState != MemoryPoint.State.Available) continue;
+                float d = Vector2.Distance(protagonist.transform.position, mp.transform.position);
+                if (d < closest) { closest = d; closestMp = mp; }
+            }
+
+            if (closestMp == null) return;
+
+            bool inRange = closest <= 3f;
+            string label = inRange
+                ? $"[E] {closestMp.name}  dist={closest:F1}  EN RANGO"
+                : $"{closestMp.name}  dist={closest:F1}  (rango=3.0)";
+
+            float w = 320f, h = 22f;
+            float x = 10f, y = Screen.height - h - 10f;
+
+            GUI.color = new Color(0.05f, 0.05f, 0.07f, 0.85f);
+            GUI.DrawTexture(new Rect(x - 4f, y - 2f, w + 8f, h + 4f), Texture2D.whiteTexture);
+            GUI.color = inRange ? Color.green : new Color(0.7f, 0.7f, 0.7f);
+            GUI.Label(new Rect(x, y, w, h), label, _checkStyle);
             GUI.color = Color.white;
         }
 

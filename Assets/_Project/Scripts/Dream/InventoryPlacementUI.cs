@@ -16,6 +16,7 @@ namespace Restless.Dream
         [SerializeField] private float _cellGap  = 4f;
 
         private bool _open;
+        public bool IsOpen => _open;
         private MemoryFragment _pending;
         private int _rotation;
         private Vector2Int _cursor;

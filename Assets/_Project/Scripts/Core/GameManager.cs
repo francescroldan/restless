@@ -14,7 +14,7 @@ namespace Restless.Core
         {
             if (Instance != null)
             {
-                Destroy(gameObject);
+                Destroy(this);
                 return;
             }
             Instance = this;
@@ -23,14 +23,16 @@ namespace Restless.Core
 
         public void EnterDream()
         {
-            if (State != GameState.Vigilia) return;
+            Debug.Log($"[GameManager] EnterDream — State={State}");
+            if (State != GameState.Vigilia) { Debug.LogWarning("[GameManager] EnterDream blocked: State is not Vigilia"); return; }
             State = GameState.Transitioning;
             SceneLoader.Instance.LoadDream();
         }
 
         public void ExitDream(bool abrupt)
         {
-            if (State != GameState.Dream && State != GameState.Transitioning) return;
+            Debug.Log($"[GameManager] ExitDream — State={State} abrupt={abrupt}");
+            if (State != GameState.Dream && State != GameState.Transitioning) { Debug.LogWarning("[GameManager] ExitDream blocked: State is not Dream/Transitioning"); return; }
             State = GameState.Transitioning;
             SceneLoader.Instance.LoadVigilia(abrupt);
         }

@@ -11,7 +11,8 @@ namespace Restless.Core
         public int inventoryGridCells = 20;
         public int totalAbruptWakeUps = 0;
 
-        public List<string> unlockedAllyIds = new();
+        public List<string> unlockedAllyIds   = new();
+        public List<string> selectedAllyIds  = new();   // slots for next dream (max 2)
         public List<string> collectedFragmentIds = new();
 
         public int totalRuns = 0;

@@ -33,22 +33,36 @@ namespace Restless.Dream
                 _visionCone = protagonistGO.GetComponentInChildren<VisionCone>();
                 _playerInput = protagonistGO.GetComponent<PlayerInput>();
             }
+
+            Debug.Log($"[MemoryPoint] {gameObject.name} Start — protagonist={_protagonist != null} visionCone={_visionCone != null} playerInput={_playerInput != null}");
+            Invoke(nameof(LogDebugState), 3f);
         }
 
         private void Update()
         {
             if (_state != State.Available || _protagonist == null) return;
+            if (InventoryPlacementUI.Instance != null && InventoryPlacementUI.Instance.IsOpen) return;
 
             float dist = Vector2.Distance(transform.position, _protagonist.position);
             if (dist > _interactRange) return;
 
-            bool inCone = _visionCone == null || _visionCone.ContainsPoint(transform.position);
-            if (!inCone) return;
-
             bool interactPressed = _playerInput != null &&
                                    _playerInput.actions["Player/Interact"].WasPressedThisFrame();
             if (interactPressed)
+            {
+                Debug.Log($"[MemoryPoint] Interact on {gameObject.name}");
                 StartExtraction();
+            }
+        }
+
+        // Called once per second via InvokeRepeating to verify runtime setup
+        private void LogDebugState()
+        {
+            if (_state != State.Available) { CancelInvoke(nameof(LogDebugState)); return; }
+            float dist = _protagonist != null ? Vector2.Distance(transform.position, _protagonist.position) : -1f;
+            bool inCone = _visionCone == null || (_protagonist != null && _visionCone.ContainsPoint(transform.position));
+            Debug.Log($"[MemoryPoint] {gameObject.name} | state={_state} protagonist={_protagonist != null} dist={dist:F1}/{_interactRange} inCone={inCone} hasInput={_playerInput != null}");
+            CancelInvoke(nameof(LogDebugState));
         }
 
         private void StartExtraction()

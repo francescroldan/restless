@@ -22,6 +22,7 @@ namespace Restless.Dream
         private int _successes;
         private int _failures;
         private PlayerInput _playerInput;
+        private int _startFrame = -1;
 
         public bool IsActive => _isActive;
 
@@ -32,7 +33,7 @@ namespace Restless.Dream
         public int Successes => _successes;
         public int Failures => _failures;
 
-        private void Awake()
+        private void Start()
         {
             var protagonistGO = GameObject.FindWithTag("Player");
             if (protagonistGO != null)
@@ -49,6 +50,7 @@ namespace Restless.Dream
             _failures = 0;
             GreenZoneHalfWidth = _greenZoneHalfWidth;
             _isActive = true;
+            _startFrame = Time.frameCount;
         }
 
         public void Cancel()
@@ -59,6 +61,12 @@ namespace Restless.Dream
         private void Update()
         {
             if (!_isActive) return;
+
+            if (_playerInput == null)
+            {
+                var p = GameObject.FindWithTag("Player");
+                if (p != null) _playerInput = p.GetComponent<PlayerInput>();
+            }
 
             // Scale difficulty with restlessness
             float restT = RestlessnessManager.Instance != null
@@ -80,6 +88,7 @@ namespace Restless.Dream
             }
 
             if (_playerInput == null) return;
+            if (Time.frameCount == _startFrame) return;
 
             bool pressed = _playerInput.actions["Player/Interact"].WasPressedThisFrame();
             if (!pressed) return;

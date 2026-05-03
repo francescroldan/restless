@@ -27,7 +27,6 @@ namespace Restless.Dream
 
         private void OnGUI()
         {
-            // Find any active extraction
             var memoryPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
             foreach (var mp in memoryPoints)
             {

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9e2d297e014a894d98adfb4cf8564d3, type: 3}
+  m_Name: AllyRegistry
+  m_EditorClassIdentifier: Assembly-CSharp::Restless.Vigil.AllyRegistry
+  _allies:
+  - {fileID: 11400000, guid: 22f823a5be13ced429b934a18571a49a, type: 2}
+  - {fileID: 11400000, guid: b5d6662a432b6e0439dfe9ca7b8d6fd6, type: 2}
+  - {fileID: 11400000, guid: a5e8bb4610604e742ac7c2bc52b28bdb, type: 2}
+  - {fileID: 11400000, guid: 54abda0d81f1dc04cb142559b16c45d4, type: 2}

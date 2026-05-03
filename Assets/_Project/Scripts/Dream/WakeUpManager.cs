@@ -35,6 +35,7 @@ namespace Restless.Dream
         {
             if (_waking) return;
             if (_playerInput == null) return;
+            if (InventoryPlacementUI.Instance != null && InventoryPlacementUI.Instance.IsOpen) return;
             if (_playerInput.actions["Player/WakeUp"].WasPressedThisFrame())
                 BeginWakeUp(abrupt: false);
         }

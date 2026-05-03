@@ -1,8 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 namespace Restless.Core
@@ -11,60 +8,39 @@ namespace Restless.Core
     {
         public static SceneLoader Instance { get; private set; }
 
-        [SerializeField] private AssetReference _dreamSceneRef;
-        [SerializeField] private AssetReference _vigiliaSceneRef;
+        [SerializeField] private string _dreamSceneName   = "Dream";
+        [SerializeField] private string _vigiliaSceneName = "Vigil";
 
         public bool LastWakeUpWasAbrupt { get; private set; }
 
-        private AsyncOperationHandle<SceneInstance> _loadedSceneHandle;
-        private bool _hasDreamLoaded;
-
         private void Awake()
         {
-            if (Instance != null) { Destroy(gameObject); return; }
+            if (Instance != null) { Destroy(this); return; }
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
 
         public void LoadDream()
         {
-            StartCoroutine(LoadSceneRoutine(_dreamSceneRef, onLoaded: () =>
-                GameManager.Instance.OnDreamSceneReady()));
+            StartCoroutine(LoadScene(_dreamSceneName, onLoaded: () =>
+                GameManager.Instance?.OnDreamSceneReady()));
         }
 
         public void LoadVigilia(bool abrupt)
         {
             LastWakeUpWasAbrupt = abrupt;
-            StartCoroutine(UnloadDreamAndLoadVigilia());
+            StartCoroutine(LoadScene(_vigiliaSceneName, onLoaded: () =>
+                GameManager.Instance?.OnVigiliaSceneReady()));
         }
 
-        private IEnumerator UnloadDreamAndLoadVigilia()
+        private IEnumerator LoadScene(string sceneName, System.Action onLoaded)
         {
-            if (_hasDreamLoaded)
-            {
-                yield return Addressables.UnloadSceneAsync(_loadedSceneHandle);
-                _hasDreamLoaded = false;
-            }
-
-            yield return LoadSceneRoutine(_vigiliaSceneRef, onLoaded: () =>
-                GameManager.Instance.OnVigiliaSceneReady());
-        }
-
-        private IEnumerator LoadSceneRoutine(AssetReference sceneRef, System.Action onLoaded)
-        {
-            var handle = Addressables.LoadSceneAsync(sceneRef, LoadSceneMode.Additive);
-            yield return handle;
-
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                _loadedSceneHandle = handle;
-                _hasDreamLoaded = sceneRef == _dreamSceneRef;
-                onLoaded?.Invoke();
-            }
-            else
-            {
-                Debug.LogError($"[SceneLoader] Failed to load scene: {sceneRef}");
-            }
+            Debug.Log($"[SceneLoader] LoadSceneAsync '{sceneName}'");
+            var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            if (op == null) { Debug.LogError($"[SceneLoader] LoadSceneAsync returned null — '{sceneName}' not in Build Settings?"); yield break; }
+            yield return op;
+            Debug.Log($"[SceneLoader] '{sceneName}' loaded");
+            onLoaded?.Invoke();
         }
     }
 }

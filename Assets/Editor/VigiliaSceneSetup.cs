@@ -13,7 +13,7 @@ using Restless.Vigil;
 /// </summary>
 public static class VigiliaSceneSetup
 {
-    private const string DataPath  = "Assets/_Project/Data/Allies";
+    private const string DataPath   = "Assets/_Project/Data/Allies";
     private const string SpritePath = "Assets/_Project/Art/Sprites/Placeholder/Vigilia";
 
     [MenuItem("Restless/Setup Vigilia Scene")]
@@ -55,11 +55,11 @@ public static class VigiliaSceneSetup
     {
         var defs = new[]
         {
-            new AllyDef("doctor",       AllyArchetype.Doctor,      "Médico",         new Color(1.0f, 0.85f, 0.55f), 0.9f, 3.5f, -0.15f, 0f),
-            new AllyDef("housekeeper",  AllyArchetype.Housekeeper, "Ama de llaves",  new Color(1.0f, 0.70f, 0.30f), 0.7f, 2.8f, 0f,    30f),
-            new AllyDef("occultist",    AllyArchetype.Occultist,   "Ocultista",      new Color(0.6f, 0.35f, 0.9f),  0.8f, 3.0f, 0f,     0f),
-            new AllyDef("addict",       AllyArchetype.Addict,      "Drogadicto",     new Color(0.35f, 0.8f, 0.4f),  0.6f, 2.5f, 0.1f,  20f),
-            new AllyDef("pet",          AllyArchetype.Pet,         "Mascota (gato)", new Color(0.9f, 0.9f, 0.95f),  0.3f, 1.5f, 0f,     0f),
+            new AllyDef("sage",     AllyArchetype.Sage,      "El Sabio",        new Color(0.9f, 0.85f, 0.55f), 0.9f, 3.5f, -0.30f, 0f,  "Presencia calmante. Reduce la Inquietud un 30%."),
+            new AllyDef("hero",     AllyArchetype.Hero,      "El Héroe",        new Color(1.0f, 0.70f, 0.30f), 0.8f, 3.0f, 0.10f,  30f, "Impulso valiente. Aumenta la duración del sueño."),
+            new AllyDef("shadow",   AllyArchetype.Shadow,    "La Sombra",       new Color(0.4f, 0.25f, 0.6f),  0.7f, 2.8f, 0f,     0f,  "Naturaleza dual. Sin efecto pasivo propio."),
+            new AllyDef("caregiver",AllyArchetype.Caregiver, "El Cuidador",     new Color(0.4f, 0.75f, 0.5f),  0.8f, 3.2f, -0.15f, 20f, "Atención constante. Reduce levemente la Inquietud."),
+            new AllyDef("anima",    AllyArchetype.Anima,     "El Ánima",        new Color(0.7f, 0.5f, 0.9f),   0.6f, 2.5f, 0f,     0f,  "Guía interior. Sin efecto pasivo propio."),
         };
 
         var result = new AllyData[defs.Length];
@@ -73,16 +73,17 @@ public static class VigiliaSceneSetup
                 data = ScriptableObject.CreateInstance<AllyData>();
                 AssetDatabase.CreateAsset(data, assetPath);
             }
-            data.id                      = d.Id;
-            data.archetype               = d.Archetype;
-            data.lightColor              = d.LightColor;
-            data.lightIntensity          = d.LightIntensity;
-            data.lightRadius             = d.LightRadius;
-            data.restlessnessRateModifier = d.RestlessMod;
-            data.dreamDurationBonus      = d.DreamBonus;
-            data.passiveDescription      = d.Name;
-            data.roomSprite              = EnsurePlaceholderSprite(d.Id, d.SpriteColor);
-            data.iconSprite              = EnsurePlaceholderSprite(d.Id + "_icon", d.LightColor, 16, 16);
+            data.id                       = d.Id;
+            data.displayName              = d.Name;
+            data.archetype                = d.Archetype;
+            data.lightColor               = d.LightColor;
+            data.lightIntensity           = d.LightIntensity;
+            data.lightRadius              = d.LightRadius;
+            data.restlessnessRateModifier  = d.RestlessMod;
+            data.dreamDurationBonus       = d.DreamBonus;
+            data.passiveDescription       = d.PassiveDesc;
+            data.roomSprite               = EnsurePlaceholderSprite(d.Id, d.SpriteColor);
+            data.iconSprite               = EnsurePlaceholderSprite(d.Id + "_icon", d.LightColor, 16, 16);
             EditorUtility.SetDirty(data);
             result[i] = data;
         }
@@ -111,10 +112,10 @@ public static class VigiliaSceneSetup
         var importer = (TextureImporter)AssetImporter.GetAtPath(path);
         if (importer != null)
         {
-            importer.textureType        = TextureImporterType.Sprite;
+            importer.textureType         = TextureImporterType.Sprite;
             importer.spritePixelsPerUnit = 16;
-            importer.filterMode         = FilterMode.Point;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.filterMode          = FilterMode.Point;
+            importer.textureCompression  = TextureImporterCompression.Uncompressed;
             importer.SaveAndReimport();
         }
 
@@ -146,17 +147,17 @@ public static class VigiliaSceneSetup
         var lightingRoot = new GameObject("Lighting");
 
         var globalLight = MakeChild(lightingRoot, "GlobalLight").AddComponent<Light2D>();
-        globalLight.lightType  = Light2D.LightType.Global;
-        globalLight.intensity  = 0.12f;
-        globalLight.color      = new Color(0.55f, 0.60f, 0.75f);
+        globalLight.lightType = Light2D.LightType.Global;
+        globalLight.intensity = 0.45f;
+        globalLight.color     = new Color(0.55f, 0.60f, 0.75f);
 
         var bedLightGO = MakeChild(lightingRoot, "BedLight");
         bedLightGO.transform.position = new Vector3(0f, 0.3f, 0f);
         var bedLight = bedLightGO.AddComponent<Light2D>();
-        bedLight.lightType              = Light2D.LightType.Point;
-        bedLight.intensity              = 1.1f;
-        bedLight.color                  = new Color(1f, 0.95f, 0.85f);
-        bedLight.pointLightOuterRadius  = 3.5f;
+        bedLight.lightType             = Light2D.LightType.Point;
+        bedLight.intensity             = 1.1f;
+        bedLight.color                 = new Color(1f, 0.95f, 0.85f);
+        bedLight.pointLightOuterRadius = 3.5f;
 
         // ── Room ────────────────────────────────────────────────────────────
         var roomRoot = new GameObject("Room");
@@ -164,13 +165,12 @@ public static class VigiliaSceneSetup
         var floor = MakeChild(roomRoot, "Floor");
         floor.transform.localScale = new Vector3(10f, 8f, 1f);
         var floorSR = floor.AddComponent<SpriteRenderer>();
-        floorSR.sprite        = EnsurePlaceholderSprite("room_floor", new Color(0.15f, 0.13f, 0.12f), 8, 8);
-        floorSR.sortingOrder  = -10;
+        floorSR.sprite       = EnsurePlaceholderSprite("room_floor", new Color(0.15f, 0.13f, 0.12f), 8, 8);
+        floorSR.sortingOrder = -10;
 
         // ── Characters ──────────────────────────────────────────────────────
         var charRoot = new GameObject("Characters");
 
-        // Protagonist in bed (centered)
         var bedGO = MakeChild(charRoot, "ProtagonistBed");
         bedGO.transform.position = Vector3.zero;
         var bedSR = bedGO.AddComponent<SpriteRenderer>();
@@ -180,7 +180,6 @@ public static class VigiliaSceneSetup
         bedCollider.size = new Vector2(1.2f, 2f);
         var bedComp = bedGO.AddComponent<ProtagonistBed>();
 
-        // Sleep icon above protagonist
         var sleepIconGO = MakeChild(bedGO, "SleepIcon");
         sleepIconGO.transform.localPosition = new Vector3(0f, 1.5f, 0f);
         var sleepIconSR = sleepIconGO.AddComponent<SpriteRenderer>();
@@ -189,20 +188,19 @@ public static class VigiliaSceneSetup
         sleepIconSR.enabled      = false;
         SetPrivateField(bedComp, "_sleepIcon", sleepIconSR);
 
-        // Allies
         var allyPositions = new[]
         {
-            new Vector3(-3.0f,  0.5f, 0f),  // doctor      — left
-            new Vector3(-2.5f, -2.0f, 0f),  // housekeeper — bottom-left
-            new Vector3( 2.8f,  1.8f, 0f),  // occultist   — top-right
-            new Vector3( 2.5f, -1.8f, 0f),  // addict      — bottom-right
-            new Vector3( 0.6f,  0.2f, 0f),  // pet         — on bed
+            new Vector3(-3.0f,  0.5f, 0f),  // sage       — left
+            new Vector3(-2.5f, -2.0f, 0f),  // hero       — bottom-left
+            new Vector3( 2.8f,  1.8f, 0f),  // shadow     — top-right
+            new Vector3( 2.5f, -1.8f, 0f),  // caregiver  — bottom-right
+            new Vector3( 0.6f,  0.2f, 0f),  // anima      — near bed
         };
 
         var slotList = new AllySlot[allies.Length];
         for (int i = 0; i < allies.Length; i++)
         {
-            var ally  = allies[i];
+            var ally   = allies[i];
             var allyGO = MakeChild(charRoot, $"Ally_{ally.archetype}");
             allyGO.transform.position = allyPositions[i];
 
@@ -212,6 +210,11 @@ public static class VigiliaSceneSetup
 
             var col = allyGO.AddComponent<BoxCollider2D>();
             col.size = new Vector2(1.0f, 1.5f);
+
+            // RoomAllyPresence — hides sprite if not yet unlocked
+            var presence = allyGO.AddComponent<RoomAllyPresence>();
+            SetPrivateField(presence, "_allyData",       ally);
+            SetPrivateField(presence, "_spriteRenderer", sr);
 
             var allyLight = MakeChild(allyGO, "Light").AddComponent<Light2D>();
             allyLight.lightType             = Light2D.LightType.Point;
@@ -241,14 +244,14 @@ public static class VigiliaSceneSetup
         canvasGO.AddComponent<UnityEngine.UI.CanvasScaler>();
         canvasGO.AddComponent<UnityEngine.UI.GraphicRaycaster>();
 
+        // AllyInfoPanel
         var panelGO = MakeChild(canvasGO, "AllyInfoPanel");
         var panelRT = panelGO.AddComponent<RectTransform>();
-        panelRT.anchorMin   = new Vector2(1f, 0.5f);
-        panelRT.anchorMax   = new Vector2(1f, 0.5f);
-        panelRT.pivot       = new Vector2(1f, 0.5f);
+        panelRT.anchorMin        = new Vector2(1f, 0.5f);
+        panelRT.anchorMax        = new Vector2(1f, 0.5f);
+        panelRT.pivot            = new Vector2(1f, 0.5f);
         panelRT.anchoredPosition = new Vector2(-20f, 0f);
-        panelRT.sizeDelta   = new Vector2(200f, 220f);
-
+        panelRT.sizeDelta        = new Vector2(200f, 220f);
         var panelBg = panelGO.AddComponent<Image>();
         panelBg.color = new Color(0.08f, 0.08f, 0.10f, 0.85f);
 
@@ -262,12 +265,12 @@ public static class VigiliaSceneSetup
         iconImg.preserveAspect = true;
 
         var infoPanel = panelGO.AddComponent<AllyInfoPanel>();
-        SetPrivateField(infoPanel, "_panel",         panelRT);
-        SetPrivateField(infoPanel, "_icon",          iconImg);
-        SetPrivateField(infoPanel, "_hiddenOffset",  new Vector2(280f, 0f));
+        SetPrivateField(infoPanel, "_panel",        panelRT);
+        SetPrivateField(infoPanel, "_icon",         iconImg);
+        SetPrivateField(infoPanel, "_hiddenOffset", new Vector2(280f, 0f));
 
         // ── Wire VigiliaRoomController ──────────────────────────────────────
-        SetPrivateField(roomCtrl, "_allySlots",     slotList);
+        SetPrivateField(roomCtrl, "_allySlots",      slotList);
         SetPrivateField(roomCtrl, "_protagonistBed", bedComp);
         SetPrivateField(roomCtrl, "_allyInfoPanel",  infoPanel);
         SetPrivateField(roomCtrl, "_globalLight",    globalLight);
@@ -301,29 +304,31 @@ public static class VigiliaSceneSetup
 
     private class AllyDef
     {
-        public readonly string         Id;
-        public readonly AllyArchetype  Archetype;
-        public readonly string         Name;
-        public readonly Color          LightColor;
-        public readonly float          LightIntensity;
-        public readonly float          LightRadius;
-        public readonly float          RestlessMod;
-        public readonly float          DreamBonus;
-        public readonly Color          SpriteColor;
+        public readonly string        Id;
+        public readonly AllyArchetype Archetype;
+        public readonly string        Name;
+        public readonly Color         LightColor;
+        public readonly float         LightIntensity;
+        public readonly float         LightRadius;
+        public readonly float         RestlessMod;
+        public readonly float         DreamBonus;
+        public readonly string        PassiveDesc;
+        public readonly Color         SpriteColor;
 
         public AllyDef(string id, AllyArchetype archetype, string name,
                        Color lightColor, float intensity, float radius,
-                       float restlessMod, float dreamBonus)
+                       float restlessMod, float dreamBonus, string passiveDesc)
         {
-            Id            = id;
-            Archetype     = archetype;
-            Name          = name;
-            LightColor    = lightColor;
+            Id             = id;
+            Archetype      = archetype;
+            Name           = name;
+            LightColor     = lightColor;
             LightIntensity = intensity;
-            LightRadius   = radius;
-            RestlessMod   = restlessMod;
-            DreamBonus    = dreamBonus;
-            SpriteColor   = new Color(lightColor.r * 0.6f, lightColor.g * 0.6f, lightColor.b * 0.6f);
+            LightRadius    = radius;
+            RestlessMod    = restlessMod;
+            DreamBonus     = dreamBonus;
+            PassiveDesc    = passiveDesc;
+            SpriteColor    = new Color(lightColor.r * 0.6f, lightColor.g * 0.6f, lightColor.b * 0.6f);
         }
     }
 }

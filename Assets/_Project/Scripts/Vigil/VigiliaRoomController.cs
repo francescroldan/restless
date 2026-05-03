@@ -25,7 +25,8 @@ namespace Restless.Vigil
 
         private void Awake()
         {
-            if (Instance != null) { Destroy(gameObject); return; }
+            // On return from Dream, replace the stale DontDestroyOnLoad instance with the fresh one.
+            if (Instance != null && Instance != this) Destroy(Instance);
             Instance = this;
         }
 
@@ -75,13 +76,44 @@ namespace Restless.Vigil
         public void RequestEnterDream()
         {
             if (_transitioning) return;
+
+            _allyInfoPanel?.Hide();
+
+            var saveData = SaveManager.Instance?.Data;
+            bool hasAllies = saveData != null && saveData.unlockedAllyIds.Count > 0;
+
+            if (PreDreamSelectionPanel.Instance != null && hasAllies)
+            {
+                PreDreamSelectionPanel.Instance.Show(EnterDream);
+            }
+            else
+            {
+                EnterDream();
+            }
+        }
+
+        private void EnterDream()
+        {
+            Debug.Log($"[VRC] EnterDream — _transitioning={_transitioning}");
+            if (_transitioning) return;
             _transitioning = true;
 
             _protagonistBed?.SetInteractable(false);
-            _allyInfoPanel?.Hide();
 
-            VigiliaTransitionFX.Instance?.PlaySleep(() =>
-                GameManager.Instance?.EnterDream());
+            if (VigiliaTransitionFX.Instance != null)
+            {
+                Debug.Log("[VRC] PlaySleep starting...");
+                VigiliaTransitionFX.Instance.PlaySleep(() =>
+                {
+                    Debug.Log("[VRC] PlaySleep done → GameManager.EnterDream");
+                    GameManager.Instance?.EnterDream();
+                });
+            }
+            else
+            {
+                Debug.LogWarning("[VRC] VigiliaTransitionFX.Instance is NULL — calling EnterDream directly");
+                GameManager.Instance?.EnterDream();
+            }
         }
     }
 }

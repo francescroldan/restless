@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Restless.Vigil
 {
@@ -28,7 +29,7 @@ namespace Restless.Vigil
 
         private void Awake()
         {
-            if (Instance != null) { Destroy(gameObject); return; }
+            if (Instance != null && Instance != this) Destroy(Instance);
             Instance = this;
 
             _white = new Texture2D(1, 1);
@@ -37,6 +38,30 @@ namespace Restless.Vigil
 
             _alpha = 1f;
             _active = true;
+        }
+
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // After the sleep fade (Vigil→Dream), fade out to reveal the dream scene.
+            // On return to Vigil, PlayEntry() handles the fade-in instead.
+            if (scene.name == "Dream" && _active && _alpha >= 0.99f)
+                StartCoroutine(ClearFade());
+        }
+
+        private IEnumerator ClearFade()
+        {
+            yield return FadeAlpha(1f, 0f, 1.0f);
+            _active = false;
         }
 
         private void OnDestroy()

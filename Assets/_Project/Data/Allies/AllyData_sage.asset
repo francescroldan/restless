@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c8feafcff6d906439030892be92ec35, type: 3}
+  m_Name: AllyData_sage
+  m_EditorClassIdentifier: Assembly-CSharp::Restless.Vigil.AllyData
+  id: sage
+  displayName: El Sabio
+  archetype: 3
+  roomSprite: {fileID: -4945595769489866231, guid: 47a677142a96de345841ba7999b35cd5, type: 3}
+  iconSprite: {fileID: 7524272629447383996, guid: 03f641b53a0c2da4bad065c011bcad33, type: 3}
+  portraitSprite: {fileID: 0}
+  lightColor: {r: 0.9, g: 0.85, b: 0.55, a: 1}
+  lightIntensity: 0.9
+  lightRadius: 3.5
+  passiveDescription: Presencia calmante. Reduce la Inquietud un 30%.
+  dreamDurationBonus: 0
+  restlessnessRateModifier: -0.3
+  incompatibleWith: []

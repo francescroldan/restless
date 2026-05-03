@@ -16,10 +16,10 @@
 | M0 | Definir el loop del MOC | ✅ Completado | [M0-Definir-Loop-MOC.md](M0-Definir-Loop-MOC.md) |
 | M1 | Setup técnico del proyecto | ✅ Completado | [M1-Setup-Tecnico.md](M1-Setup-Tecnico.md) |
 | M2 | Prototipo gris del loop core | ✅ Completado | [M2-Prototipo-Loop.md](M2-Prototipo-Loop.md) |
-| M3 | Identidad visual base | ⬜ Pendiente | [M3-Identidad-Visual.md](M3-Identidad-Visual.md) |
-| M4 | Hub de Vigilia completo | ⬜ Pendiente | [M4-Hub-Vigilia.md](M4-Hub-Vigilia.md) |
-| M5 | Primer aliado end-to-end | ⬜ Pendiente | [M5-Primer-Aliado.md](M5-Primer-Aliado.md) |
-| M6 | MOC completo y jugable | ⬜ Pendiente | [M6-MOC-Completo.md](M6-MOC-Completo.md) |
+| M3 | Identidad visual base | ✅ Completado | [M3-Identidad-Visual.md](M3-Identidad-Visual.md) |
+| M4 | Hub de Vigilia completo | ✅ Completado | [M4-Hub-Vigilia.md](M4-Hub-Vigilia.md) |
+| M5 | Primer aliado end-to-end | ✅ Completado | [M5-Primer-Aliado.md](M5-Primer-Aliado.md) |
+| M6 | MOC completo y jugable | 🔄 En curso | [M6-MOC-Completo.md](M6-MOC-Completo.md) |
 
 **Leyenda:** ⬜ Pendiente · 🔄 En curso · ✅ Completado
 

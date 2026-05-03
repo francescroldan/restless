@@ -1,4 +1,5 @@
 using UnityEngine;
+using Restless.Core;
 
 namespace Restless.Dream
 {
@@ -14,8 +15,10 @@ namespace Restless.Dream
 
         private void Start()
         {
+            GameManager.Instance?.OnDreamSceneReady();
             DreamInventory.Instance?.Initialize(_inventoryWidth, _inventoryHeight);
             DreamTimer.Instance?.StartTimer(_dreamDuration);
+            GetComponent<DreamPassiveApplier>()?.ApplyPassives();
             Debug.Log($"[DreamSceneBootstrap] Inventory {_inventoryWidth}x{_inventoryHeight}, timer {_dreamDuration}s");
         }
     }

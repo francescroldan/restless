@@ -21,8 +21,10 @@ namespace Restless.Dream
         [SerializeField] private float _minigameMultiplier = 2.5f;
 
         private float _value;
-        private float _rateMultiplier = 1f;
+        private float _rateMultiplier   = 1f;
+        private float _passiveMultiplier = 1f;
         private bool _minigameActive;
+        private bool _maxFired;
         private Threshold _currentThreshold = Threshold.Low;
 
         public float Value => _value;
@@ -37,7 +39,7 @@ namespace Restless.Dream
 
         private void Update()
         {
-            float rate = _baseRate * _rateMultiplier;
+            float rate = _baseRate * _rateMultiplier * _passiveMultiplier;
             if (_minigameActive) rate *= _minigameMultiplier;
 
             _value = Mathf.Clamp(_value + rate * Time.deltaTime, 0f, 100f);
@@ -45,8 +47,9 @@ namespace Restless.Dream
             UpdateThreshold();
             _onRestlessnessChanged?.Raise(_value);
 
-            if (_value >= 100f)
+            if (_value >= 100f && !_maxFired)
             {
+                _maxFired = true;
                 _onRestlessnessMax?.Raise();
                 OnMaxReached?.Invoke();
             }
@@ -67,6 +70,9 @@ namespace Restless.Dream
 
         /// <summary>Called by RestlessnessZone when player enters/exits.</summary>
         public void SetZoneMultiplier(float multiplier) => _rateMultiplier = multiplier;
+
+        /// <summary>Called by DreamPassiveApplier with combined ally passive multiplier.</summary>
+        public void SetPassiveMultiplier(float multiplier) => _passiveMultiplier = multiplier;
 
         /// <summary>Called by MemoryPoint when minigame starts/ends.</summary>
         public void SetMinigameActive(bool active) => _minigameActive = active;

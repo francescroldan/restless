@@ -1,19 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using TMPro;
 using DG.Tweening;
 
 namespace Restless.Vigil
 {
-    /// <summary>
-    /// Minimal ally info panel — shows only the ally icon, no text.
-    /// Slides in from the edge when an ally is clicked; closes on click-outside.
-    /// Attach to a Canvas > Panel RectTransform.
-    /// Requires: Image _icon (child Image), configured _hiddenOffset in Inspector.
-    /// </summary>
     public class AllyInfoPanel : MonoBehaviour
     {
         [SerializeField] private RectTransform _panel;
         [SerializeField] private Image         _icon;
+        [SerializeField] private TMP_Text      _nameText;
+        [SerializeField] private TMP_Text      _passiveText;
         [SerializeField] private Vector2       _hiddenOffset = new Vector2(320f, 0f);
         [SerializeField] private float         _slideDuration = 0.22f;
 
@@ -32,8 +30,21 @@ namespace Restless.Vigil
         {
             if (slot?.Data == null) return;
 
-            if (_icon != null && slot.Data.iconSprite != null)
-                _icon.sprite = slot.Data.iconSprite;
+            if (_icon != null)
+            {
+                Sprite icon = null;
+                if (slot.Data.portraitSprite != null)      icon = slot.Data.portraitSprite;
+                else if (slot.Data.roomSprite != null)     icon = slot.Data.roomSprite;
+                else if (slot.Data.iconSprite != null)     icon = slot.Data.iconSprite;
+                _icon.enabled = icon != null;
+                if (icon != null) _icon.sprite = icon;
+            }
+
+            if (_nameText != null)
+                _nameText.text = slot.Data.displayName;
+
+            if (_passiveText != null)
+                _passiveText.text = slot.Data.passiveDescription;
 
             _tween?.Kill();
             _tween = _panel.DOAnchorPos(_shownAnchoredPos, _slideDuration)
@@ -53,9 +64,9 @@ namespace Restless.Vigil
         private void Update()
         {
             if (!_visible) return;
-            if (!Input.GetMouseButtonDown(0)) return;
+            if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame) return;
 
-            if (!RectTransformUtility.RectangleContainsScreenPoint(_panel, Input.mousePosition))
+            if (!RectTransformUtility.RectangleContainsScreenPoint(_panel, Mouse.current.position.ReadValue()))
                 Hide();
         }
 

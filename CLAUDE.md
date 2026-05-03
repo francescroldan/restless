@@ -2,7 +2,7 @@
 
 Restless is a psychological horror game with roguelite elements. The protagonist is an elderly man on the verge of suicide who enters a recurring dream world to find his son, trapped under the influence of an entity known as the Yellow King. The game cycles between two interconnected states: **Vigilia** (waking hub) and **Sueño** (dream gameplay).
 
-The current design target is a simplified MOC (Minimum Original Concept) — the V1 metroidvania-style exploration loop has been replaced by a simpler gameplay loop yet to be defined.
+The current design target is a simplified MOC (Minimum Original Concept). The core loop: the player prepares in Vigil (selects allies, items), enters the dream, navigates a top-down space with a limited vision cone, extracts memory fragments of their son via minigames while a Restlessness meter climbs, and returns before the meter maxes out. Abrupt awakenings degrade the protagonist's state; allies modify the run's conditions and consequences.
 
 Built in Unity 6. Pixel art, monochromatic palette with selective color accents.
 
@@ -13,8 +13,18 @@ Built in Unity 6. Pixel art, monochromatic palette with selective color accents.
 ```
 Docs/
 ├── Dirección narrativa.md
+├── Plans/                           ← milestones de desarrollo
+│   ├── TIMELINE.md
+│   ├── M0-Definir-Loop-MOC.md       ✅ completado
+│   ├── M1-Setup-Tecnico.md          ✅ completado
+│   ├── M2-Prototipo-Loop.md         ✅ completado
+│   ├── M3-Identidad-Visual.md       ✅ completado
+│   ├── M4-Hub-Vigilia.md            ✅ completado
+│   ├── M5-Primer-Aliado.md          🔄 en curso
+│   └── M6-MOC-Completo.md
 └── GDD/
     ├── README.md
+    ├── MOC-Loop.md                  ← loop definitivo del MOC (v1.0)
     ├── 01_NARRATIVE/
     │   ├── Narrativa.md
     │   ├── Página principal.md
@@ -49,7 +59,8 @@ Docs/
     │   ├── Mejoras builds y economía.md
     │   └── Sistema de builds mediante aliados.md
     ├── 05_ART_AND_AUDIO/
-    │   └── Arte.md
+    │   ├── Arte.md
+    │   └── Paleta.md
     ├── 06_WORLD_BUILDING/
     │   ├── Estudio de mercado.md
     │   └── Inspiración de parajes lovecraftianos para restles.md
@@ -62,6 +73,61 @@ Docs/
         ├── Puzles progresión y habilidades.md
         ├── Puzles y backtracking.md
         └── Retos y puzles.md
+```
+
+---
+
+## Project Structure
+
+```
+Assets/
+├── Editor/                          ← editor scripts (VigiliaSceneSetup, etc.)
+├── Plugins/Demigiant/DOTween/       ← DOTween animation library
+├── TextMesh Pro/                    ← TMP resources
+└── _Project/                        ← todo el contenido del juego
+    ├── Art/
+    │   ├── Animations/Protagonist/  ← ProtagonistAnimator.controller + anims
+    │   ├── Materials/
+    │   ├── Shaders/                 ← MonochromeAccent.shader
+    │   ├── Sprites/
+    │   │   └── Placeholder/
+    │   │       ├── Anim/            ← frames protagonista (idle/walk)
+    │   │       ├── Dream/           ← sprites escena sueño
+    │   │       └── Vigilia/         ← sprites aliados + room
+    │   └── UI/
+    ├── Audio/
+    │   ├── Music/
+    │   └── SFX/
+    ├── Data/
+    │   ├── Allies/                  ← AllyData_*.asset + AllyRegistry.asset
+    │   └── ScriptableObjects/Events/
+    ├── Input/
+    │   └── PlayerInputActions.inputactions
+    ├── Prefabs/
+    │   ├── Characters/
+    │   ├── Environment/
+    │   └── UI/
+    ├── Scenes/
+    │   ├── Bootstrap.unity
+    │   ├── Dream.unity
+    │   └── Vigil.unity
+    ├── ScriptableObjects/
+    │   ├── Events/                  ← GameEvent assets (restlessness, timer…)
+    │   └── MemoryFragments/
+    └── Scripts/
+        ├── Core/                    ← GameManager, SceneLoader, SaveManager,
+        │                               ProtagonistState, CameraFollow, events
+        ├── Dream/                   ← ProtagonistController, RestlessnessManager,
+        │                               DreamTimer, WakeUpManager, minigames,
+        │                               AllyEncounter, MemoryPoint, VisionCone…
+        ├── Vigil/                   ← VigiliaRoomController, AllyData, AllySlot,
+        │                               PreDreamSelectionPanel, RoomAllyPresence…
+        └── Shared/
+
+Docs/
+├── GDD/                             ← diseño activo (01–06 + README)
+├── Plans/                           ← hitos M0–M6 + TIMELINE
+└── Notion/ + _ARCHIVE_V1/          ← histórico, no activo
 ```
 
 ---
