@@ -21,7 +21,9 @@ MonoBehaviour:
   lightColor: {r: 1, g: 0.7, b: 0.3, a: 1}
   lightIntensity: 0.8
   lightRadius: 3
-  passiveDescription: "Impulso valiente. Aumenta la duraci\xF3n del sue\xF1o."
+  passiveDescription: "+30s de sue\xF1o, pero +10% Inquietud.\nRiesgo/recompensa:
+    m\xE1s tiempo, m\xE1s peligro."
   dreamDurationBonus: 30
   restlessnessRateModifier: 0.1
-  incompatibleWith: []
+  incompatibleWith:
+  - {fileID: 11400000, guid: 22f823a5be13ced429b934a18571a49a, type: 2}

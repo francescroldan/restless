@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
+using Restless.Core;
 
 namespace Restless.Vigil
 {
@@ -38,6 +39,9 @@ namespace Restless.Vigil
             }
 
             StartBreathing();
+
+            bool isFirstRun = SaveManager.Instance == null || SaveManager.Instance.Data.totalRuns == 0;
+            if (isFirstRun) StartFirstRunHint();
         }
 
         private void StartBreathing()
@@ -47,6 +51,23 @@ namespace Restless.Vigil
                 .DOScaleY(_baseScale.y * (1f + _breathingAmplitude), _breathingDuration)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.InOutSine);
+        }
+
+        private void StartFirstRunHint()
+        {
+            if (_sleepIcon == null) return;
+            _sleepIcon.enabled = true;
+            _sleepIcon.DOFade(0.7f, 1.2f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine)
+                .SetId("firstRunHint");
+        }
+
+        private void StopFirstRunHint()
+        {
+            DOTween.Kill("firstRunHint");
+            if (_sleepIcon != null)
+                _sleepIcon.DOFade(0f, 0.2f).OnComplete(() => _sleepIcon.enabled = false);
         }
 
         public void SetInteractable(bool interactable)
@@ -74,6 +95,7 @@ namespace Restless.Vigil
 
         private void ShowHoverFX()
         {
+            StopFirstRunHint();
             if (_sleepIcon != null)
             {
                 _sleepIcon.enabled = true;

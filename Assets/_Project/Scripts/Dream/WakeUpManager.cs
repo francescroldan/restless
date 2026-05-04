@@ -45,6 +45,8 @@ namespace Restless.Dream
             if (_waking) return;
             _waking = true;
             Debug.Log($"[WakeUpManager] Wake-up — abrupt: {abrupt}");
+            if (abrupt) DreamSFXPlayer.Instance?.PlayWakeupAbrupt();
+            else        DreamSFXPlayer.Instance?.PlayWakeupVoluntary();
 
             if (TransitionFX.Instance != null)
             {

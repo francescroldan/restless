@@ -11,18 +11,20 @@ namespace Restless.Dream
         private GUIStyle _checkStyle;
         private GUIStyle _headerStyle;
 
-        // M2 playtest checklist — tick manually in the Inspector during testing
-        [Header("Playtest Checklist (marcar durante la prueba)")]
+        // M6 playtest checklist — tick manually in the Inspector during testing
+        [Header("Playtest Checklist M6 (marcar durante la prueba)")]
         [SerializeField] private bool _check_movimiento;
         [SerializeField] private bool _check_conoPorRaton;
-        [SerializeField] private bool _check_inquietudSube;
+        [SerializeField] private bool _check_corredoresBloquean;
+        [SerializeField] private bool _check_inquietudSubePorZona;
+        [SerializeField] private bool _check_entidadPatrulla;
         [SerializeField] private bool _check_interaccionMemoryPoint;
-        [SerializeField] private bool _check_minijuegoTiming;
-        [SerializeField] private bool _check_colocarFragmento;
-        [SerializeField] private bool _check_entidadSubeInquietud;
-        [SerializeField] private bool _check_timerBaja;
+        [SerializeField] private bool _check_minijuego;
+        [SerializeField] private bool _check_fragmentoEnInventario;
+        [SerializeField] private bool _check_encuentroAliado;
+        [SerializeField] private bool _check_pasivaAliado;
         [SerializeField] private bool _check_despertarVoluntario;
-        [SerializeField] private bool _check_botonDormir;
+        [SerializeField] private bool _check_seleccionIncompatibles;
         [SerializeField] private bool _check_despertarAbrupto;
 
         private void Awake()
@@ -48,6 +50,7 @@ namespace Restless.Dream
         private void OnGUI()
         {
             EnsureStyles();
+            DrawBars();
             DrawChecklist();
             DrawKeyLegend();
             DrawProximity();
@@ -63,17 +66,19 @@ namespace Restless.Dream
             float pad    = 8f;
 
             (string label, bool done)[] items = {
-                ("Mover protagonista (WASD)",          _check_movimiento),
-                ("Cono sigue al ratón",                _check_conoPorRaton),
-                ("Inquietud sube con el tiempo",       _check_inquietudSube),
-                ("Interactuar con memory point (E)",   _check_interaccionMemoryPoint),
-                ("Completar minijuego Timing",         _check_minijuegoTiming),
-                ("Colocar fragmento en inventario",    _check_colocarFragmento),
-                ("Entidad sube inquietud (en cono)",   _check_entidadSubeInquietud),
-                ("Timer del sueño baja",               _check_timerBaja),
-                ("Despertar voluntario → Vigilia",     _check_despertarVoluntario),
-                ("Botón Dormir → vuelve al sueño",     _check_botonDormir),
-                ("Despertar abrupto (timer/máx.)",     _check_despertarAbrupto),
+                ("Mover protagonista (WASD)",            _check_movimiento),
+                ("Cono sigue al ratón",                  _check_conoPorRaton),
+                ("Corredores bloquean el paso",          _check_corredoresBloquean),
+                ("Inquietud sube por zona (1→2→3)",      _check_inquietudSubePorZona),
+                ("Entidad patrulla y detecta",           _check_entidadPatrulla),
+                ("Interactuar con memory point (E)",     _check_interaccionMemoryPoint),
+                ("Completar minijuego",                  _check_minijuego),
+                ("Fragmento colocado en inventario",     _check_fragmentoEnInventario),
+                ("Encuentro con aliado en sueño",        _check_encuentroAliado),
+                ("Pasiva del aliado funciona",           _check_pasivaAliado),
+                ("Despertar voluntario → Vigilia",       _check_despertarVoluntario),
+                ("Selección aliados incompatibles",      _check_seleccionIncompatibles),
+                ("Despertar abrupto (timer/máx.)",       _check_despertarAbrupto),
             };
 
             int doneCount = 0;
@@ -92,7 +97,7 @@ namespace Restless.Dream
             // Header
             GUI.color = doneCount == items.Length ? Color.green : new Color(0.8f, 0.8f, 0.85f);
             GUI.Label(new Rect(x + pad, y, panelW - pad * 2, lineH),
-                $"M2 CHECKLIST  {doneCount}/{items.Length}", _headerStyle);
+                $"M6 CHECKLIST  {doneCount}/{items.Length}", _headerStyle);
             y += lineH + 2f;
 
             // Items
@@ -127,7 +132,7 @@ namespace Restless.Dream
             float x      = Screen.width - panelW - 8f;
 
             // Position below the checklist — estimate checklist height
-            float checklistH = pad * 2 + lineH + 11 * lineH + 4f + 6f; // header + 11 items + gap
+            float checklistH = pad * 2 + lineH + 13 * lineH + 4f + 6f; // header + 13 items + gap
             float y = 8f + checklistH + 6f;
 
             GUI.color = new Color(0.06f, 0.06f, 0.08f, 0.88f);
@@ -151,12 +156,68 @@ namespace Restless.Dream
             GUI.color = Color.white;
         }
 
+        // ── Bars (always visible) ────────────────────────────────────────
+
+        private void DrawBars()
+        {
+            const float barH   = 18f;
+            const float labelW = 110f;
+            const float pad    = 4f;
+            const float x      = 10f;
+            const float rowGap = 4f;
+            float barW = Screen.width - x * 2f - labelW;
+            float y    = 10f;
+
+            if (DreamTimer.Instance != null)
+            {
+                float rem  = DreamTimer.Instance.Remaining;
+                float dur  = DreamTimer.Instance.Duration;
+                float fill = dur > 0f ? Mathf.Clamp01(rem / dur) : 0f;
+                Color col  = Color.Lerp(Color.red, new Color(0.3f, 0.8f, 1f), fill);
+                DrawBar(x, y, labelW, barW, barH, pad, $"SUEÑO  {rem:F0}s", fill, col);
+                y += barH + rowGap;
+            }
+
+            if (RestlessnessManager.Instance != null)
+            {
+                float fill = RestlessnessManager.Instance.NormalizedValue;
+                Color col  = Color.Lerp(new Color(0.2f, 0.85f, 0.35f), new Color(1f, 0.15f, 0.15f), fill);
+                DrawBar(x, y, labelW, barW, barH, pad, $"INQUIETUD  {fill * 100f:F0}%", fill, col);
+            }
+        }
+
+        private void DrawBar(float x, float y, float labelW, float barW, float barH, float pad,
+                             string label, float fill, Color fillColor)
+        {
+            float totalW = labelW + barW;
+
+            // Background
+            GUI.color = new Color(0.06f, 0.06f, 0.08f, 0.88f);
+            GUI.DrawTexture(new Rect(x, y, totalW, barH), _white);
+
+            // Label
+            GUI.color = new Color(0.78f, 0.78f, 0.85f);
+            GUI.Label(new Rect(x + pad, y, labelW - pad, barH), label, _checkStyle);
+
+            // Empty track
+            float bx = x + labelW;
+            GUI.color = new Color(0.18f, 0.18f, 0.22f);
+            GUI.DrawTexture(new Rect(bx, y + pad, barW, barH - pad * 2f), _white);
+
+            // Fill
+            float fillPx = Mathf.Max(2f, (barW - 1f) * fill);
+            GUI.color = fillColor;
+            GUI.DrawTexture(new Rect(bx, y + pad, fillPx, barH - pad * 2f), _white);
+
+            GUI.color = Color.white;
+        }
+
         // ── Stats (F1 toggle) ────────────────────────────────────────────
 
         private void DrawStats()
         {
             const int x = 10, lineH = 20;
-            int y = 10;
+            int y = 10 + (18 + 4) * 2 + 8; // below the two bars
 
             GUI.color = Color.white;
             GUI.Label(new Rect(x, y, 400, lineH), "=== DEBUG HUD (F1) ===");

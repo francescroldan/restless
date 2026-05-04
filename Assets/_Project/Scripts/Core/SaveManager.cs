@@ -13,9 +13,6 @@ namespace Restless.Core
 
         public SaveData Data { get; private set; } = new SaveData();
 
-        [Header("Editor testing")]
-        [SerializeField] private string[] _editorDefaultUnlockedAllies = { "sage", "hero", "shadow", "caregiver" };
-
         private void Awake()
         {
             if (Instance != null) { Destroy(this); return; }
@@ -23,8 +20,9 @@ namespace Restless.Core
             DontDestroyOnLoad(gameObject);
 #if UNITY_EDITOR
             DeleteSave();
-            foreach (var id in _editorDefaultUnlockedAllies)
-                if (!string.IsNullOrEmpty(id)) Data.unlockedAllyIds.Add(id);
+            // Pre-unlock Sage and Hero so the Vigil UI is testable from the start
+            Data.unlockedAllyIds.Add("sage");
+            Data.unlockedAllyIds.Add("hero");
 #else
             Load();
 #endif

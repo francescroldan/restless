@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,14 +21,14 @@ namespace Restless.Vigil
         [SerializeField] private Image         _slotAPortrait;
         [SerializeField] private TMP_Text      _slotAName;
         [SerializeField] private TMP_Text      _slotAPassive;
-        [SerializeField] private Image         _slotAWarning;
+        [SerializeField] private TMP_Text      _slotAWarning;
 
         [Header("Slot B")]
         [SerializeField] private Button        _slotBButton;
         [SerializeField] private Image         _slotBPortrait;
         [SerializeField] private TMP_Text      _slotBName;
         [SerializeField] private TMP_Text      _slotBPassive;
-        [SerializeField] private Image         _slotBWarning;
+        [SerializeField] private TMP_Text      _slotBWarning;
 
         [SerializeField] private AllyRegistry  _registry;
 
@@ -183,12 +184,23 @@ namespace Restless.Vigil
                 incompatible = !IncompatibilityChecker.AreCompatible(a, b);
             }
 
-            if (_slotAWarning != null) _slotAWarning.enabled = incompatible;
-            if (_slotBWarning != null) _slotBWarning.enabled = incompatible;
+            if (_slotAWarning != null) _slotAWarning.gameObject.SetActive(incompatible);
+            if (_slotBWarning != null) _slotBWarning.gameObject.SetActive(incompatible);
         }
 
         private void OnConfirm()
         {
+            if (_slotAIndex >= 0 && _slotBIndex >= 0)
+            {
+                var a = _unlockedAllies[_slotAIndex];
+                var b = _unlockedAllies[_slotBIndex];
+                if (!IncompatibilityChecker.AreCompatible(a, b))
+                {
+                    TriggerIncompatibleFlash();
+                    return;
+                }
+            }
+
             var ids = new List<string>();
             if (_slotAIndex >= 0) ids.Add(_unlockedAllies[_slotAIndex].id);
             if (_slotBIndex >= 0) ids.Add(_unlockedAllies[_slotBIndex].id);
@@ -196,6 +208,30 @@ namespace Restless.Vigil
 
             Hide();
             _onConfirm?.Invoke();
+        }
+
+        private Coroutine _flashCoroutine;
+
+        private void TriggerIncompatibleFlash()
+        {
+            if (_flashCoroutine != null) StopCoroutine(_flashCoroutine);
+            _flashCoroutine = StartCoroutine(IncompatibleFlashRoutine());
+        }
+
+        private IEnumerator IncompatibleFlashRoutine()
+        {
+            var red   = new Color(1f, 0.1f, 0.1f);
+            var white = Color.white;
+            for (int i = 0; i < 3; i++)
+            {
+                if (_slotAWarning != null) _slotAWarning.color = red;
+                if (_slotBWarning != null) _slotBWarning.color = red;
+                yield return new WaitForSecondsRealtime(0.07f);
+                if (_slotAWarning != null) _slotAWarning.color = white;
+                if (_slotBWarning != null) _slotBWarning.color = white;
+                yield return new WaitForSecondsRealtime(0.07f);
+            }
+            _flashCoroutine = null;
         }
     }
 }

@@ -99,16 +99,20 @@ namespace Restless.Dream
                 int target = _targetSlots[_selectedPiece];
                 if (_pieceSlots[_selectedPiece] != target)
                 {
-                    // Find which piece currently occupies the target slot and swap
                     for (int i = 0; i < _pieceCount; i++)
                     {
                         if (_pieceSlots[i] == target)
                         {
                             _pieceSlots[i] = _pieceSlots[_selectedPiece];
                             _pieceSlots[_selectedPiece] = target;
+                            DreamSFXPlayer.Instance?.PlayMinigameHit();
                             break;
                         }
                     }
+                }
+                else
+                {
+                    DreamSFXPlayer.Instance?.PlayMinigameMiss();
                 }
 
                 if (CheckSolved())

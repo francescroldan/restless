@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!245 &-6642490576848390644
+AudioMixerSnapshotController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Overload
+  m_AudioMixer: {fileID: 24100000}
+  m_SnapshotID: eecccd6e0c642ea4a838ded9ee5513e4
+  m_FloatValues: {}
+  m_TransitionOverrides: {}
+--- !u!245 &-3955823571600379823
+AudioMixerSnapshotController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Tense
+  m_AudioMixer: {fileID: 24100000}
+  m_SnapshotID: 258de5852cd13b1419a5eb96e2cd066b
+  m_FloatValues: {}
+  m_TransitionOverrides: {}
+--- !u!241 &24100000
+AudioMixerController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: RestlessnessAudioMixer
+  m_OutputGroup: {fileID: 0}
+  m_MasterGroup: {fileID: 24300002}
+  m_Snapshots:
+  - {fileID: 24500006}
+  - {fileID: -3955823571600379823}
+  - {fileID: 1690679374393026080}
+  - {fileID: -6642490576848390644}
+  m_StartSnapshot: {fileID: 24500006}
+  m_SuspendThreshold: -80
+  m_EnableSuspend: 1
+  m_UpdateMode: 0
+  m_ExposedParameters: []
+  m_AudioMixerGroupViews:
+  - guids:
+    - 1db751f57d7967e47ba30e556b5f406a
+    name: View
+  m_CurrentViewIndex: 0
+  m_TargetSnapshot: {fileID: -6642490576848390644}
+--- !u!243 &24300002
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Master
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 1db751f57d7967e47ba30e556b5f406a
+  m_Children: []
+  m_Volume: baf6774e8a6dc6848ba5e52880b7255e
+  m_Pitch: fbe3a32f440f10249a41ef80df688ed7
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: 24400004}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &24400004
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 3052394d9eefda9489fe5de6d3e39ee5
+  m_EffectName: Attenuation
+  m_MixLevel: 804b6ef35d33e174bacadce3fbb669e9
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
+--- !u!245 &24500006
+AudioMixerSnapshotController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Calm
+  m_AudioMixer: {fileID: 24100000}
+  m_SnapshotID: 709b8945a37040342b8460e318efa32b
+  m_FloatValues: {}
+  m_TransitionOverrides: {}
+--- !u!245 &1690679374393026080
+AudioMixerSnapshotController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Critical
+  m_AudioMixer: {fileID: 24100000}
+  m_SnapshotID: 65b52d3859ad7ce42adeeb09bb22ba22
+  m_FloatValues: {}
+  m_TransitionOverrides: {}

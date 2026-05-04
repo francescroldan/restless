@@ -99,6 +99,7 @@ namespace Restless.Vigil
             _transitioning = true;
 
             _protagonistBed?.SetInteractable(false);
+            VigiliaAudioPlayer.Instance?.PlaySleep();
 
             if (VigiliaTransitionFX.Instance != null)
             {

@@ -23,5 +23,5 @@ MonoBehaviour:
   lightRadius: 3.2
   passiveDescription: "Atenci\xF3n constante. Reduce levemente la Inquietud."
   dreamDurationBonus: 20
-  restlessnessRateModifier: -0.15
+  restlessnessRateModifier: 0
   incompatibleWith: []

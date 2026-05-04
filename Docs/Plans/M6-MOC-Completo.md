@@ -1,6 +1,6 @@
 # M6 — MOC completo y jugable
 
-**Estado:** ⬜ Pendiente  
+**Estado:** 🔄 En curso  
 **Hito anterior:** [M5 — Primer aliado end-to-end](M5-Primer-Aliado.md)  
 **Hito siguiente:** — (Post-MOC: a definir)
 
@@ -20,53 +20,56 @@ Al terminar M6, *Restless* tiene una identidad clara, un loop que funciona y suf
 
 Añadir un segundo aliado para que exista una elección de build real.
 
-- [ ] **El Héroe** — aumenta el tiempo máximo del sueño pero incrementa la tasa base de Inquietud. Riesgo/recompensa.
-- [ ] Assets completos (retrato, sprite habitación, sprite Sueño, animación idle).
-- [ ] Encuentro en el Sueño: zona diferente al Sabio, nivel de Inquietud medio para acceder.
-- [ ] Pasiva: `HeroPassive.cs` — `DreamCapacity +25%`, tasa de Inquietud `+15%`.
-- [ ] **Incompatibilidad**: el Héroe y el Sabio son incompatibles (no pueden estar activos a la vez). El `IncompatibilityChecker` lo bloquea en la pantalla de preparación con mensaje explicativo.
+- [x] **El Héroe** — aumenta el tiempo máximo del sueño (+30s) pero incrementa la tasa de Inquietud (+10%). Riesgo/recompensa.
+- [x] Assets completos (retrato sprite 16×24, sprite habitación, sprite Sueño).
+- [x] Encuentro en el Sueño: Zona 3 — posición (9, -4).
+- [x] Pasiva aplicada por `DreamPassiveApplier`: `dreamDurationBonus +30`, `restlessnessRateModifier +0.1`.
+- [x] **Incompatibilidad**: `AllyData_hero.incompatibleWith` referencia `AllyData_sage`. `IncompatibilityChecker` activo con warning visual en PreDreamSelectionPanel.
 
 ### 2. Nivel del Sueño definitivo para el MOC
 
 Reemplazar el nivel de prueba de M2 por el nivel "real" del MOC:
 
-- [ ] 3 zonas diferenciadas: zona de entrada (segura), zona central (Inquietud media), zona profunda (Inquietud alta + encuentro con aliado).
-- [ ] Cada zona tiene tileset y ambientación propios.
-- [ ] La zona profunda solo es alcanzable en ~60% del tiempo disponible — obliga a decidir si seguir o volver.
-- [ ] Punto de salida voluntaria en la zona central y en la zona profunda.
-- [ ] Fragmento de memoria (objeto narrativo) en la zona profunda: recompensa de riesgo.
+- [x] 3 zonas diferenciadas: Zona 1 segura (spawn, salida, sin restlessness extra), Zona 2 media (×1.5 Inquietud, SageEncounter, Entity_02), Zona 3 profunda (×2.0 Inquietud, HeroEncounter, Entity_01).
+- [x] Cada zona tiene tileset visual propio (floor/wall base + floor_medium/floor_deep overlay).
+- [x] Divisores de zona con colisionadores en x=-5 y x=+5, con paso central libre.
+- [ ] La zona profunda solo es alcanzable en ~60% del tiempo disponible — obliga a decidir si seguir o volver. *(requiere tuning del timer con el nivel real)*
+- [x] Punto de salida voluntaria en zona central (ExitPoint_Zone2 en -4,-8) y zona 1 (ExitPoint en -13,-8.5).
+- [x] Fragmentos de memoria en cada zona: MemoryPoint_A (-10,-7), MemoryPoint_B (0,2), MemoryPoint_C (11,-3).
 
 ### 3. Efectos visuales de Inquietud pulidos
 
 Revisar los efectos de M3 con el nivel definitivo:
 
-- [ ] Los umbrales de Inquietud producen efectos proporcionales y coherentes con el entorno.
-- [ ] El efecto Crítico no impide leer el entorno (jugabilidad sobre espectáculo).
-- [ ] Testear que ningún efecto provoca fatiga visual tras 5 minutos de juego.
+- [x] Los umbrales de Inquietud producen efectos proporcionales y coherentes con el entorno.
+- [x] El efecto Crítico no impide leer el entorno (jugabilidad sobre espectáculo). *(vignette cap 0.58, chromatic cap 0.65)*
+- [ ] Testear que ningún efecto provoca fatiga visual tras 5 minutos de juego. *(requiere playtest)*
 
 ### 4. Audio completo del loop
 
-- [ ] Ambient del Sueño: dron oscuro, sonidos distantes imposibles.
-- [ ] Música adaptativa: sube en intensidad con la Inquietud (via Audio Mixer snapshots).
-- [ ] SFX: pasos del protagonista, activar zona de Inquietud, encuentro con aliado, despertar tranquilo, despertar abrupto.
-- [ ] Audio de la Vigilia del hito M4 revisado y balanceado.
+- [x] Ambient del Sueño: drones sintéticos 4 capas (Calm/Tense/Critical/Overload), crossfade automático por umbral. `AmbientAudioPlayer.cs` en _Managers.
+- [x] Infraestructura de música adaptativa: `RestlessnessAudioController.cs` — 4 snapshots asignados al mixer. Componente en _Managers de Dream scene.
+- [x] SFX: zona de Inquietud (sweep ascendente), encuentro aliado (acorde mayor), despertar voluntario (tono descendente), despertar abrupto (burst ruido). `DreamSFXPlayer.cs` en _Managers, disparado desde `RestlessnessZone`, `WakeUpManager`, `AllyEncounter`.
+- [x] Clips generados vía `Restless > Generate Placeholder Audio` (8 WAV sintéticos, sustituibles por assets finales).
+- [x] Pasos del protagonista — `FootstepPlayer.cs` + 3 variantes WAV sintéticas.
+- [x] Audio de la Vigilia: `VigiliaAudioPlayer.cs` — ambient loop, return tranquilo/abrupto, sleep SFX.
 
 ### 5. UI de la Vigilia con aliados
 
 Actualizar la pantalla de habitación para que funcione con 2 aliados:
 
-- [ ] La habitación tiene espacio para el Sabio y el Héroe con sus posiciones asignadas.
-- [ ] La selección pre-sueño muestra los aliados disponibles, sus pasivas, y el warning de incompatibilidad.
-- [ ] Feedback visual claro cuando se intenta seleccionar dos aliados incompatibles.
+- [x] La habitación tiene espacio para el Sabio y el Héroe con sus posiciones asignadas.
+- [x] La selección pre-sueño muestra los aliados disponibles, sus pasivas, y el warning de incompatibilidad.
+- [x] Feedback visual claro cuando se intenta seleccionar dos aliados incompatibles. *(flash rojo 3× en warnings)*
 
 ### 6. Onboarding mínimo
 
 El juego no tiene texto de historia, pero el jugador debe entender qué hacer:
 
-- [ ] Primera vez que se abre el juego: la habitación aparece sola, con el protagonista en cama. Un prompt sutil indica "Dormir" (`[E]` o botón A).
-- [ ] Primera run: el `DreamTimer` empieza más lento y la primera zona de Inquietud tiene una señal visual clara.
-- [ ] El encuentro con el primer aliado pausa el timer y el panel es autoexplicativo.
-- [ ] Sin tutoriales de texto. Si algo no se entiende sin texto, rediseñar el elemento.
+- [x] Primera vez que se abre el juego: la habitación aparece sola, con el protagonista en cama. Un prompt sutil indica "Dormir" (`[E]` o botón A). *(icono pulsante en cama en run 0)*
+- [x] Primera run: el `DreamTimer` empieza más lento y la primera zona de Inquietud tiene una señal visual clara. *(+60s bonus run 0; flash naranja/rojo en entrada de zona)*
+- [x] El encuentro con el primer aliado pausa el timer y el panel es autoexplicativo.
+- [x] Sin tutoriales de texto. Si algo no se entiende sin texto, rediseñar el elemento.
 
 ### 7. Sesión de playtest
 

@@ -12,25 +12,34 @@ namespace Restless.Dream
     {
         [SerializeField] private AllyRegistry _registry;
 
-        public void ApplyPassives()
+        /// <summary>
+        /// Applies ally passives and returns the modified dream duration.
+        /// Must be called before DreamTimer.StartTimer.
+        /// </summary>
+        public float ApplyPassives(float baseDuration)
         {
-            if (_registry == null) { Debug.LogWarning("[DreamPassiveApplier] No AllyRegistry assigned."); return; }
+            if (_registry == null) { Debug.LogWarning("[DreamPassiveApplier] No AllyRegistry assigned."); return baseDuration; }
 
             var selectedIds = SaveManager.Instance?.Data?.selectedAllyIds;
-            if (selectedIds == null || selectedIds.Count == 0) return;
+            if (selectedIds == null || selectedIds.Count == 0) return baseDuration;
 
-            float combinedRateMultiplier = 1f;
+            float rateMultiplier  = 1f;
+            float durationBonus   = 0f;
+
             foreach (var id in selectedIds)
             {
                 var ally = _registry.GetById(id);
                 if (ally == null) continue;
-                // restlessnessRateModifier is additive: -0.3 means -30%
-                combinedRateMultiplier += ally.restlessnessRateModifier;
+                rateMultiplier += ally.restlessnessRateModifier;
+                durationBonus  += ally.dreamDurationBonus;
             }
-            combinedRateMultiplier = Mathf.Max(0.1f, combinedRateMultiplier);
 
-            RestlessnessManager.Instance?.SetPassiveMultiplier(combinedRateMultiplier);
-            Debug.Log($"[DreamPassiveApplier] Passive rate multiplier: {combinedRateMultiplier:F2}");
+            rateMultiplier = Mathf.Max(0.1f, rateMultiplier);
+            RestlessnessManager.Instance?.SetPassiveMultiplier(rateMultiplier);
+
+            float finalDuration = baseDuration + durationBonus;
+            Debug.Log($"[DreamPassiveApplier] rate×{rateMultiplier:F2}  duration {baseDuration}s+{durationBonus}s={finalDuration}s");
+            return finalDuration;
         }
     }
 }

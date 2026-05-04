@@ -11,9 +11,11 @@ namespace Restless.Core
         [SerializeField] private float _smoothSpeed  = 5f;
         [SerializeField] private float _orthoSize    = 6f;
 
-        [Header("Room bounds (match wall positions)")]
-        [SerializeField] private float _roomHalfW = 14f;
-        [SerializeField] private float _roomHalfH = 9f;
+        [Header("Room bounds (world units, match wall positions)")]
+        [SerializeField] private float _boundsXMin = -14f;
+        [SerializeField] private float _boundsXMax =  44f;
+        [SerializeField] private float _boundsYMin =  -9f;
+        [SerializeField] private float _boundsYMax =   9f;
 
         private Transform _target;
         private Camera    _cam;
@@ -59,8 +61,8 @@ namespace Restless.Core
             float halfH = _cam.orthographicSize;
             float halfW = halfH * _cam.aspect;
 
-            float clampedX = Mathf.Clamp(pos.x, -_roomHalfW + halfW, _roomHalfW - halfW);
-            float clampedY = Mathf.Clamp(pos.y, -_roomHalfH + halfH, _roomHalfH - halfH);
+            float clampedX = Mathf.Clamp(pos.x, _boundsXMin + halfW, _boundsXMax - halfW);
+            float clampedY = Mathf.Clamp(pos.y, _boundsYMin + halfH, _boundsYMax - halfH);
 
             return new Vector3(clampedX, clampedY, pos.z);
         }

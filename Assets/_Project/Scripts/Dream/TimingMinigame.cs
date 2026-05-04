@@ -97,6 +97,7 @@ namespace Restless.Dream
             if (delta <= _greenZoneHalfWidth)
             {
                 _successes++;
+                DreamSFXPlayer.Instance?.PlayMinigameHit();
                 if (_successes >= _successesRequired)
                 {
                     _isActive = false;
@@ -106,6 +107,7 @@ namespace Restless.Dream
             else
             {
                 _failures++;
+                DreamSFXPlayer.Instance?.PlayMinigameMiss();
                 if (_failures > _failuresAllowed)
                 {
                     _isActive = false;

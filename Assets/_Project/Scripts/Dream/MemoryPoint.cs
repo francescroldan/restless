@@ -76,6 +76,7 @@ namespace Restless.Dream
             _state = State.Extracting;
             RestlessnessManager.Instance?.SetMinigameActive(true);
             _visionCone?.Freeze();
+            DreamSFXPlayer.Instance?.PlayMemoryActivate();
 
             _minigame.Begin(
                 onSuccess: OnExtractionSuccess,
@@ -88,6 +89,8 @@ namespace Restless.Dream
             _state = State.Collected;
             RestlessnessManager.Instance?.SetMinigameActive(false);
             _visionCone?.Unfreeze();
+            DreamSFXPlayer.Instance?.PlayMinigameSuccess();
+            DreamSFXPlayer.Instance?.PlayFragmentCollect();
 
             // Open manual placement UI if available; fall back to auto-place
             if (InventoryPlacementUI.Instance != null)
@@ -101,6 +104,7 @@ namespace Restless.Dream
             _state = State.Failed;
             RestlessnessManager.Instance?.SetMinigameActive(false);
             _visionCone?.Unfreeze();
+            DreamSFXPlayer.Instance?.PlayMinigameFail();
         }
 
         private void OnDrawGizmosSelected()

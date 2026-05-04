@@ -12,6 +12,8 @@ namespace Restless.Dream
         {
             if (!other.CompareTag("Player")) return;
             RestlessnessManager.Instance?.SetZoneMultiplier(_rateMultiplier);
+            if (_rateMultiplier > 1f)
+                DreamSFXPlayer.Instance?.PlayZoneEnter();
         }
 
         private void OnTriggerExit2D(Collider2D other)

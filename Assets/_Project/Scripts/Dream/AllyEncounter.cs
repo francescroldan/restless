@@ -16,6 +16,8 @@ namespace Restless.Dream
         [SerializeField] private SpriteRenderer  _spriteRenderer;
         [SerializeField] private float           _triggerRadius = 1.2f;
 
+        public AllyData AllyDataRef => _allyData;
+
         private bool _interacted;
         private Collider2D _col;
 
@@ -40,6 +42,7 @@ namespace Restless.Dream
 
             _interacted = true;
             DreamTimer.Instance?.Pause();
+            DreamSFXPlayer.Instance?.PlayAllyEncounter();
 
             AllyEncounterPanel.Instance?.Show(
                 _allyData,
