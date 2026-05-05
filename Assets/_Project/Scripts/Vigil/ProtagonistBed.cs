@@ -34,9 +34,7 @@ namespace Restless.Vigil
             }
 
             if (_actionLabel != null)
-            {
-                var c = _actionLabel.color; c.a = 0f; _actionLabel.color = c;
-            }
+                _actionLabel.color = new Color(0.85f, 0.9f, 1f, 0f);
 
             StartBreathing();
 
@@ -55,7 +53,7 @@ namespace Restless.Vigil
 
         private void StartFirstRunHint()
         {
-            if (_sleepIcon == null) return;
+            if (_sleepIcon == null || _sleepIcon.sprite == null) return;
             _sleepIcon.enabled = true;
             _sleepIcon.DOFade(0.7f, 1.2f)
                 .SetLoops(-1, LoopType.Yoyo)
@@ -96,7 +94,7 @@ namespace Restless.Vigil
         private void ShowHoverFX()
         {
             StopFirstRunHint();
-            if (_sleepIcon != null)
+            if (_sleepIcon != null && _sleepIcon.sprite != null)
             {
                 _sleepIcon.enabled = true;
                 _sleepIcon.DOFade(1f, 0.2f);
@@ -116,23 +114,6 @@ namespace Restless.Vigil
             }
         }
 
-        private void PositionLabelInCanvas(TMP_Text label, Vector3 worldOffset)
-        {
-            var cam = Camera.main;
-            if (cam == null) return;
-            var canvas = label.GetComponentInParent<Canvas>();
-            if (canvas == null || canvas.renderMode == RenderMode.WorldSpace) return;
-            var screenPos = cam.WorldToScreenPoint(transform.position + worldOffset);
-            var canvasRT  = canvas.GetComponent<RectTransform>();
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    canvasRT, screenPos, null, out var localPos))
-            {
-                var rt = label.transform.parent?.GetComponent<RectTransform>()
-                      ?? label.GetComponent<RectTransform>();
-                if (rt != null) rt.anchoredPosition = localPos;
-            }
-        }
-
         private void HideHoverFX()
         {
             if (_sleepIcon != null)
@@ -148,6 +129,22 @@ namespace Restless.Vigil
                     () => _actionLabel.color,
                     v  => _actionLabel.color = v,
                     new Color(0.85f, 0.9f, 1f, 0f), 0.15f);
+            }
+        }
+
+        private void PositionLabelInCanvas(TMP_Text label, Vector3 worldOffset)
+        {
+            var cam = Camera.main;
+            if (cam == null) return;
+            var canvas = label.GetComponentInParent<Canvas>();
+            if (canvas == null || canvas.renderMode == RenderMode.WorldSpace) return;
+            var screenPos = cam.WorldToScreenPoint(transform.position + worldOffset);
+            var canvasRT  = canvas.GetComponent<RectTransform>();
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    canvasRT, screenPos, null, out var localPos))
+            {
+                var rt = label.GetComponent<RectTransform>();
+                if (rt != null) rt.anchoredPosition = localPos;
             }
         }
 

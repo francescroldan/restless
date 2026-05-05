@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.InputSystem;
 using Restless.Core;
 
 namespace Restless.Vigil
@@ -23,9 +24,45 @@ namespace Restless.Vigil
 
         private bool _transitioning;
 
+#if UNITY_EDITOR
+        [Header("Editor Debug")]
+        [SerializeField] private bool _debugUnlockTestAllies;
+#endif
+
+        private void Update()
+        {
+            if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
+                GameManager.Instance?.StartNewGame();
+#if UNITY_EDITOR
+            if (_debugUnlockTestAllies)
+            {
+                _debugUnlockTestAllies = false;
+                DebugToggleTestAllies();
+            }
+#endif
+        }
+
+#if UNITY_EDITOR
+        private void DebugToggleTestAllies()
+        {
+            bool anyPresent = System.Array.Exists(_allySlots, s => s != null && s.IsPresent);
+            foreach (var slot in _allySlots)
+            {
+                if (slot?.Data == null) continue;
+                bool isTestAlly = slot.Data.id == "sage" || slot.Data.id == "hero";
+                if (isTestAlly) slot.SetPresence(!anyPresent);
+            }
+            if (SaveManager.Instance != null)
+            {
+                if (!anyPresent) SaveManager.Instance.UnlockTestAllies();
+                else SaveManager.Instance.Data.unlockedAllyIds.Clear();
+            }
+            Debug.Log($"[VRC] [DEBUG] Aliados de prueba {(!anyPresent ? "desbloqueados" : "bloqueados")}.");
+        }
+#endif
+
         private void Awake()
         {
-            // On return from Dream, replace the stale DontDestroyOnLoad instance with the fresh one.
             if (Instance != null && Instance != this) Destroy(Instance);
             Instance = this;
         }

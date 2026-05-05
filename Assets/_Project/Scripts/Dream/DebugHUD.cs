@@ -51,10 +51,11 @@ namespace Restless.Dream
         {
             EnsureStyles();
             DrawBars();
+            DrawProximity();
+            if (!_visible) return;
             DrawChecklist();
             DrawKeyLegend();
-            DrawProximity();
-            if (_visible) DrawStats();
+            DrawStats();
         }
 
         // ── Checklist (always visible) ───────────────────────────────────

@@ -37,6 +37,7 @@ namespace Restless.Vigil
         public void SetPresence(bool present)
         {
             _isPresent = present;
+            gameObject.SetActive(present);
             _sr.enabled = present;
 
             if (_data?.roomSprite != null)
@@ -65,6 +66,7 @@ namespace Restless.Vigil
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (!_isPresent) return;
+            VigiliaAudioPlayer.Instance?.PlayAllyHover();
 
             _scaleTween?.Kill();
             _scaleTween = transform.DOScale(_baseScale * 1.1f, 0.18f).SetEase(Ease.OutBack);
@@ -109,6 +111,7 @@ namespace Restless.Vigil
         public void OnPointerClick(PointerEventData eventData)
         {
             if (!_isPresent || _data == null) return;
+            VigiliaAudioPlayer.Instance?.PlayAllyClick();
             ClickPulse();
             VigiliaRoomController.Instance?.OnAllyClicked(this);
         }

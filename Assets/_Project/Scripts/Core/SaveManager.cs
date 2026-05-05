@@ -20,12 +20,15 @@ namespace Restless.Core
             DontDestroyOnLoad(gameObject);
 #if UNITY_EDITOR
             DeleteSave();
-            // Pre-unlock Sage and Hero so the Vigil UI is testable from the start
-            Data.unlockedAllyIds.Add("sage");
-            Data.unlockedAllyIds.Add("hero");
 #else
             Load();
 #endif
+        }
+
+        public void UnlockTestAllies()
+        {
+            Data.unlockedAllyIds.Add("sage");
+            Data.unlockedAllyIds.Add("hero");
         }
 
         public void Save()

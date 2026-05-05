@@ -10,6 +10,8 @@ namespace Restless.Core
 
         public GameState State { get; private set; } = GameState.Vigilia;
 
+        [SerializeField] private ProtagonistState _protagonistState;
+
         private void Awake()
         {
             if (Instance != null)
@@ -19,6 +21,9 @@ namespace Restless.Core
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+#if UNITY_EDITOR
+            _protagonistState?.ResetForNewGame();
+#endif
         }
 
         public void EnterDream()
@@ -40,5 +45,13 @@ namespace Restless.Core
         public void OnDreamSceneReady() => State = GameState.Dream;
 
         public void OnVigiliaSceneReady() => State = GameState.Vigilia;
+
+        public void StartNewGame()
+        {
+            _protagonistState?.ResetForNewGame();
+            SaveManager.Instance?.DeleteSave();
+            State = GameState.Transitioning;
+            SceneLoader.Instance.LoadVigilia(abrupt: false);
+        }
     }
 }

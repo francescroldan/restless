@@ -15,16 +15,20 @@ namespace Restless.Vigil
         [SerializeField] private AudioClip _sfxReturnTranquil;
         [SerializeField] private AudioClip _sfxReturnAbrupt;
         [SerializeField] private AudioClip _sfxSleep;
+        [SerializeField] private AudioClip _sfxAllyHover;
+        [SerializeField] private AudioClip _sfxAllyClick;
 
-        [SerializeField] private float _ambientVolume = 0.4f;
-        [SerializeField] private float _sfxVolume     = 0.7f;
+        [SerializeField] private float _ambientVolume   = 0.4f;
+        [SerializeField] private float _sfxVolume       = 0.7f;
+        [SerializeField] private float _sfxAllyHoverVol = 0.4f;
+        [SerializeField] private float _sfxAllyClickVol = 0.6f;
 
         private AudioSource _ambientSrc;
         private AudioSource _sfxSrc;
 
         private void Awake()
         {
-            if (Instance != null) { Destroy(gameObject); return; }
+            if (Instance != null) { Destroy(this); return; }
             Instance = this;
 
             _ambientSrc = gameObject.AddComponent<AudioSource>();
@@ -52,14 +56,16 @@ namespace Restless.Vigil
             else           PlayReturnTranquil();
         }
 
-        public void PlayReturnTranquil() => PlaySFX(_sfxReturnTranquil);
-        public void PlayReturnAbrupt()   => PlaySFX(_sfxReturnAbrupt);
-        public void PlaySleep()          => PlaySFX(_sfxSleep);
+        public void PlayReturnTranquil() => PlaySFX(_sfxReturnTranquil, _sfxVolume);
+        public void PlayReturnAbrupt()   => PlaySFX(_sfxReturnAbrupt,   _sfxVolume);
+        public void PlaySleep()          => PlaySFX(_sfxSleep,          _sfxVolume);
+        public void PlayAllyHover()      => PlaySFX(_sfxAllyHover,      _sfxAllyHoverVol);
+        public void PlayAllyClick()      => PlaySFX(_sfxAllyClick,      _sfxAllyClickVol);
 
-        private void PlaySFX(AudioClip clip)
+        private void PlaySFX(AudioClip clip, float volume)
         {
             if (clip == null) return;
-            _sfxSrc.PlayOneShot(clip, _sfxVolume);
+            _sfxSrc.PlayOneShot(clip, volume);
         }
     }
 }
