@@ -20,6 +20,7 @@
 | M4 | Hub de Vigilia completo | ✅ Completado | [M4-Hub-Vigilia.md](M4-Hub-Vigilia.md) |
 | M5 | Primer aliado end-to-end | ✅ Completado | [M5-Primer-Aliado.md](M5-Primer-Aliado.md) |
 | M6 | MOC completo y jugable | 🔄 En curso | [M6-MOC-Completo.md](M6-MOC-Completo.md) |
+| M7 | RunConfig: parámetros modificables por run | ⬜ Pendiente | [M7-RunConfig.md](M7-RunConfig.md) |
 
 **Leyenda:** ⬜ Pendiente · 🔄 En curso · ✅ Completado
 

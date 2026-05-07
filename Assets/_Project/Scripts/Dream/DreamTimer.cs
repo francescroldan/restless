@@ -14,6 +14,7 @@ namespace Restless.Dream
 
         [Header("Settings")]
         [SerializeField] private float _highRestlessnessAcceleration = 2f;
+        [SerializeField] private float _maxRestlessnessAcceleration  = 4f;
 
         private float _remaining;
         private bool _running;
@@ -46,11 +47,13 @@ namespace Restless.Dream
 
             float drain = Time.deltaTime;
 
-            // Accelerate when restlessness is high or critical
+            // Accelerate when restlessness is elevated; Max drains much faster
             if (RestlessnessManager.Instance != null)
             {
                 var threshold = RestlessnessManager.Instance.CurrentThreshold;
-                if (threshold >= RestlessnessManager.Threshold.High)
+                if (threshold == RestlessnessManager.Threshold.Max)
+                    drain *= _maxRestlessnessAcceleration;
+                else if (threshold >= RestlessnessManager.Threshold.High)
                     drain *= _highRestlessnessAcceleration;
             }
 

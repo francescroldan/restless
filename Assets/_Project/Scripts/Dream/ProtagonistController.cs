@@ -21,8 +21,10 @@ namespace Restless.Dream
         private bool _isRunning;
 
         public Vector2 LookDirection => _lookDirection;
-        public bool IsMoving  => _moveInput.sqrMagnitude > 0.01f;
-        public bool IsRunning => _isRunning;
+        public bool IsMoving   => _moveInput.sqrMagnitude > 0.01f;
+        public bool IsRunning  => _isRunning;
+        public float WalkSpeed => _walkSpeed;
+        public float RunSpeed  => _runSpeed;
 
         private void Awake()
         {

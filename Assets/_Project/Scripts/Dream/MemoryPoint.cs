@@ -19,6 +19,8 @@ namespace Restless.Dream
         public MemoryFragment Fragment => _fragment;
         public State CurrentState => _state;
 
+        public void AssignFragment(MemoryFragment fragment) => _fragment = fragment;
+
         private void Awake()
         {
             _minigame = GetComponent<IExtractionMinigame>();

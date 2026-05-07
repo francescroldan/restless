@@ -11,12 +11,22 @@ namespace Restless.Core
         public int inventoryGridHeight = 5;
         public int totalAbruptWakeUps = 0;
 
-        // Base dream duration in seconds, reduced by abrupt wake-ups
-        public float BaseDreamDuration => Mathf.Max(120f, 360f - totalAbruptWakeUps * 12f);
+        [Range(0f, 180f)] public float dreamDurationOverride = 0f;
+
+        // Base dream duration in seconds, reduced by abrupt wake-ups (override if set)
+        public float BaseDreamDuration => dreamDurationOverride > 0f
+            ? dreamDurationOverride
+            : Mathf.Max(40f, 75f - totalAbruptWakeUps * 3f);
+
+        public void ApplyNormalRun(float mentalCost, float physicalCost)
+        {
+            mentalHealth   = Mathf.Max(0f, mentalHealth   - mentalCost);
+            physicalHealth = Mathf.Max(0f, physicalHealth - physicalCost);
+        }
 
         public void ApplyAbruptWakeUp(float mentalDamage, float physicalDamage)
         {
-            mentalHealth = Mathf.Max(0f, mentalHealth - mentalDamage);
+            mentalHealth   = Mathf.Max(0f, mentalHealth   - mentalDamage);
             physicalHealth = Mathf.Max(0f, physicalHealth - physicalDamage);
             totalAbruptWakeUps++;
 

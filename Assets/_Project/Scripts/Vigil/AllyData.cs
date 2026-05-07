@@ -27,6 +27,9 @@ namespace Restless.Vigil
         [TextArea(2, 4)] public string passiveDescription;
         public float dreamDurationBonus = 0f;
         [Range(-1f, 1f)] public float restlessnessRateModifier = 0f;
+        [Range(0.3f, 1f)]  public float minigameSpeedMultiplier  = 1f;
+        [Range(0.1f, 1f)]  public float healthCostMultiplier    = 1f;
+        [Range(0, 8)]      public int   inventoryBonusCells      = 0;
 
         [Header("Incompatibilities")]
         public List<AllyData> incompatibleWith = new();

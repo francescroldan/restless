@@ -49,15 +49,19 @@ namespace Restless.Vigil
             foreach (var slot in _allySlots)
             {
                 if (slot?.Data == null) continue;
-                bool isTestAlly = slot.Data.id == "sage" || slot.Data.id == "hero";
-                if (isTestAlly) slot.SetPresence(!anyPresent);
+                slot.SetPresence(!anyPresent);
             }
             if (SaveManager.Instance != null)
             {
-                if (!anyPresent) SaveManager.Instance.UnlockTestAllies();
-                else SaveManager.Instance.Data.unlockedAllyIds.Clear();
+                if (!anyPresent)
+                {
+                    foreach (var slot in _allySlots)
+                        if (slot?.Data != null) SaveManager.Instance.UnlockAlly(slot.Data.id);
+                }
+                else
+                    SaveManager.Instance.Data.unlockedAllyIds.Clear();
             }
-            Debug.Log($"[VRC] [DEBUG] Aliados de prueba {(!anyPresent ? "desbloqueados" : "bloqueados")}.");
+            Debug.Log($"[VRC] [DEBUG] Todos los aliados {(!anyPresent ? "desbloqueados" : "bloqueados")}.");
         }
 #endif
 
@@ -82,7 +86,9 @@ namespace Restless.Vigil
 
         // ── Room setup ─────────────────────────────────────────────────────
 
-        private void InitializeRoom()
+        private void InitializeRoom() => RefreshAllySlots();
+
+        public void RefreshAllySlots()
         {
             var unlockedIds = SaveManager.Instance?.Data?.unlockedAllyIds ?? new List<string>();
 

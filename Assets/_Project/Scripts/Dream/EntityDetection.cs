@@ -13,9 +13,11 @@ namespace Restless.Dream
         [SerializeField] private float _interruptRadius = 1.2f;
         [SerializeField] private float _interruptMagnitude = 0.35f;
 
-        private VisionCone _visionCone;
+        private VisionCone    _visionCone;
         private DreamEntity[] _entities;
-        private float _interruptCooldown;
+        private float         _interruptCooldown;
+        private bool          _wasDetecting;
+        private float         _detectionBuzzCooldown;
 
         private void Start()
         {
@@ -25,8 +27,10 @@ namespace Restless.Dream
 
         private void Update()
         {
-            if (_interruptCooldown > 0f)
-                _interruptCooldown -= Time.deltaTime;
+            if (_interruptCooldown     > 0f) _interruptCooldown     -= Time.deltaTime;
+            if (_detectionBuzzCooldown > 0f) _detectionBuzzCooldown -= Time.deltaTime;
+
+            bool anyInCone = false;
 
             foreach (var entity in _entities)
             {
@@ -35,7 +39,10 @@ namespace Restless.Dream
                 bool inCone = _visionCone != null && _visionCone.ContainsPoint(entity.transform.position);
 
                 if (inCone)
+                {
+                    anyInCone = true;
                     RestlessnessManager.Instance?.AddSpike(_spikePerSecond * Time.deltaTime);
+                }
 
                 // Interrupt active RetentionMinigame when entity is very close
                 if (_interruptCooldown <= 0f)
@@ -52,6 +59,15 @@ namespace Restless.Dream
                     }
                 }
             }
+
+            // Rising edge: entity just entered cone — buzz + sound
+            if (anyInCone && !_wasDetecting && _detectionBuzzCooldown <= 0f)
+            {
+                DreamSFXPlayer.Instance?.PlayEntityDetected();
+                RestlessnessVisualFX.Instance?.TriggerDetectionBuzz();
+                _detectionBuzzCooldown = 1.5f;
+            }
+            _wasDetecting = anyInCone;
         }
 
         private RetentionMinigame FindAnyRetentionMinigame()

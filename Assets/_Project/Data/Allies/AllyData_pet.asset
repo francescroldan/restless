@@ -17,9 +17,14 @@ MonoBehaviour:
   archetype: 4
   roomSprite: {fileID: -8914541830777553014, guid: 0eac94e2e831da5428739575119fbdc4, type: 3}
   iconSprite: {fileID: -6632257462059831058, guid: 4f6f09f0e61c36c42bc1279d280d81e7, type: 3}
+  portraitSprite: {fileID: 0}
   lightColor: {r: 0.9, g: 0.9, b: 0.95, a: 1}
   lightIntensity: 0.3
   lightRadius: 1.5
-  passiveDescription: 
+  passiveDescription: "Compa\xF1ero fiel. Ampl\xEDa la capacidad de carga en 3 casillas
+    extra."
   dreamDurationBonus: 0
   restlessnessRateModifier: 0
+  minigameSpeedMultiplier: 1
+  inventoryBonusCells: 3
+  incompatibleWith: []

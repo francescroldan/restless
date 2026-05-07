@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
+using DG.Tweening;
 using Restless.Core;
 
 namespace Restless.Vigil
@@ -47,6 +48,10 @@ namespace Restless.Vigil
             _slotBButton.onClick.AddListener(CycleSlotB);
             _confirmButton.onClick.AddListener(OnConfirm);
             if (_cancelButton != null) _cancelButton.onClick.AddListener(Hide);
+
+            var btnImg = _confirmButton?.GetComponent<Image>();
+            if (btnImg != null) _confirmButtonOriginalColor = btnImg.color;
+
             _root.SetActive(false);
         }
 
@@ -210,10 +215,33 @@ namespace Restless.Vigil
             _onConfirm?.Invoke();
         }
 
+        private Color _confirmButtonOriginalColor;
         private Coroutine _flashCoroutine;
+        private Tween _btnShakeTween;
+        private Tween _btnColorTween;
 
         private void TriggerIncompatibleFlash()
         {
+            VigiliaAudioPlayer.Instance?.PlayIncompatibleError();
+
+            // Shake the confirm button horizontally
+            var btnRT = _confirmButton?.GetComponent<RectTransform>();
+            if (btnRT != null)
+            {
+                _btnShakeTween?.Kill(true);
+                _btnShakeTween = btnRT.DOShakeAnchorPos(0.35f, new Vector2(10f, 0f), vibrato: 24, randomness: 0f);
+            }
+
+            // Flash confirm button image red → original color
+            var btnImg = _confirmButton?.GetComponent<Image>();
+            if (btnImg != null)
+            {
+                _btnColorTween?.Kill();
+                btnImg.color = new Color(1f, 0.2f, 0.2f);
+                _btnColorTween = btnImg.DOColor(_confirmButtonOriginalColor, 0.4f).SetEase(Ease.OutCubic);
+            }
+
+            // Also flash warning labels if wired
             if (_flashCoroutine != null) StopCoroutine(_flashCoroutine);
             _flashCoroutine = StartCoroutine(IncompatibleFlashRoutine());
         }
@@ -232,6 +260,12 @@ namespace Restless.Vigil
                 yield return new WaitForSecondsRealtime(0.07f);
             }
             _flashCoroutine = null;
+        }
+
+        private void OnDestroy()
+        {
+            _btnShakeTween?.Kill();
+            _btnColorTween?.Kill();
         }
     }
 }

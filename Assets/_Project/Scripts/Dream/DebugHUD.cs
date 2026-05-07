@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Restless.Core;
+using Restless.Vigil;
 
 namespace Restless.Dream
 {
@@ -10,6 +12,8 @@ namespace Restless.Dream
         private Texture2D _white;
         private GUIStyle _checkStyle;
         private GUIStyle _headerStyle;
+
+        [SerializeField] private AllyRegistry _registry;
 
         // M6 playtest checklist — tick manually in the Inspector during testing
         [Header("Playtest Checklist M6 (marcar durante la prueba)")]
@@ -161,12 +165,13 @@ namespace Restless.Dream
 
         private void DrawBars()
         {
-            const float barH   = 18f;
-            const float labelW = 110f;
-            const float pad    = 4f;
-            const float x      = 10f;
-            const float rowGap = 4f;
-            float barW = Screen.width - x * 2f - labelW;
+            const float barH        = 18f;
+            const float labelW      = 110f;
+            const float pad         = 4f;
+            const float x           = 10f;
+            const float rowGap      = 4f;
+            const float rightReserve = 292f; // espacio reservado para checklist/controles
+            float barW = Screen.width - x * 2f - labelW - rightReserve;
             float y    = 10f;
 
             if (DreamTimer.Instance != null)
@@ -224,6 +229,15 @@ namespace Restless.Dream
             GUI.Label(new Rect(x, y, 400, lineH), "=== DEBUG HUD (F1) ===");
             y += lineH + 4;
 
+            var player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                Vector2 pos = player.transform.position;
+                GUI.color = new Color(0.7f, 0.7f, 0.75f);
+                GUI.Label(new Rect(x, y, 400, lineH), $"Jugador: ({pos.x:F1}, {pos.y:F1})");
+                y += lineH;
+            }
+
             if (RestlessnessManager.Instance != null)
             {
                 float val = RestlessnessManager.Instance.Value;
@@ -244,6 +258,8 @@ namespace Restless.Dream
                 y += lineH;
             }
 
+            DrawModifiers(x, ref y, lineH);
+
             if (DreamInventory.Instance != null)
             {
                 int placed = DreamInventory.Instance.PlacedFragments.Count;
@@ -253,6 +269,20 @@ namespace Restless.Dream
                     $"Inventory: {placed} fragment(s){(full ? "  [FULL]" : "")}");
                 y += lineH;
             }
+
+            if (SaveManager.Instance != null && GameManager.Instance != null)
+            {
+                int collected = SaveManager.Instance.CollectedFragmentCount;
+                int target    = GameManager.Instance.DemoFragmentTarget;
+                int remaining = Mathf.Max(0, target - collected);
+                GUI.color = remaining == 0 ? new Color(1f, 0.82f, 0.28f) : new Color(0.7f, 0.7f, 0.75f);
+                GUI.Label(new Rect(x, y, 400, lineH),
+                    $"Ecos: {collected}/{target}  (faltan {remaining})");
+                y += lineH;
+            }
+
+            DrawActiveAllies(x, ref y, lineH);
+            DrawEncounterAndMemories(x, ref y, lineH);
 
             GUI.color = Color.cyan;
             var memoryPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
@@ -274,6 +304,135 @@ namespace Restless.Dream
                     GUI.Label(new Rect(x, y, 400, lineH),
                         $"Minigame [RETENTION]: conc={retention.Concentration:F2}");
                 y += lineH;
+            }
+
+            GUI.color = Color.white;
+        }
+
+        // ── Modifiers block ─────────────────────────────────────────────────
+
+        private void DrawModifiers(int x, ref int y, int lineH)
+        {
+            var rm = RestlessnessManager.Instance;
+            var protagonist = GameObject.FindWithTag("Player");
+            var ctrl = protagonist != null ? protagonist.GetComponent<ProtagonistController>() : null;
+
+            GUI.color = new Color(1f, 0.85f, 0.4f);
+            GUI.Label(new Rect(x, y, 500, lineH), "Modificadores activos:");
+            y += lineH;
+
+            if (rm != null)
+            {
+                float rate = rm.CurrentRate;
+                GUI.color = rate > 1.5f ? Color.red : rate > 0.7f ? Color.yellow : Color.white;
+                GUI.Label(new Rect(x + 12, y, 500, lineH),
+                    $"Inquietud: base {rm.BaseRate:F2}/s  ×zona {rm.ZoneMultiplier:F2}  ×pasiva {rm.PassiveMultiplier:F2}  = {rate:F2}/s");
+                y += lineH;
+            }
+
+            if (ctrl != null)
+            {
+                GUI.color = Color.white;
+                GUI.Label(new Rect(x + 12, y, 500, lineH),
+                    $"Velocidad: caminar {ctrl.WalkSpeed:F1} u/s  |  correr {ctrl.RunSpeed:F1} u/s");
+                y += lineH;
+            }
+
+            GUI.color = Color.white;
+        }
+
+        // ── Active allies block ──────────────────────────────────────────────
+
+        private void DrawActiveAllies(int x, ref int y, int lineH)
+        {
+            var selectedIds = SaveManager.Instance?.Data?.selectedAllyIds;
+
+            GUI.color = new Color(0.6f, 0.7f, 1f);
+            GUI.Label(new Rect(x, y, 400, lineH), "Aliados activos:");
+            y += lineH;
+
+            if (selectedIds == null || selectedIds.Count == 0)
+            {
+                GUI.color = new Color(0.5f, 0.5f, 0.55f);
+                GUI.Label(new Rect(x + 12, y, 400, lineH), "— ninguno");
+                y += lineH;
+                return;
+            }
+
+            foreach (var id in selectedIds)
+            {
+                AllyData ally = _registry != null ? _registry.GetById(id) : null;
+                string name   = ally != null ? ally.displayName : id;
+                string detail = ally != null
+                    ? $"  rate×{1f + ally.restlessnessRateModifier:F2}  dur+{ally.dreamDurationBonus:F0}s"
+                    : "";
+                GUI.color = new Color(0.4f, 0.9f, 0.5f);
+                GUI.Label(new Rect(x + 12, y, 500, lineH), $"• {name}{detail}");
+                y += lineH;
+            }
+
+            GUI.color = Color.white;
+        }
+
+        // ── Encounter + memories block ───────────────────────────────────────
+
+        private void DrawEncounterAndMemories(int x, ref int y, int lineH)
+        {
+            // ── Encounter ally ──
+            GUI.color = new Color(0.9f, 0.7f, 1f);
+            GUI.Label(new Rect(x, y, 500, lineH), "Encuentro esta run:");
+            y += lineH;
+
+            var spawner = AllyEncounterSpawner.Instance;
+            if (spawner == null || spawner.ActiveAlly == null)
+            {
+                GUI.color = new Color(0.5f, 0.5f, 0.55f);
+                GUI.Label(new Rect(x + 12, y, 500, lineH), "— ninguno");
+                y += lineH;
+            }
+            else
+            {
+                bool obtained = spawner.AllyObtained;
+                GUI.color = obtained ? new Color(0.3f, 0.9f, 0.4f) : new Color(0.95f, 0.85f, 0.3f);
+                GUI.Label(new Rect(x + 12, y, 500, lineH),
+                    $"{(obtained ? "✓" : "○")} {spawner.ActiveAlly.displayName}  " +
+                    $"{(obtained ? "obtenido" : "disponible")}");
+                y += lineH;
+                var pos = spawner.ActiveEncounterPosition;
+                GUI.color = new Color(0.55f, 0.55f, 0.6f);
+                GUI.Label(new Rect(x + 12, y, 500, lineH),
+                    $"   spawn ({pos.x:F0}, {pos.y:F0})");
+                y += lineH;
+            }
+
+            // ── Memory points ──
+            GUI.color = new Color(0.9f, 0.7f, 1f);
+            GUI.Label(new Rect(x, y, 500, lineH), "Recuerdos:");
+            y += lineH;
+
+            var memPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
+            if (memPoints.Length == 0)
+            {
+                GUI.color = new Color(0.5f, 0.5f, 0.55f);
+                GUI.Label(new Rect(x + 12, y, 500, lineH), "— ninguno");
+                y += lineH;
+            }
+            else
+            {
+                foreach (var mp in memPoints)
+                {
+                    (Color col, string icon) = mp.CurrentState switch
+                    {
+                        MemoryPoint.State.Collected  => (new Color(0.3f, 0.9f, 0.4f), "✓"),
+                        MemoryPoint.State.Extracting => (Color.yellow,                 "⟳"),
+                        MemoryPoint.State.Failed     => (Color.red,                    "✗"),
+                        _                            => (new Color(0.55f, 0.55f, 0.6f), "○"),
+                    };
+                    GUI.color = col;
+                    GUI.Label(new Rect(x + 12, y, 500, lineH),
+                        $"{icon} {mp.gameObject.name}  [{mp.CurrentState}]");
+                    y += lineH;
+                }
             }
 
             GUI.color = Color.white;

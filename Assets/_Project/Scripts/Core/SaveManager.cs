@@ -75,5 +75,25 @@ namespace Restless.Core
             Data.selectedAllyIds = new System.Collections.Generic.List<string>(ids);
             Save();
         }
+
+        // ── Fragment helpers ───────────────────────────────────────────────
+
+        public int CollectedFragmentCount => Data.collectedFragmentIds.Count;
+
+        /// <summary>
+        /// Persists fragments from a completed run.
+        /// On abrupt wake-up, <paramref name="lossOnAbrupt"/> fragments are dropped from the end of the list.
+        /// </summary>
+        public void CommitRunFragments(System.Collections.Generic.List<string> ids, bool abrupt, int lossOnAbrupt = 1)
+        {
+            if (ids == null || ids.Count == 0) return;
+
+            int saveCount = abrupt ? Mathf.Max(0, ids.Count - lossOnAbrupt) : ids.Count;
+            for (int i = 0; i < saveCount; i++)
+                Data.collectedFragmentIds.Add(ids[i]);
+
+            Debug.Log($"[SaveManager] Fragments committed: {saveCount}/{ids.Count} (abrupt={abrupt}, lost={ids.Count - saveCount}). Total: {Data.collectedFragmentIds.Count}");
+            Save();
+        }
     }
 }

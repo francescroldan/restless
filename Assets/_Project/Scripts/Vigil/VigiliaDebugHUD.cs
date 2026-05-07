@@ -30,6 +30,7 @@ namespace Restless.Vigil
 
         private void OnGUI()
         {
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Vigil") return;
             EnsureStyles();
             if (!_visible) return;
 
@@ -80,7 +81,7 @@ namespace Restless.Vigil
 
             DrawRow(x + pad, y, w - pad * 2, lineH, "Duración base sueño",
                 $"{ps.BaseDreamDuration:F0}s",
-                ps.BaseDreamDuration >= 300f ? Color.green : ps.BaseDreamDuration >= 180f ? Color.yellow : Color.red);
+                ps.BaseDreamDuration >= 120f ? Color.green : ps.BaseDreamDuration >= 80f ? Color.yellow : Color.red);
             y += lineH;
 
             DrawRow(x + pad, y, w - pad * 2, lineH, "Inventario",

@@ -32,6 +32,7 @@ namespace Restless.Dream
         private readonly Color _colCursorBorder = new Color(1f, 1f, 1f, 0.55f);
 
         private float _inputCooldown;
+        private int   _openFrame = -1;
         private const float INPUT_REPEAT = 0.18f;
 
         private void Awake()
@@ -52,10 +53,12 @@ namespace Restless.Dream
         /// <summary>Opens the placement screen for a newly extracted fragment.</summary>
         public void Open(MemoryFragment fragment)
         {
-            _pending  = fragment;
-            _rotation = 0;
-            _cursor   = Vector2Int.zero;
-            _open     = true;
+            _pending   = fragment;
+            _rotation  = 0;
+            _cursor    = Vector2Int.zero;
+            _openFrame = Time.frameCount;
+            _open      = true;
+            if (_inventory == null) _inventory = DreamInventory.Instance;
             Time.timeScale = 0f;
             ClampCursor(_pending.GetRotated(_rotation));
         }
@@ -63,6 +66,10 @@ namespace Restless.Dream
         private void Update()
         {
             if (!_open) return;
+            if (Time.frameCount == _openFrame) return; // skip frame that triggered the minigame success
+
+            if (_inventory == null) _inventory = DreamInventory.Instance;
+            if (_inventory == null) return;
 
             var kb = Keyboard.current;
             if (kb == null) return;

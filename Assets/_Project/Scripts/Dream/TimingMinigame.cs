@@ -33,11 +33,17 @@ namespace Restless.Dream
         public int Successes => _successes;
         public int Failures => _failures;
 
+        private float _speedMultiplier = 1f;
+
         private void Start()
         {
             var protagonistGO = GameObject.FindWithTag("Player");
             if (protagonistGO != null)
                 _playerInput = protagonistGO.GetComponent<PlayerInput>();
+
+            // Apply ally passive if available
+            var applier = FindFirstObjectByType<DreamPassiveApplier>();
+            if (applier != null) _speedMultiplier = applier.MinigameSpeedMultiplier;
         }
 
         public void Begin(Action onSuccess, Action onFailure)
@@ -71,7 +77,7 @@ namespace Restless.Dream
             // Scale difficulty with restlessness
             float restT = RestlessnessManager.Instance != null
                 ? RestlessnessManager.Instance.NormalizedValue : 0f;
-            float speed = Mathf.Lerp(_markerSpeed, _markerSpeedMax, restT);
+            float speed = Mathf.Lerp(_markerSpeed, _markerSpeedMax, restT) * _speedMultiplier;
             GreenZoneHalfWidth = Mathf.Lerp(_greenZoneHalfWidth, _greenZoneHalfWidthMin, restT);
 
             _markerPosition += _markerDirection * speed * Time.deltaTime;

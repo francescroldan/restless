@@ -17,11 +17,13 @@ namespace Restless.Vigil
         [SerializeField] private AudioClip _sfxSleep;
         [SerializeField] private AudioClip _sfxAllyHover;
         [SerializeField] private AudioClip _sfxAllyClick;
+        [SerializeField] private AudioClip _sfxIncompatible;
 
-        [SerializeField] private float _ambientVolume   = 0.4f;
-        [SerializeField] private float _sfxVolume       = 0.7f;
-        [SerializeField] private float _sfxAllyHoverVol = 0.4f;
-        [SerializeField] private float _sfxAllyClickVol = 0.6f;
+        [SerializeField] private float _ambientVolume      = 0.4f;
+        [SerializeField] private float _sfxVolume          = 0.7f;
+        [SerializeField] private float _sfxAllyHoverVol    = 0.4f;
+        [SerializeField] private float _sfxAllyClickVol    = 0.6f;
+        [SerializeField] private float _sfxIncompatibleVol = 0.7f;
 
         private AudioSource _ambientSrc;
         private AudioSource _sfxSrc;
@@ -51,16 +53,19 @@ namespace Restless.Vigil
                 _ambientSrc.Play();
             }
 
-            bool wasAbrupt = SceneLoader.Instance != null && SceneLoader.Instance.LastWakeUpWasAbrupt;
-            if (wasAbrupt) PlayReturnAbrupt();
-            else           PlayReturnTranquil();
+            if (SceneLoader.Instance != null)
+            {
+                if (SceneLoader.Instance.LastWakeUpWasAbrupt) PlayReturnAbrupt();
+                else                                          PlayReturnTranquil();
+            }
         }
 
         public void PlayReturnTranquil() => PlaySFX(_sfxReturnTranquil, _sfxVolume);
         public void PlayReturnAbrupt()   => PlaySFX(_sfxReturnAbrupt,   _sfxVolume);
         public void PlaySleep()          => PlaySFX(_sfxSleep,          _sfxVolume);
-        public void PlayAllyHover()      => PlaySFX(_sfxAllyHover,      _sfxAllyHoverVol);
-        public void PlayAllyClick()      => PlaySFX(_sfxAllyClick,      _sfxAllyClickVol);
+        public void PlayAllyHover()        => PlaySFX(_sfxAllyHover,      _sfxAllyHoverVol);
+        public void PlayAllyClick()        => PlaySFX(_sfxAllyClick,      _sfxAllyClickVol);
+        public void PlayIncompatibleError() => PlaySFX(_sfxIncompatible,   _sfxIncompatibleVol);
 
         private void PlaySFX(AudioClip clip, float volume)
         {

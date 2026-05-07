@@ -21,7 +21,10 @@ MonoBehaviour:
   lightColor: {r: 0.7, g: 0.5, b: 0.9, a: 1}
   lightIntensity: 0.6
   lightRadius: 2.5
-  passiveDescription: "Gu\xEDa interior. Sin efecto pasivo propio."
+  passiveDescription: "Gu\xEDa interior. Los ritmos del sue\xF1o se vuelven m\xE1s
+    lentos y manejables."
   dreamDurationBonus: 0
   restlessnessRateModifier: 0
+  minigameSpeedMultiplier: 0.6
+  inventoryBonusCells: 0
   incompatibleWith: []

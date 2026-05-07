@@ -68,7 +68,10 @@ namespace Restless.Dream
             _currentThreshold = newThreshold;
         }
 
-        public float ZoneMultiplier => _rateMultiplier;
+        public float ZoneMultiplier    => _rateMultiplier;
+        public float PassiveMultiplier => _passiveMultiplier;
+        public float BaseRate          => _baseRate;
+        public float CurrentRate       => _baseRate * _rateMultiplier * _passiveMultiplier * (_minigameActive ? _minigameMultiplier : 1f);
 
         /// <summary>Called by RestlessnessZone when player enters/exits.</summary>
         public void SetZoneMultiplier(float multiplier) => _rateMultiplier = multiplier;

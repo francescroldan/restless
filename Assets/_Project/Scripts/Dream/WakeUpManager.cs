@@ -15,18 +15,12 @@ namespace Restless.Dream
             if (protagonistGO != null)
                 _playerInput = protagonistGO.GetComponent<PlayerInput>();
 
-            if (RestlessnessManager.Instance != null)
-                RestlessnessManager.Instance.OnMaxReached += TriggerAbruptWakeUp;
-
             if (DreamTimer.Instance != null)
                 DreamTimer.Instance.OnExpired += TriggerAbruptWakeUp;
         }
 
         private void OnDestroy()
         {
-            if (RestlessnessManager.Instance != null)
-                RestlessnessManager.Instance.OnMaxReached -= TriggerAbruptWakeUp;
-
             if (DreamTimer.Instance != null)
                 DreamTimer.Instance.OnExpired -= TriggerAbruptWakeUp;
         }

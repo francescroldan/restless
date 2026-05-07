@@ -9,29 +9,35 @@ namespace Restless.Dream
     /// </summary>
     public class DreamSceneBootstrap : MonoBehaviour
     {
-        [SerializeField] private int   _inventoryWidth    = 4;
-        [SerializeField] private int   _inventoryHeight   = 5;
-        [SerializeField] private float _dreamDuration     = 300f;
-        [SerializeField] private float _firstRunBonusTime = 60f;
+        [SerializeField] private int   _inventoryWidth  = 4;
+        [SerializeField] private int   _inventoryHeight = 5;
+        [SerializeField] private ProtagonistState _protagonistState;
 
         private void Start()
         {
             GameManager.Instance?.OnDreamSceneReady();
-            DreamInventory.Instance?.Initialize(_inventoryWidth, _inventoryHeight);
 
-            bool isFirstRun = SaveManager.Instance != null && SaveManager.Instance.Data.totalRuns == 0;
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.Data.totalRuns++;
                 SaveManager.Instance.Save();
             }
 
-            float baseDuration = isFirstRun ? _dreamDuration + _firstRunBonusTime : _dreamDuration;
+            float baseDuration = _protagonistState != null
+                ? _protagonistState.BaseDreamDuration
+                : 200f;
             var applier = GetComponent<DreamPassiveApplier>();
             float duration = applier != null ? applier.ApplyPassives(baseDuration) : baseDuration;
+
+            int bonusCells = applier?.InventoryBonusCells ?? 0;
+            int totalCells = _inventoryWidth * _inventoryHeight + bonusCells;
+            // Keep width fixed, grow height to accommodate bonus cells
+            int finalHeight = Mathf.CeilToInt((float)totalCells / _inventoryWidth);
+            DreamInventory.Instance?.Initialize(_inventoryWidth, finalHeight);
+
             DreamTimer.Instance?.StartTimer(duration);
 
-            Debug.Log($"[DreamSceneBootstrap] Inventory {_inventoryWidth}x{_inventoryHeight}, timer {duration}s (firstRun={isFirstRun})");
+            Debug.Log($"[DreamSceneBootstrap] Inventory {_inventoryWidth}x{finalHeight} (bonus={bonusCells}), timer {duration}s");
         }
     }
 }

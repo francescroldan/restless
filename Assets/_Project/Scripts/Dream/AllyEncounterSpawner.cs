@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Restless.Core;
@@ -5,55 +6,51 @@ using Restless.Vigil;
 
 namespace Restless.Dream
 {
-    /// <summary>
-    /// Each time the Dream scene loads, picks ONE ally not yet unlocked and places
-    /// its encounter at a random position from the predefined spawn points.
-    /// All other encounter GameObjects are deactivated.
-    /// </summary>
     public class AllyEncounterSpawner : MonoBehaviour
     {
+        public static AllyEncounterSpawner Instance { get; private set; }
+
         [SerializeField] private AllyEncounter[] _encounters;
-        [SerializeField] private Transform[]     _spawnPoints;
 
-        private void Start()
+        public AllyData   ActiveAlly             { get; private set; }
+        public Vector2    ActiveEncounterPosition { get; private set; }
+        public bool       AllyObtained           => ActiveAlly != null &&
+                                                    SaveManager.Instance != null &&
+                                                    SaveManager.Instance.IsAllyUnlocked(ActiveAlly.id);
+
+        private void Awake()
         {
-            if (_encounters == null || _encounters.Length == 0) return;
-
-            // Deactivate all encounters first
-            foreach (var enc in _encounters)
-                if (enc != null) enc.gameObject.SetActive(false);
-
-            // Filter to allies not yet unlocked
-            var candidates = new List<AllyEncounter>();
-            foreach (var enc in _encounters)
-            {
-                if (enc == null) continue;
-                var ally = GetAllyData(enc);
-                if (ally == null) continue;
-                if (SaveManager.Instance != null && SaveManager.Instance.IsAllyUnlocked(ally.id)) continue;
-                candidates.Add(enc);
-            }
-
-            if (candidates.Count == 0) return;  // all allies already unlocked
-
-            // Pick one random encounter and one random spawn point
-            var chosen = candidates[Random.Range(0, candidates.Count)];
-
-            if (_spawnPoints != null && _spawnPoints.Length > 0)
-            {
-                var spawnPt = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-                chosen.transform.position = spawnPt.position;
-            }
-
-            chosen.gameObject.SetActive(true);
+            if (Instance != null) { Destroy(this); return; }
+            Instance = this;
         }
 
-        private static AllyData GetAllyData(AllyEncounter enc)
+        private IEnumerator Start()
         {
-            // AllyEncounter stores _allyData as a private serialized field — access via property if available,
-            // otherwise use SerializedObject in editor or reflection at runtime.
-            // We expose it via a public accessor added to AllyEncounter.
-            return enc.AllyDataRef;
+            foreach (var e in _encounters)
+                if (e != null) e.gameObject.SetActive(false);
+
+            // Wait for SaveManager so unlock state is accurate before picking a candidate
+            yield return new WaitUntil(() => SaveManager.Instance != null);
+
+            var candidates = new List<AllyEncounter>();
+            foreach (var e in _encounters)
+            {
+                if (e?.AllyDataRef == null) continue;
+                if (SaveManager.Instance.IsAllyUnlocked(e.AllyDataRef.id)) continue;
+                candidates.Add(e);
+            }
+
+            if (candidates.Count == 0)
+            {
+                Debug.Log("[AllyEncounterSpawner] Todos los aliados ya desbloqueados — sin encuentro esta run.");
+                yield break;
+            }
+
+            var chosen = candidates[Random.Range(0, candidates.Count)];
+            chosen.gameObject.SetActive(true);
+            ActiveAlly = chosen.AllyDataRef;
+            ActiveEncounterPosition = chosen.transform.position;
+            Debug.Log($"[AllyEncounterSpawner] Encuentro esta run: {ActiveAlly.displayName} @ {ActiveEncounterPosition}");
         }
     }
 }

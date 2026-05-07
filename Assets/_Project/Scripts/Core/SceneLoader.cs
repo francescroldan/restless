@@ -8,10 +8,12 @@ namespace Restless.Core
     {
         public static SceneLoader Instance { get; private set; }
 
-        [SerializeField] private string _dreamSceneName   = "Dream";
-        [SerializeField] private string _vigiliaSceneName = "Vigil";
+        [SerializeField] private string _dreamSceneName    = "Dream";
+        [SerializeField] private string _vigiliaSceneName  = "Vigil";
+        [SerializeField] private string _gameOverSceneName = "GameOver";
 
         public bool LastWakeUpWasAbrupt { get; private set; }
+        public GameManager.GameOverType LastGameOverType { get; private set; }
 
         private void Awake()
         {
@@ -31,6 +33,12 @@ namespace Restless.Core
             LastWakeUpWasAbrupt = abrupt;
             StartCoroutine(LoadScene(_vigiliaSceneName, onLoaded: () =>
                 GameManager.Instance?.OnVigiliaSceneReady()));
+        }
+
+        public void LoadGameOver(GameManager.GameOverType type)
+        {
+            LastGameOverType = type;
+            StartCoroutine(LoadScene(_gameOverSceneName, onLoaded: null));
         }
 
         private IEnumerator LoadScene(string sceneName, System.Action onLoaded)

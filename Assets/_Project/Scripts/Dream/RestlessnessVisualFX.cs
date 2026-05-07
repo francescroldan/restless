@@ -11,6 +11,7 @@ namespace Restless.Dream
     [RequireComponent(typeof(Volume))]
     public class RestlessnessVisualFX : MonoBehaviour
     {
+        public static RestlessnessVisualFX Instance { get; private set; }
         [Header("Transition speed")]
         [SerializeField] private float _lerpSpeed = 2f;
 
@@ -36,6 +37,11 @@ namespace Restless.Dream
         [SerializeField] private float _flashDuration = 0.25f;
         [SerializeField] private float _flashAlphaMax = 0.38f;
 
+        [Header("Max restlessness red veil")]
+        [SerializeField] private float _maxVeilBaseAlpha  = 0.10f;
+        [SerializeField] private float _maxVeilPulseDepth = 0.10f;
+        [SerializeField] private float _maxVeilPulseRate  = 2.2f;
+
         private Volume   _volume;
         private Vignette _vignette;
         private ChromaticAberration _chromatic;
@@ -47,9 +53,21 @@ namespace Restless.Dream
         private float  _pulseTime;
         private float  _lastZoneMultiplier = 1f;
         private Texture2D _white;
+        private bool   _maxReached;
+        private float  _maxVeilTime;
+        private float  _buzzChromatic;
+        private float  _buzzVignette;
+
+        [Header("Detection buzz")]
+        [SerializeField] private float _buzzChromaticStrength = 0.6f;
+        [SerializeField] private float _buzzVignetteStrength  = 0.15f;
+        [SerializeField] private float _buzzDecaySpeed        = 3.5f;
 
         private void Awake()
         {
+            if (Instance != null) { Destroy(gameObject); return; }
+            Instance = this;
+
             _volume = GetComponent<Volume>();
             if (_volume.profile == null)
                 _volume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
@@ -70,10 +88,28 @@ namespace Restless.Dream
             _white.Apply();
         }
 
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+            if (RestlessnessManager.Instance != null)
+                RestlessnessManager.Instance.OnMaxReached -= OnMaxReached;
+        }
+
         private void Start()
         {
             if (RestlessnessManager.Instance != null)
+            {
                 _lastThreshold = RestlessnessManager.Instance.CurrentThreshold;
+                RestlessnessManager.Instance.OnMaxReached += OnMaxReached;
+            }
+        }
+
+        private void OnMaxReached() => _maxReached = true;
+
+        public void TriggerDetectionBuzz()
+        {
+            _buzzChromatic = _buzzChromaticStrength;
+            _buzzVignette  = _buzzVignetteStrength;
         }
 
         private void Update()
@@ -103,7 +139,11 @@ namespace Restless.Dream
             }
             _lastZoneMultiplier = zone;
 
-            _flashAlpha = Mathf.MoveTowards(_flashAlpha, 0f, Time.deltaTime / _flashDuration);
+            _flashAlpha    = Mathf.MoveTowards(_flashAlpha,    0f, Time.deltaTime / _flashDuration);
+            _buzzChromatic = Mathf.MoveTowards(_buzzChromatic, 0f, Time.deltaTime * _buzzDecaySpeed);
+            _buzzVignette  = Mathf.MoveTowards(_buzzVignette,  0f, Time.deltaTime * _buzzDecaySpeed);
+            if (_maxReached)
+                _maxVeilTime += Time.deltaTime * _maxVeilPulseRate * Mathf.PI * 2f;
 
             // Pulse (heartbeat) kicks in above 50% restlessness, speeds up at Critical
             float pulseBlend = Mathf.Clamp01(Mathf.InverseLerp(0.5f, 1f, t));
@@ -114,7 +154,7 @@ namespace Restless.Dream
             // Vignette: base curve + pulse + dark-red tint at Critical
             float baseVig = Mathf.Lerp(_vignetteIdle, _vignetteCritical, Mathf.Pow(t, 1.5f));
             _vignette.intensity.Override(Mathf.Lerp(
-                _vignette.intensity.value, baseVig + pulse,
+                _vignette.intensity.value, baseVig + pulse + _buzzVignette,
                 Time.deltaTime * _lerpSpeed));
 
             // Vignette color fades from black to dark red as restlessness passes 0.5
@@ -128,7 +168,7 @@ namespace Restless.Dream
                 : t < 0.75f ? Mathf.Lerp(_chromaticMedium,  _chromaticHigh,     Mathf.InverseLerp(0.5f,  0.75f, t))
                              : Mathf.Lerp(_chromaticHigh,    _chromaticCritical, Mathf.InverseLerp(0.75f, 1f,    t));
             _chromatic.intensity.Override(Mathf.Lerp(
-                _chromatic.intensity.value, targetChromatic,
+                _chromatic.intensity.value, targetChromatic + _buzzChromatic,
                 Time.deltaTime * _lerpSpeed));
 
             // Lens distortion: starts at High threshold
@@ -142,10 +182,24 @@ namespace Restless.Dream
 
         private void OnGUI()
         {
-            if (_flashAlpha <= 0f) return;
-            GUI.color = new Color(_flashColor.r, _flashColor.g, _flashColor.b, _flashAlpha);
-            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _white);
-            GUI.color = Color.white;
+            var rect = new Rect(0, 0, Screen.width, Screen.height);
+
+            // Persistent red veil when restlessness is maxed
+            if (_maxReached)
+            {
+                float veilAlpha = _maxVeilBaseAlpha + _maxVeilPulseDepth * (0.5f + 0.5f * Mathf.Sin(_maxVeilTime));
+                GUI.color = new Color(0.85f, 0f, 0.05f, veilAlpha);
+                GUI.DrawTexture(rect, _white);
+                GUI.color = Color.white;
+            }
+
+            // Threshold / zone flash on top
+            if (_flashAlpha > 0f)
+            {
+                GUI.color = new Color(_flashColor.r, _flashColor.g, _flashColor.b, _flashAlpha);
+                GUI.DrawTexture(rect, _white);
+                GUI.color = Color.white;
+            }
         }
 
         private static Color FlashColor(RestlessnessManager.Threshold t) => t switch

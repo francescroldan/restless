@@ -25,13 +25,20 @@ namespace Restless.Dream
 
         [Header("Entity")]
         [SerializeField] private AudioClip _sfxEntityNearby;
+        [SerializeField] private AudioClip _sfxEntityDetected;
         [SerializeField] private float     _entityNearbyRadius    = 6f;
         [SerializeField] private float     _entityNearbyCooldown  = 3f;
+
+        [Header("Fragment proximity")]
+        [SerializeField] private AudioClip _sfxFragmentNearby;
+        [SerializeField] private float     _fragmentNearbyRadius   = 3f;
+        [SerializeField] private float     _fragmentNearbyCooldown = 2.5f;
 
         [SerializeField] private float _sfxVolume = 0.7f;
 
         private AudioSource _src;
         private float       _entityNearbyCooldownTimer;
+        private float       _fragmentNearbyCooldownTimer;
 
         private void Awake()
         {
@@ -44,28 +51,46 @@ namespace Restless.Dream
 
         private void Update()
         {
-            if (_entityNearbyCooldownTimer > 0f)
-                _entityNearbyCooldownTimer -= Time.deltaTime;
-
-            if (_entityNearbyCooldownTimer > 0f) return;
+            if (_entityNearbyCooldownTimer  > 0f) _entityNearbyCooldownTimer  -= Time.deltaTime;
+            if (_fragmentNearbyCooldownTimer > 0f) _fragmentNearbyCooldownTimer -= Time.deltaTime;
 
             var protagonist = GameObject.FindWithTag("Player");
             if (protagonist == null) return;
 
-            var entities = FindObjectsByType<DreamEntity>(FindObjectsSortMode.None);
-            foreach (var e in entities)
+            // Entity nearby sound
+            if (_entityNearbyCooldownTimer <= 0f)
             {
-                if (e == null) continue;
-                float dist = Vector2.Distance(protagonist.transform.position, e.transform.position);
-                if (dist <= _entityNearbyRadius)
+                var entities = FindObjectsByType<DreamEntity>(FindObjectsSortMode.None);
+                foreach (var e in entities)
                 {
-                    Play(_sfxEntityNearby, 0.5f);
-                    _entityNearbyCooldownTimer = _entityNearbyCooldown;
-                    break;
+                    if (e == null) continue;
+                    if (Vector2.Distance(protagonist.transform.position, e.transform.position) <= _entityNearbyRadius)
+                    {
+                        Play(_sfxEntityNearby, 0.5f);
+                        _entityNearbyCooldownTimer = _entityNearbyCooldown;
+                        break;
+                    }
+                }
+            }
+
+            // Fragment nearby sound
+            if (_fragmentNearbyCooldownTimer <= 0f)
+            {
+                var memPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
+                foreach (var mp in memPoints)
+                {
+                    if (mp == null || mp.CurrentState != MemoryPoint.State.Available) continue;
+                    if (Vector2.Distance(protagonist.transform.position, mp.transform.position) <= _fragmentNearbyRadius)
+                    {
+                        Play(_sfxFragmentNearby, 0.4f);
+                        _fragmentNearbyCooldownTimer = _fragmentNearbyCooldown;
+                        break;
+                    }
                 }
             }
         }
 
+        public void PlayEntityDetected()   => Play(_sfxEntityDetected, 0.8f);
         public void PlayZoneEnter()        => Play(_sfxZoneEnter);
         public void PlayAllyEncounter()    => Play(_sfxAllyEncounter);
         public void PlayWakeupVoluntary()  => Play(_sfxWakeupVoluntary);

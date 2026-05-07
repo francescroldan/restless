@@ -16,10 +16,17 @@ namespace Restless.Dream
         [SerializeField] private SpriteRenderer  _spriteRenderer;
         [SerializeField] private float           _triggerRadius = 1.2f;
 
+        [Header("Idle Animation")]
+        [SerializeField] private Sprite _idleFrameA;
+        [SerializeField] private Sprite _idleFrameB;
+        [SerializeField] private float  _idleFrameInterval = 0.55f;
+
         public AllyData AllyDataRef => _allyData;
 
         private bool _interacted;
         private Collider2D _col;
+        private float _animTimer;
+        private bool  _onFrameA = true;
 
         private void Start()
         {
@@ -33,6 +40,22 @@ namespace Restless.Dream
 
             _col = GetComponent<Collider2D>();
             _col.isTrigger = true;
+
+            if (_spriteRenderer != null && _idleFrameA != null)
+                _spriteRenderer.sprite = _idleFrameA;
+        }
+
+        private void Update()
+        {
+            if (_spriteRenderer == null || _idleFrameA == null || _idleFrameB == null) return;
+
+            _animTimer += Time.deltaTime;
+            if (_animTimer >= _idleFrameInterval)
+            {
+                _animTimer -= _idleFrameInterval;
+                _onFrameA = !_onFrameA;
+                _spriteRenderer.sprite = _onFrameA ? _idleFrameA : _idleFrameB;
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)
