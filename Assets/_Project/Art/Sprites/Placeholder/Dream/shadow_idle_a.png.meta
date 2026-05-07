@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 88c7015c2376f6743be7e87ccdd1abe1
+guid: 37e375b5e573e344593db3e2e1268dc9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8459390046004490504
-    second: sage_idle_b_0
+      213: -8540746746433793449
+    second: shadow_idle_a_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -24,7 +24,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -48,9 +48,9 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
-  spritePivot: {x: 0.5, y: 0}
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sage_idle_b_0
+      name: shadow_idle_a_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 16
-        height: 23
+        x: 1
+        y: 2
+        width: 13
+        height: 22
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8fe4d6ba2953a9a80800000000000000
-      internalID: -8459390046004490504
+      spriteID: 7529d3eb51c297980800000000000000
+      internalID: -8540746746433793449
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      sage_idle_b_0: -8459390046004490504
+      shadow_idle_a_0: -8540746746433793449
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
