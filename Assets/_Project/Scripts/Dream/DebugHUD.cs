@@ -186,7 +186,7 @@ namespace Restless.Dream
                 float dur  = DreamTimer.Instance.Duration;
                 float fill = dur > 0f ? Mathf.Clamp01(rem / dur) : 0f;
                 Color col  = Color.Lerp(Color.red, new Color(0.3f, 0.8f, 1f), fill);
-                DrawBar(x, y, labelW, barW, barH, pad, $"SUEÑO  {rem:F0}s", fill, col);
+                DrawBar(x, y, labelW, barW, barH, pad, $"SUEÑO  {rem:F0}s / {dur:F0}s", fill, col);
                 y += barH + rowGap;
             }
 
@@ -194,7 +194,8 @@ namespace Restless.Dream
             {
                 float fill = RestlessnessManager.Instance.NormalizedValue;
                 Color col  = Color.Lerp(new Color(0.2f, 0.85f, 0.35f), new Color(1f, 0.15f, 0.15f), fill);
-                DrawBar(x, y, labelW, barW, barH, pad, $"INQUIETUD  {fill * 100f:F0}%", fill, col);
+                float val = RestlessnessManager.Instance.Value;
+                DrawBar(x, y, labelW, barW, barH, pad, $"INQUIETUD  {val:F1} / 100", fill, col);
             }
         }
 
