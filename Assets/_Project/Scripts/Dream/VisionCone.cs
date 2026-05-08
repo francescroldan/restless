@@ -72,10 +72,12 @@ namespace Restless.Dream
             float angle = Vector2.Angle(transform.up, toTarget);
             if (angle > outerAngle * 0.5f) return false;
 
-            // Line-of-sight: blocked by any solid (non-trigger) collider
+            // Line-of-sight: blocked by any solid (non-trigger) collider except the protagonist
+            var protagonistRoot = transform.root;
             var hits = Physics2D.LinecastAll(transform.position, worldPosition, _occluderMask);
             foreach (var h in hits)
-                if (!h.collider.isTrigger) return false;
+                if (!h.collider.isTrigger && h.collider.transform.root != protagonistRoot)
+                    return false;
 
             return true;
         }
