@@ -3,60 +3,92 @@ using UnityEngine;
 namespace Restless.Dream
 {
     /// <summary>
-    /// Waypoint-patrol entity. Moves between assigned waypoints at constant speed.
-    /// EntityDetection handles restlessness spikes when spotted by the player's cone.
+    /// Ghostly presence. Stays dormant until illuminated by the player's vision cone.
+    /// If active (haunted), it moves in a random direction and fades out.
+    /// Inert entities (isActive=false) never react — visually identical to active ones.
+    /// Restlessness drains continuously while the entity is inside the cone (handled by EntityDetection).
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(SpriteRenderer))]
     public class DreamEntity : MonoBehaviour
     {
-        [SerializeField] private Transform[] _waypoints;
-        [SerializeField] private float _speed = 1.8f;
-        [SerializeField] private float _waypointReachThreshold = 0.1f;
+        [Header("Behaviour")]
+        [SerializeField] private bool  _isHaunted    = true;
+        [SerializeField] private float _moveSpeed    = 1.5f;
+        [SerializeField] private float _moveDuration = 1.2f;
+        [SerializeField] private float _fadeDuration = 0.8f;
 
-        private Rigidbody2D _rb;
-        private int _currentWaypoint;
-        private bool _patrolPaused;
+        private enum State { Dormant, Moving, Vanishing }
+
+        private Rigidbody2D    _rb;
+        private SpriteRenderer _sr;
+        private State          _state = State.Dormant;
+        private Vector2        _moveDir;
+        private float          _moveTimer;
+        private float          _fadeTimer;
+
+        public bool IsDormant  => _state == State.Dormant;
+        public bool IsHaunted  => _isHaunted;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
-            _rb.gravityScale = 0f;
+            _rb.gravityScale  = 0f;
             _rb.freezeRotation = true;
+            _sr = GetComponent<SpriteRenderer>();
+        }
+
+        /// <summary>Called by EntityDetection on first cone contact.</summary>
+        public void Trigger()
+        {
+            if (_state != State.Dormant || !_isHaunted) return;
+
+            _state     = State.Moving;
+            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            _moveDir   = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+            _moveTimer = _moveDuration;
         }
 
         private void FixedUpdate()
         {
-            if (_patrolPaused || _waypoints == null || _waypoints.Length == 0) return;
+            if (_state != State.Moving) return;
 
-            var   run       = Core.RunConfig.Current;
-            float speed     = run?.entitySpeed             ?? _speed;
-            float threshold = run?.entityWaypointThreshold ?? _waypointReachThreshold;
-
-            Transform target    = _waypoints[_currentWaypoint];
-            Vector2   direction = ((Vector2)target.position - _rb.position).normalized;
-            float     distance  = Vector2.Distance(_rb.position, target.position);
-
-            if (distance <= threshold)
-                _currentWaypoint = (_currentWaypoint + 1) % _waypoints.Length;
-            else
-                _rb.MovePosition(_rb.position + direction * speed * Time.fixedDeltaTime);
+            float speed = Core.RunConfig.Current?.entitySpeed ?? _moveSpeed;
+            _rb.MovePosition(_rb.position + _moveDir * speed * Time.fixedDeltaTime);
         }
 
-        public void PausePatrol() => _patrolPaused = true;
-        public void ResumePatrol() => _patrolPaused = false;
+        private void Update()
+        {
+            switch (_state)
+            {
+                case State.Moving:
+                    _moveTimer -= Time.deltaTime;
+                    if (_moveTimer <= 0f)
+                    {
+                        _rb.linearVelocity = Vector2.zero;
+                        _state     = State.Vanishing;
+                        _fadeTimer = _fadeDuration;
+                    }
+                    break;
+
+                case State.Vanishing:
+                    _fadeTimer -= Time.deltaTime;
+                    float alpha = Mathf.Clamp01(_fadeTimer / _fadeDuration);
+                    var c = _sr.color;
+                    c.a = alpha;
+                    _sr.color = c;
+                    if (_fadeTimer <= 0f)
+                        gameObject.SetActive(false);
+                    break;
+            }
+        }
 
         private void OnDrawGizmos()
         {
-            if (_waypoints == null || _waypoints.Length < 2) return;
-            Gizmos.color = new Color(1f, 0.3f, 0.3f, 0.6f);
-            for (int i = 0; i < _waypoints.Length; i++)
-            {
-                if (_waypoints[i] == null) continue;
-                Gizmos.DrawSphere(_waypoints[i].position, 0.15f);
-                var next = _waypoints[(i + 1) % _waypoints.Length];
-                if (next != null)
-                    Gizmos.DrawLine(_waypoints[i].position, next.position);
-            }
+            Gizmos.color = _isHaunted
+                ? new Color(1f, 0.2f, 0.2f, 0.5f)
+                : new Color(0.4f, 0.4f, 0.8f, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, 0.25f);
         }
     }
 }

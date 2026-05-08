@@ -3,14 +3,14 @@ using UnityEngine;
 namespace Restless.Dream
 {
     /// <summary>
-    /// Attached to the protagonist. Checks each frame whether any DreamEntity is inside
-    /// the vision cone and applies restlessness spikes accordingly. Also interrupts any
-    /// active RetentionMinigame when an entity enters the interrupt radius.
+    /// Attached to the protagonist. Each frame checks whether any DreamEntity is inside
+    /// the vision cone. On first contact, triggers the entity (if haunted). While any
+    /// entity remains in the cone, restlessness drains continuously.
     /// </summary>
     public class EntityDetection : MonoBehaviour
     {
-        [SerializeField] private float _spikePerSecond = 8f;
-        [SerializeField] private float _interruptRadius = 1.2f;
+        [SerializeField] private float _spikePerSecond     = 8f;
+        [SerializeField] private float _interruptRadius    = 1.2f;
         [SerializeField] private float _interruptMagnitude = 0.35f;
 
         private VisionCone    _visionCone;
@@ -22,7 +22,7 @@ namespace Restless.Dream
         private void Start()
         {
             _visionCone = GetComponentInChildren<VisionCone>();
-            _entities = FindObjectsByType<DreamEntity>(FindObjectsSortMode.None);
+            _entities   = FindObjectsByType<DreamEntity>(FindObjectsSortMode.None);
         }
 
         private void Update()
@@ -34,13 +34,19 @@ namespace Restless.Dream
 
             foreach (var entity in _entities)
             {
-                if (entity == null) continue;
+                if (entity == null || !entity.gameObject.activeInHierarchy) continue;
 
                 bool inCone = _visionCone != null && _visionCone.ContainsPoint(entity.transform.position);
 
                 if (inCone)
                 {
                     anyInCone = true;
+
+                    // First contact: wake up the entity
+                    if (entity.IsDormant)
+                        entity.Trigger();
+
+                    // Continuous restlessness drain while in cone
                     RestlessnessManager.Instance?.AddSpike(_spikePerSecond * Time.deltaTime);
                 }
 
@@ -72,7 +78,6 @@ namespace Restless.Dream
 
         private RetentionMinigame FindAnyRetentionMinigame()
         {
-            // MemoryPoints in the scene own the minigame components
             var memoryPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
             foreach (var mp in memoryPoints)
             {

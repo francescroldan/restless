@@ -1,101 +1,59 @@
 # Transformación del entorno por estado mental
 
 ## Descripción breve
-(Por completar)
 
-## Contexto
-(Por completar)
-
-## Contenido original
-
-# Transformación del entorno por estado mental
-
-El mundo de los sueños en *Restless* no es fijo ni lógico. Cambia constantemente en función del **estado mental del protagonista**, lo que convierte la exploración en una experiencia inestable, impredecible y profundamente personal.
-
-El entorno responde al nivel de **inquietud**, a los **traumas acumulados**, y a las **condiciones mentales** que se desarrollan a lo largo de la partida.
+El sueño no es un nivel de juego convencional. Es una representación del interior del protagonista: un paisaje onírico poblado de presencias extrañas, formas imposibles y objetos que no deberían existir. El espacio es ambiguo por diseño — lo que parece decorado puede ser peligro, y lo que parece peligro puede ser una oportunidad.
 
 ---
 
-## 🔄 Entorno mutable según el estado interno
+## Principio de diseño: ambigüedad total
 
-El espacio onírico no es simplemente un mapa con plataformas y enemigos, sino un **reflejo distorsionado de la mente del protagonista**. A medida que el personaje cambia, el sueño también lo hace.
+**Los elementos interaccionables son visualmente indistinguibles de los decorativos.**
 
-### Cambios posibles:
+No hay iconos flotantes, no hay colores distintos, no hay indicadores de "esto es importante". El jugador tiene que investigar — apuntar el cono de visión hacia las cosas — para descubrir qué son. Esta investigación tiene un coste: iluminar algo que no debería verse puede desencadenar consecuencias.
 
-- Rutas que antes existían desaparecen.
-- Nuevos caminos, puertas o habitaciones aparecen con altos niveles de inquietud.
-- Elementos visuales cambian:
-    - Colores, sombras, geometría, símbolos.
-    - Arquitecturas imposibles o fragmentadas.
-- Algunos enemigos mutan o adoptan formas distintas dependiendo del estado mental.
-- Objetos que antes eran interactuables se vuelven inútiles (y viceversa).
+El cono de visión deja de ser solo herramienta de navegación y se convierte en la herramienta de exploración, pero explorar tiene un precio. La tensión central del juego nace aquí: **curiosidad vs. miedo a lo que puedas encontrar**.
 
 ---
 
-## 💢 Condiciones mentales que alteran el entorno
+## Tipos de elementos en el sueño
 
-El protagonista puede adquirir **enfermedades mentales persistentes** (tras despertar abruptamente o por exposición a ciertos eventos), que transforman la percepción del mundo.
+### Presencias (actualmente: "enemigos")
 
-### Ejemplos:
+Entidades estáticas, aparentemente inertes, distribuidas por el espacio. Algunas están "malditas" y reaccionan al ser iluminadas por el cono; otras son inofensivas. Son visualmente idénticas — no hay forma de saber cuál es cuál hasta mirarlas.
 
-- **Paranoia:** activa enemigos invisibles o hace que los aliados parezcan hostiles.
-- **Depresión:** el entorno se vuelve más oscuro y opresivo; los movimientos son más lentos.
-- **Alucinaciones:** se ven cosas que no están, o no se ven cosas que sí están.
-- **Claustrofobia:** algunos espacios parecen más estrechos o imposibles de atravesar.
-- **Miedo al fuego / al vacío / al agua:** ciertos elementos del escenario se transforman en barreras mentales insuperables hasta tratar la fobia en la vigilia.
+**Comportamiento al ser iluminadas (si están activas):**
+- Se activan y se mueven brevemente en una dirección aleatoria antes de desvanecerse
+- Mientras permanezcan dentro del cono de visión, aumentan la Inquietud continuamente
+- Apartar la mirada detiene el efecto inmediatamente
+- La habilidad del jugador es aprender a no mirar ciertos sitios, y reaccionar rápido cuando ilumina una por accidente
 
-Estas condiciones no son solo decorativas: afectan a la jugabilidad y al diseño de niveles.
+### Recuerdos (Memory Points)
 
----
+Fragmentos de la memoria del hijo, atrapados en el espacio onírico. La extracción requiere un minijuego. Son el objetivo principal de cada run.
 
-## 🧩 Puzles dependientes del estado mental
+### Aliados en el sueño
 
-El entorno puede contener desafíos que **solo se pueden resolver en un estado mental concreto**. Esto fomenta la rejugabilidad y el control consciente del nivel de inquietud o del estado psicológico.
+Presencias que el protagonista ya conoce de la Vigilia. Pueden aparecer en el sueño como encuentros opcionales que refuerzan o desbloquean aliados para runs futuras.
 
-### Ejemplos:
+### Objetos e items
 
-- Una puerta aparece solo con alto nivel de inquietud.
-- Un pasadizo solo se revela si se sufre una alucinación.
-- Un enemigo solo es vulnerable cuando el protagonista tiene cierta enfermedad mental.
-- Un objeto importante solo puede recogerse si se está en un estado de calma extrema.
+Elementos del entorno que el protagonista puede recoger. Pueden modificar la run actual o tener efectos entre runs.
 
----
+### Decorado puro
 
-## 🎨 Integración visual y sonora
-
-Los cambios en el estado mental también afectan al ambiente audiovisual:
-
-- **Colores lavados o saturados** según el nivel de estabilidad.
-- **Distorsiones visuales** (glitches, vibraciones, niebla, deformación del pixel art).
-- **Sonidos y música** que se alteran según la percepción:
-    - Ecos, susurros, frecuencias bajas.
-    - Ruidos que aparecen sin fuente aparente.
-
-Esto refuerza la sensación de que el jugador no puede confiar completamente en lo que ve u oye.
+Elementos sin ninguna función mecánica. Existen para construir el paisaje onírico y para crear ruido visual que dificulte identificar los elementos interaccionables.
 
 ---
 
-## 🧠 Mecánica central, no decorativa
+## Evolución prevista
 
-El estado mental y la inquietud no solo afectan al personaje, sino al mundo mismo. Los niveles no están simplemente diseñados "de una manera", sino que **pueden leerse y recorrerse de múltiples formas según el estado psicológico en el que se accede**.
+**Sprint actual (museo):** presencias estáticas, algunas activas, comportamiento simple de movimiento aleatorio + fade.
 
-Esto permite:
-
-- Explorar el mismo nivel con múltiples experiencias.
-- Crear secretos y rutas ocultas accesibles solo en condiciones específicas.
-- Ampliar la narrativa ambiental sin usar texto ni diálogos.
+**Visión a largo plazo:** el sueño como un paisaje onírico complejo — geometrías imposibles, objetos que no deberían existir, presencias que pueden ser amenaza o ayuda. Todo convive en el mismo espacio visual sin señalización. El jugador construye un mapa mental de qué zonas son seguras, qué elementos vale la pena investigar y cuándo es mejor no mirar.
 
 ---
 
-✅ Ver también:
+## Relación con el estado mental del protagonista
 
-- [Medidor de inquietud (Restlessness)](Medidor%20de%20inquietud%20(Restlessness)%2022a50b6236c18012bb3af6f2726a7692.md)
-- [Condiciones mentales en el sueño](Condiciones%20mentales%20en%20el%20sue%C3%B1o%2022a50b6236c1809a8768c6e953eeb2ab.md)
-- [Condiciones mentales en la vigilia](Condiciones%20mentales%20en%20la%20vigilia%2022a50b6236c18062bb6ac077624706f6.md)
-- [Puzles y backtracking](Puzles%20y%20backtracking%2022950b6236c18095ad24c67dda3dcdeb.md)
-- [Sueño lúcido vs sueño profundo](Sue%C3%B1o%20l%C3%BAcido%20vs%20sue%C3%B1o%20profundo%2022950b6236c18025a1e0f7a36be67aa8.md)
-
----
-
-## Observaciones
-(Añadir notas y relaciones con otros documentos)
+El aspecto del sueño puede transformarse en función de la Inquietud acumulada: a mayor inquietud, más densa la oscuridad, más presencias activas, más distorsionado el entorno (efectos visuales de vignette, chromatic aberration, lens distortion). El mundo se vuelve más hostil cuanto más nervioso está el protagonista — retroalimentación coherente con la mecánica.
