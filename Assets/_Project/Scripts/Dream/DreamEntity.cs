@@ -30,6 +30,8 @@ namespace Restless.Dream
         public bool IsDormant  => _state == State.Dormant;
         public bool IsHaunted  => _isHaunted;
 
+        public void SetHaunted(bool haunted) => _isHaunted = haunted;
+
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();

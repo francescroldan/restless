@@ -101,6 +101,11 @@ namespace Restless.Core
         public float entityNearbyRadius       = 6f;
         [Tooltip("Cooldown between 'enemy nearby' sound repetitions (s).")]
         public float entityNearbyCooldown     = 3f;
+        [Tooltip("Number of presences spawned per run.")]
+        public int   entitySpawnCount         = 12;
+        [Tooltip("Fraction of spawned presences that are haunted (0=none, 1=all).")]
+        [Range(0f, 1f)]
+        public float entityHauntedFraction    = 0.4f;
 
         // =====================================================================
         // ALLIES (Dream encounter)

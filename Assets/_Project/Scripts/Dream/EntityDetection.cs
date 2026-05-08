@@ -22,11 +22,14 @@ namespace Restless.Dream
         private void Start()
         {
             _visionCone = GetComponentInChildren<VisionCone>();
-            _entities   = FindObjectsByType<DreamEntity>(FindObjectsSortMode.None);
         }
 
         private void Update()
         {
+            // Refresh once entities have been spawned (EntitySpawner runs in Start too)
+            if (_entities == null || _entities.Length == 0)
+                _entities = FindObjectsByType<DreamEntity>(FindObjectsSortMode.None);
+
             if (_interruptCooldown     > 0f) _interruptCooldown     -= Time.deltaTime;
             if (_detectionBuzzCooldown > 0f) _detectionBuzzCooldown -= Time.deltaTime;
 
