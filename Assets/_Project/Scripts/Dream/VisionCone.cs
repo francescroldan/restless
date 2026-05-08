@@ -13,9 +13,10 @@ namespace Restless.Dream
     [RequireComponent(typeof(Light2D))]
     public class VisionCone : MonoBehaviour
     {
-        [SerializeField] private float _range = 8f;
-        [SerializeField] private float _outerAngle = 110f;
-        [SerializeField] private float _minVisibleRadius = 1.2f;
+        [SerializeField] private float     _range = 8f;
+        [SerializeField] private float     _outerAngle = 110f;
+        [SerializeField] private float     _minVisibleRadius = 1.2f;
+        [SerializeField] private LayerMask _occluderMask = ~0;
 
         private Light2D _light;
         private ProtagonistController _protagonist;
@@ -69,7 +70,14 @@ namespace Restless.Dream
             if (distance > range) return false;
 
             float angle = Vector2.Angle(transform.up, toTarget);
-            return angle <= outerAngle * 0.5f;
+            if (angle > outerAngle * 0.5f) return false;
+
+            // Line-of-sight: blocked by any solid (non-trigger) collider
+            var hits = Physics2D.LinecastAll(transform.position, worldPosition, _occluderMask);
+            foreach (var h in hits)
+                if (!h.collider.isTrigger) return false;
+
+            return true;
         }
     }
 }
