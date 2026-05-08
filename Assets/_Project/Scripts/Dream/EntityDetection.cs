@@ -51,8 +51,6 @@ namespace Restless.Dream
 
                 if (inCone)
                 {
-                    anyInCone = true;
-
                     // Wake up only when close enough — requires deliberate aim, not a distant glance
                     if (entity.IsDormant)
                     {
@@ -61,9 +59,12 @@ namespace Restless.Dream
                             entity.Trigger();
                     }
 
-                    // Drain restlessness while any triggered entity stays in cone
+                    // Only triggered (non-dormant) entities cause effects
                     if (!entity.IsDormant)
+                    {
+                        anyInCone = true;
                         RestlessnessManager.Instance?.AddSpike(_spikePerSecond * Time.deltaTime);
+                    }
                 }
 
                 if (_interruptCooldown <= 0f)
