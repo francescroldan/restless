@@ -3,15 +3,15 @@ using UnityEngine;
 namespace Restless.Dream
 {
     /// <summary>
-    /// Attached to the protagonist. Each frame checks whether any DreamEntity is inside
-    /// the vision cone.
+    /// Attached to the protagonist. Manages two independent zones:
     ///
-    /// Activation uses a narrower focused zone (activationRange + activationHalfAngle)
-    /// so entities only wake up when the player looks at them directly and up close —
-    /// not when they appear at the edge of the peripheral cone.
+    ///   Vision cone  — the rendered light cone. While a triggered entity is inside it,
+    ///                  restlessness drains continuously.
     ///
-    /// Restlessness drains continuously while an already-triggered entity is anywhere
-    /// inside the full cone.
+    ///   Perception radius — a small circle around the player. A dormant entity only
+    ///                       wakes up when it is BOTH inside the vision cone AND within
+    ///                       this radius. The player has to deliberately aim at something
+    ///                       nearby to activate it, not just glance across the room.
     /// </summary>
     public class EntityDetection : MonoBehaviour
     {
@@ -19,9 +19,8 @@ namespace Restless.Dream
         [SerializeField] private float _interruptRadius    = 1.2f;
         [SerializeField] private float _interruptMagnitude = 0.35f;
 
-        [Header("Focused activation zone (narrower than full cone)")]
-        [SerializeField] private float _activationRange     = 3.5f;
-        [SerializeField] private float _activationHalfAngle = 30f;   // degrees from cone centre
+        [Header("Perception radius (activation only)")]
+        [SerializeField] private float _perceptionRadius = 3f;
 
         private VisionCone    _visionCone;
         private DreamEntity[] _entities;
@@ -54,11 +53,15 @@ namespace Restless.Dream
                 {
                     anyInCone = true;
 
-                    // Only wake up dormant entities when looked at directly and up close
-                    if (entity.IsDormant && IsFocused(entity.transform.position))
-                        entity.Trigger();
+                    // Wake up only when close enough — requires deliberate aim, not a distant glance
+                    if (entity.IsDormant)
+                    {
+                        float dist = Vector2.Distance(transform.position, entity.transform.position);
+                        if (dist <= _perceptionRadius)
+                            entity.Trigger();
+                    }
 
-                    // Restlessness drains while active entity is anywhere in cone
+                    // Drain restlessness while any triggered entity stays in cone
                     if (!entity.IsDormant)
                         RestlessnessManager.Instance?.AddSpike(_spikePerSecond * Time.deltaTime);
                 }
@@ -87,21 +90,6 @@ namespace Restless.Dream
             _wasDetecting = anyInCone;
         }
 
-        /// <summary>
-        /// Returns true if worldPos is within the focused activation zone:
-        /// close enough AND near the centre of the vision cone.
-        /// </summary>
-        private bool IsFocused(Vector3 worldPos)
-        {
-            if (_visionCone == null) return false;
-
-            Vector2 toTarget = (Vector2)(worldPos - _visionCone.transform.position);
-            if (toTarget.magnitude > _activationRange) return false;
-
-            float angle = Vector2.Angle(_visionCone.transform.up, toTarget);
-            return angle <= _activationHalfAngle;
-        }
-
         private RetentionMinigame FindAnyRetentionMinigame()
         {
             var memoryPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
@@ -112,5 +100,13 @@ namespace Restless.Dream
             }
             return null;
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = new Color(0.8f, 0.4f, 1f, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, _perceptionRadius);
+        }
+#endif
     }
 }

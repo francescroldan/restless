@@ -3,13 +3,11 @@ using UnityEngine;
 namespace Restless.Dream
 {
     /// <summary>
-    /// Ghostly presence. Stays dormant until illuminated by the player's vision cone.
-    /// If active (haunted), it moves in a random direction and fades out.
-    /// Inert entities (isActive=false) never react — visually identical to active ones.
-    /// Restlessness drains continuously while the entity is inside the cone (handled by EntityDetection).
+    /// Ghostly presence. Stays dormant until the player looks at it within perception range.
+    /// If haunted, it drifts in a random direction and fades out.
+    /// Inert entities never react — visually identical to haunted ones.
+    /// Movement ignores physics so presences never get stuck on walls.
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(SpriteRenderer))]
     public class DreamEntity : MonoBehaviour
     {
         [Header("Behaviour")]
@@ -20,27 +18,28 @@ namespace Restless.Dream
 
         private enum State { Dormant, Moving, Vanishing }
 
-        private Rigidbody2D    _rb;
         private SpriteRenderer _sr;
         private State          _state = State.Dormant;
         private Vector2        _moveDir;
         private float          _moveTimer;
         private float          _fadeTimer;
 
-        public bool IsDormant  => _state == State.Dormant;
-        public bool IsHaunted  => _isHaunted;
+        public bool IsDormant => _state == State.Dormant;
+        public bool IsHaunted => _isHaunted;
 
         public void SetHaunted(bool haunted) => _isHaunted = haunted;
 
         private void Awake()
         {
-            _rb = GetComponent<Rigidbody2D>();
-            _rb.gravityScale  = 0f;
-            _rb.freezeRotation = true;
-            _sr = GetComponent<SpriteRenderer>();
+            _sr = GetComponentInChildren<SpriteRenderer>();
+
+            // Disable physics collision — presences are visual only, must not get stuck on walls
+            var rb = GetComponent<Rigidbody2D>();
+            if (rb != null) Destroy(rb);
+            var col = GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
         }
 
-        /// <summary>Called by EntityDetection on first cone contact.</summary>
         public void Trigger()
         {
             if (_state != State.Dormant || !_isHaunted) return;
@@ -51,23 +50,16 @@ namespace Restless.Dream
             _moveTimer = _moveDuration;
         }
 
-        private void FixedUpdate()
-        {
-            if (_state != State.Moving) return;
-
-            float speed = Core.RunConfig.Current?.entitySpeed ?? _moveSpeed;
-            _rb.MovePosition(_rb.position + _moveDir * speed * Time.fixedDeltaTime);
-        }
-
         private void Update()
         {
             switch (_state)
             {
                 case State.Moving:
+                    float speed = Core.RunConfig.Current?.entitySpeed ?? _moveSpeed;
+                    transform.position += (Vector3)(_moveDir * speed * Time.deltaTime);
                     _moveTimer -= Time.deltaTime;
                     if (_moveTimer <= 0f)
                     {
-                        _rb.linearVelocity = Vector2.zero;
                         _state     = State.Vanishing;
                         _fadeTimer = _fadeDuration;
                     }
@@ -75,10 +67,12 @@ namespace Restless.Dream
 
                 case State.Vanishing:
                     _fadeTimer -= Time.deltaTime;
-                    float alpha = Mathf.Clamp01(_fadeTimer / _fadeDuration);
-                    var c = _sr.color;
-                    c.a = alpha;
-                    _sr.color = c;
+                    if (_sr != null)
+                    {
+                        var c = _sr.color;
+                        c.a = Mathf.Clamp01(_fadeTimer / _fadeDuration);
+                        _sr.color = c;
+                    }
                     if (_fadeTimer <= 0f)
                         gameObject.SetActive(false);
                     break;
