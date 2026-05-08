@@ -65,8 +65,10 @@ namespace Restless.Dream
 
         private bool IsBlocked(Vector2 pos)
         {
-            var hit = Physics2D.OverlapCircle(pos, _clearanceRadius, _obstacleLayer);
-            return hit != null;
+            var hits = Physics2D.OverlapCircleAll(pos, _clearanceRadius, _obstacleLayer);
+            foreach (var hit in hits)
+                if (!hit.isTrigger) return true;
+            return false;
         }
 
 #if UNITY_EDITOR
