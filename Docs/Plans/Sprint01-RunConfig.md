@@ -1,6 +1,6 @@
 # Sprint 01 — RunConfig: parámetros modificables por run
 
-**Estado:** 🔄 En curso  
+**Estado:** ✅ Completado 2026-05-08  
 **Fase:** Post-MOC  
 **Prerequisito:** [M6 — MOC completo y jugable](MOC/M6-MOC-Completo.md) ✅ cerrado 2026-05-08
 
@@ -110,20 +110,20 @@ GameConfig.asset   ← valores de diseño, tweakeables en Editor
 
 ### 6. Validación
 
-- [ ] Aliado Sabio: verificar que sus pasivas siguen aplicando correctamente vía RunConfig
-- [ ] Aliado Héroe: verificar `dreamDurationBonus` y `restlessnessRateModifier`
-- [ ] Sin aliados: RunConfig con valores base produce el mismo comportamiento que antes del refactor
-- [ ] Dos runs seguidas no se contaminan entre sí (RunConfig se recrea limpio cada vez)
+- [x] Aliado Sabio: `restlessnessRateModifier` y `minigameSpeedMultiplier` de AllyData se acumulan en `DreamPassiveApplier` y se escriben en RunConfig — cadena íntegra
+- [x] Aliado Héroe: `dreamDurationBonus` se suma a `RunConfig.dreamDuration` antes de llamar a `DreamTimer.StartTimer()` — orden correcto en DreamSceneBootstrap
+- [x] Sin aliados: `selectedAllyIds` vacío → passives no aplican → RunConfig queda con los valores de GameConfig — comportamiento idéntico a M6
+- [x] Dos runs seguidas: `RunConfig.Clear()` en `DreamSceneBootstrap.OnDestroy` y `RunConfig.Create()` en el siguiente `Awake` garantizan instancia limpia
 
 ---
 
 ## Criterios de salida
 
-- [ ] `GameConfig.asset` existe y contiene todos los parámetros listados arriba
-- [ ] `RunConfig.Current` es accesible desde cualquier sistema durante el sueño y null fuera de él
-- [ ] Añadir un aliado nuevo que modifique cualquier parámetro de la lista requiere solo cambiar `DreamPassiveApplier`, sin tocar el sistema destino
-- [ ] El comportamiento del juego sin aliados es idéntico al de M6
-- [ ] Los aliados Sabio y Héroe funcionan igual que antes del refactor
+- [x] `GameConfig.asset` existe y contiene todos los parámetros listados arriba
+- [x] `RunConfig.Current` es accesible desde cualquier sistema durante el sueño y null fuera de él
+- [x] Añadir un aliado nuevo que modifique cualquier parámetro de la lista requiere solo cambiar `DreamPassiveApplier`, sin tocar el sistema destino
+- [x] El comportamiento del juego sin aliados es idéntico al de M6
+- [x] Los aliados Sabio y Héroe funcionan igual que antes del refactor
 
 ---
 
