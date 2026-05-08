@@ -3,22 +3,22 @@ using UnityEngine;
 namespace Restless.Dream
 {
     /// <summary>
-    /// Attach to any interactive element (entities, fragments, allies).
-    /// Outside the vision cone the sprite is ghostly (faint, desaturated).
-    /// Inside the cone it materialises to full opacity and colour.
+    /// Elements appear as faint silhouettes and materialise fully when the player
+    /// gets within revealRadius. No cone direction required — proximity is enough.
     /// </summary>
     public class FocusReveal : MonoBehaviour
     {
-        [Header("Ghost state (outside cone)")]
-        [SerializeField] private Color _ghostColor   = new Color(0.55f, 0.55f, 0.65f, 0.18f);
+        [Header("Ghost state (far from player)")]
+        [SerializeField] private Color _ghostColor   = new Color(0.6f, 0.62f, 0.75f, 0.35f);
 
-        [Header("Present state (inside cone)")]
+        [Header("Present state (within reveal radius)")]
         [SerializeField] private Color _presentColor = Color.white;
 
-        [SerializeField] private float _lerpSpeed = 4f;
+        [SerializeField] private float _revealRadius = 5f;
+        [SerializeField] private float _lerpSpeed    = 3f;
 
         private SpriteRenderer _sr;
-        private VisionCone     _visionCone;
+        private Transform      _player;
 
         private void Awake()
         {
@@ -29,16 +29,17 @@ namespace Restless.Dream
 
         private void Start()
         {
-            _visionCone = FindFirstObjectByType<VisionCone>();
+            var playerGO = GameObject.FindWithTag("Player");
+            if (playerGO != null) _player = playerGO.transform;
         }
 
         private void Update()
         {
-            if (_sr == null || _visionCone == null) return;
+            if (_sr == null || _player == null) return;
 
-            bool inCone = _visionCone.ContainsPoint(transform.position);
-            Color target = inCone ? _presentColor : _ghostColor;
-            _sr.color = Color.Lerp(_sr.color, target, Time.deltaTime * _lerpSpeed);
+            float dist   = Vector2.Distance(_player.position, transform.position);
+            Color target = dist <= _revealRadius ? _presentColor : _ghostColor;
+            _sr.color    = Color.Lerp(_sr.color, target, Time.deltaTime * _lerpSpeed);
         }
     }
 }
