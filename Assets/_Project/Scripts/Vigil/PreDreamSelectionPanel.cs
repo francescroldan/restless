@@ -38,6 +38,8 @@ namespace Restless.Vigil
         private int _slotBIndex = -1;
 
         private System.Action _onConfirm;
+        private TMP_Text _confirmLabel;
+        private TMP_Text _cancelLabel;
 
         private void Awake()
         {
@@ -48,6 +50,11 @@ namespace Restless.Vigil
             _slotBButton.onClick.AddListener(CycleSlotB);
             _confirmButton.onClick.AddListener(OnConfirm);
             if (_cancelButton != null) _cancelButton.onClick.AddListener(Hide);
+
+            _confirmLabel = _confirmButton?.GetComponentInChildren<TMP_Text>();
+            _cancelLabel  = _cancelButton?.GetComponentInChildren<TMP_Text>();
+            if (_confirmLabel != null) _confirmLabel.text = "Dormir  (RB)";
+            if (_cancelLabel  != null) _cancelLabel.text  = "Cancelar  (LB)";
 
             var btnImg = _confirmButton?.GetComponent<Image>();
             if (btnImg != null) _confirmButtonOriginalColor = btnImg.color;
@@ -60,6 +67,13 @@ namespace Restless.Vigil
             if (!_root.activeSelf) return;
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
                 Hide();
+
+            var gp = Gamepad.current;
+            if (gp == null) return;
+            if (gp.leftShoulder.wasPressedThisFrame)  Hide();
+            if (gp.rightShoulder.wasPressedThisFrame) OnConfirm();
+            if (gp.leftTrigger.wasPressedThisFrame)   CycleSlotA();
+            if (gp.rightTrigger.wasPressedThisFrame)  CycleSlotB();
         }
 
         public void Show(System.Action onConfirm)

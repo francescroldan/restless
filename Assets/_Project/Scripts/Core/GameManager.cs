@@ -77,7 +77,7 @@ namespace Restless.Core
             Debug.Log($"[GameManager] ExitDream — State={State} abrupt={abrupt}");
             if (State != GameState.Dream && State != GameState.Transitioning) { Debug.LogWarning("[GameManager] ExitDream blocked: State is not Dream/Transitioning"); return; }
             State = GameState.Transitioning;
-            float healthMult = Dream.DreamPassiveApplier.FindApplier()?.HealthCostMultiplier ?? 1f;
+            float healthMult = RunConfig.Current?.healthCostMultiplier ?? 1f;
             if (abrupt)
                 _protagonistState?.ApplyAbruptWakeUp(_abruptWakeUpMentalDamage * healthMult, _abruptWakeUpPhysicalDamage * healthMult);
             else

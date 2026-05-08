@@ -86,9 +86,10 @@ namespace Restless.Core
             if (_done) return;
             if (_elapsed < _textDelay + _textFadeDuration * 0.5f) return;
 
-            bool anyKey = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
-            bool click  = Mouse.current    != null && Mouse.current.leftButton.wasPressedThisFrame;
-            if (anyKey || click)
+            bool anyKey  = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
+            bool click   = Mouse.current    != null && Mouse.current.leftButton.wasPressedThisFrame;
+            bool gamepad = Gamepad.current  != null && Gamepad.current.buttonSouth.wasPressedThisFrame;
+            if (anyKey || click || gamepad)
                 StartCoroutine(Proceed());
         }
 

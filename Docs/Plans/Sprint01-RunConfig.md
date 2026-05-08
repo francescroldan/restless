@@ -1,8 +1,24 @@
 # Sprint 01 — RunConfig: parámetros modificables por run
 
-**Estado:** ⬜ Pendiente  
+**Estado:** 🔄 En curso  
 **Fase:** Post-MOC  
-**Prerequisito:** [M6 — MOC completo y jugable](M6-MOC-Completo.md) cerrado con playtest
+**Prerequisito:** [M6 — MOC completo y jugable](MOC/M6-MOC-Completo.md) ✅ cerrado 2026-05-08
+
+---
+
+## Backlog UX heredado del playtest de M6
+
+Feedback recogido el 2026-05-08 (3 jugadores externos, 8–13 años):
+
+| # | Problema | Causa raíz | Solución propuesta |
+|---|----------|------------|--------------------|
+| U1 | Audio del enemigo no comunica daño | SFX demasiado sutil; sin feedback visual | Flash rojo de pantalla al recibir daño + SFX más impactante |
+| U2 | Inquietud/timer no se entienden en caliente | La barra sube pero no "grita" | Pulso/color en barra y timer cuando inquietud > 60% |
+| U3 | La urna y su condición de victoria no son obvias | Contador no visible en HUD | Añadir "Recuerdos: X/Y" siempre visible en HUD |
+
+Estas tareas se pueden abordar antes, durante o después del refactor RunConfig, ya que son independientes.
+
+---
 
 ---
 

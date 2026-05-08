@@ -121,13 +121,14 @@ namespace Restless.Dream
 
         private void DrawKeyLegend()
         {
-            (string key, string action)[] keys = {
-                ("WASD",    "Mover"),
-                ("Ratón",   "Orientar cono de visión"),
-                ("E",       "Interactuar / Confirmar"),
-                ("R",       "Rotar fragmento (inventario)"),
-                ("Escape",  "Despertar voluntario"),
-                ("F1",      "Toggle stats HUD"),
+            (string kb, string gp, string action)[] keys = {
+                ("WASD",    "L.Stick",  "Mover"),
+                ("Ratón",   "R.Stick",  "Orientar cono"),
+                ("Shift",   "LT",       "Correr"),
+                ("E",       "A",        "Interactuar"),
+                ("R",       "RB",       "Rotar fragmento"),
+                ("Escape",  "Start",    "Despertar"),
+                ("F1",      "—",        "Toggle HUD"),
             };
 
             float lineH  = 18f;
@@ -136,8 +137,7 @@ namespace Restless.Dream
             float panelH = pad * 2 + lineH * (keys.Length + 1) + 2f;
             float x      = Screen.width - panelW - 8f;
 
-            // Position below the checklist — estimate checklist height
-            float checklistH = pad * 2 + lineH + 13 * lineH + 4f + 6f; // header + 13 items + gap
+            float checklistH = pad * 2 + lineH + 13 * lineH + 4f + 6f;
             float y = 8f + checklistH + 6f;
 
             GUI.color = new Color(0.06f, 0.06f, 0.08f, 0.88f);
@@ -148,13 +148,19 @@ namespace Restless.Dream
             GUI.Label(new Rect(x + pad, y, panelW - pad * 2, lineH), "CONTROLES", _headerStyle);
             y += lineH + 2f;
 
-            foreach (var (key, action) in keys)
+            float kbW    = 52f;
+            float gpW    = 52f;
+            float actX   = x + pad + kbW + gpW;
+            float actW   = panelW - pad * 2 - kbW - gpW;
+
+            foreach (var (kb, gp, action) in keys)
             {
-                float keyW = 62f;
                 GUI.color = new Color(0.95f, 0.85f, 0.4f);
-                GUI.Label(new Rect(x + pad, y, keyW, lineH), key, _checkStyle);
+                GUI.Label(new Rect(x + pad,       y, kbW,  lineH), kb,     _checkStyle);
+                GUI.color = new Color(0.4f, 0.85f, 0.95f);
+                GUI.Label(new Rect(x + pad + kbW, y, gpW,  lineH), gp,     _checkStyle);
                 GUI.color = new Color(0.7f, 0.7f, 0.75f);
-                GUI.Label(new Rect(x + pad + keyW, y, panelW - pad * 2 - keyW, lineH), action, _checkStyle);
+                GUI.Label(new Rect(actX,           y, actW, lineH), action, _checkStyle);
                 y += lineH;
             }
 

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ab86829c81612548b43e7bcc5e14b79, type: 3}
   m_Name: ProtagonistState
   m_EditorClassIdentifier: Assembly-CSharp::Restless.Core.ProtagonistState
-  mentalHealth: 100
-  physicalHealth: 100
+  mentalHealth: 94
+  physicalHealth: 96
   inventoryGridWidth: 4
   inventoryGridHeight: 5
   totalAbruptWakeUps: 0
+  dreamDurationOverride: 0

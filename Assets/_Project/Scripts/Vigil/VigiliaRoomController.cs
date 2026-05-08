@@ -33,6 +33,9 @@ namespace Restless.Vigil
         {
             if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
                 GameManager.Instance?.StartNewGame();
+
+            if (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)
+                RequestEnterDream();
 #if UNITY_EDITOR
             if (_debugUnlockTestAllies)
             {

@@ -78,8 +78,11 @@ namespace Restless.Dream
 
             var cells = _pending.GetRotated(_rotation);
 
+            var gp = Gamepad.current;
+
             // Rotate
-            if (kb.rKey.wasPressedThisFrame)
+            if (kb.rKey.wasPressedThisFrame ||
+                (gp != null && gp.rightShoulder.wasPressedThisFrame))
             {
                 _rotation = (_rotation + 1) % 4;
                 cells = _pending.GetRotated(_rotation);
@@ -95,6 +98,15 @@ namespace Restless.Dream
                 if (kb.upArrowKey.isPressed    || kb.wKey.isPressed) dy = -1;
                 if (kb.downArrowKey.isPressed  || kb.sKey.isPressed) dy =  1;
 
+                if (gp != null)
+                {
+                    Vector2 stick = gp.leftStick.ReadValue();
+                    if (gp.dpad.right.isPressed || stick.x >  0.5f) dx =  1;
+                    if (gp.dpad.left.isPressed  || stick.x < -0.5f) dx = -1;
+                    if (gp.dpad.up.isPressed    || stick.y >  0.5f) dy = -1;
+                    if (gp.dpad.down.isPressed  || stick.y < -0.5f) dy =  1;
+                }
+
                 if (dx != 0 || dy != 0)
                 {
                     int maxX, maxY;
@@ -107,11 +119,13 @@ namespace Restless.Dream
 
             // Place
             if (kb.eKey.wasPressedThisFrame || kb.enterKey.wasPressedThisFrame ||
-                kb.numpadEnterKey.wasPressedThisFrame)
+                kb.numpadEnterKey.wasPressedThisFrame ||
+                (gp != null && gp.buttonSouth.wasPressedThisFrame))
                 TryPlace();
 
             // Discard
-            if (kb.escapeKey.wasPressedThisFrame)
+            if (kb.escapeKey.wasPressedThisFrame ||
+                (gp != null && gp.buttonEast.wasPressedThisFrame))
                 Close(placed: false);
         }
 
