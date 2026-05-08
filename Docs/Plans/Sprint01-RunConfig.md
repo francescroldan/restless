@@ -57,18 +57,27 @@ GameConfig.asset   ← valores de diseño, tweakeables en Editor
 
 ## Tareas
 
-### 1. GameConfig ScriptableObject
+### 1. GameConfig ScriptableObject ✅
 
-Crear `Assets/_Project/Data/GameConfig.asset` con todos los parámetros base agrupados por sistema.
+`Assets/_Project/Data/GameConfig.asset` creado con todos los parámetros del juego en 17 secciones:
 
-- [ ] **Jugador**: `playerSpeed`, `playerSprintSpeed`, `playerSprintStamina`, `interactRange`
-- [ ] **Cono de visión**: `visionConeAngle`, `visionConeRange`, `haloIntensity`, `haloRadius`
-- [ ] **Sueño / Timer**: `dreamDuration`, `firstRunBonusTime`, `highRestlessnessAcceleration`, `maxRestlessnessAcceleration`
-- [ ] **Inquietud**: `baseRestlessnessRate`, `minigameActiveMultiplier`; umbrales de zona ya están en `RestlessnessZone` — valorar si mover aquí
-- [ ] **Entidades**: `entitySpeed`, `entityWaypointThreshold`
-- [ ] **Minijuego (Timing)**: `markerSpeed`, `markerSpeedMax`, `greenZoneHalfWidth`, `greenZoneHalfWidthMin`, `successesRequired`, `failuresAllowed`
-- [ ] **Audio**: `ambientVolume`, `sfxVolume`, `footstepVolume`
-- [ ] **FX visuales**: `vignetteIdle`, `vignetteCritical`, `chromaticCritical`, `maxVeilBaseAlpha`, `maxVeilPulseDepth`
+- [x] Protagonista: escala, velocidades, rango de interacción
+- [x] Cono de visión: alcance, ángulo, intensidad, halo
+- [x] Iluminación Sueño y Vigilia
+- [x] Inquietud: tasa base, multiplicador minijuego, multiplicadores zona 2 y 3
+- [x] Timer: aceleraciones, bonus primera run
+- [x] Enemigos: escala, velocidad, spike, radios de detección
+- [x] Aliados: escala, radio de encuentro, animación
+- [x] Fragmentos: escala, rango, pulso visual, sonido proximidad
+- [x] Minijuego Timing: todos los parámetros de dificultad
+- [x] Minijuego Retención: fill, decay, bonus
+- [x] Inventario: tamaño grid y UI
+- [x] Costes de salud: daños por tipo de despertar, target demo
+- [x] Pasos: intervalos y volumen
+- [x] Cámara: tamaño ortográfico, suavidad
+- [x] Transiciones: duraciones de fade, shake, flash
+- [x] Audio: volúmenes ambient, SFX, snapshots
+- [x] FX visuales: vignette, chromatic, distorsión, velo rojo, buzz
 
 ### 2. RunConfig — clase de runtime
 

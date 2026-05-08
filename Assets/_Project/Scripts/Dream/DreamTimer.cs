@@ -50,11 +50,15 @@ namespace Restless.Dream
             // Accelerate when restlessness is elevated; Max drains much faster
             if (RestlessnessManager.Instance != null)
             {
+                var   run     = Core.RunConfig.Current;
+                float highAcc = run?.highRestlessnessAcceleration ?? _highRestlessnessAcceleration;
+                float maxAcc  = run?.maxRestlessnessAcceleration  ?? _maxRestlessnessAcceleration;
+
                 var threshold = RestlessnessManager.Instance.CurrentThreshold;
                 if (threshold == RestlessnessManager.Threshold.Max)
-                    drain *= _maxRestlessnessAcceleration;
+                    drain *= maxAcc;
                 else if (threshold >= RestlessnessManager.Threshold.High)
-                    drain *= _highRestlessnessAcceleration;
+                    drain *= highAcc;
             }
 
             _remaining -= drain;

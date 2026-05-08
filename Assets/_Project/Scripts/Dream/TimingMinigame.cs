@@ -33,29 +33,26 @@ namespace Restless.Dream
         public int Successes => _successes;
         public int Failures => _failures;
 
-        private float _speedMultiplier = 1f;
-
         private void Start()
         {
             var protagonistGO = GameObject.FindWithTag("Player");
             if (protagonistGO != null)
                 _playerInput = protagonistGO.GetComponent<PlayerInput>();
-
-            // Apply ally passive if available
-            var applier = FindFirstObjectByType<DreamPassiveApplier>();
-            if (applier != null) _speedMultiplier = applier.MinigameSpeedMultiplier;
         }
 
         public void Begin(Action onSuccess, Action onFailure)
         {
             _onSuccess = onSuccess;
             _onFailure = onFailure;
-            _markerPosition = 0f;
+            _markerPosition  = 0f;
             _markerDirection = 1;
-            _successes = 0;
-            _failures = 0;
-            GreenZoneHalfWidth = _greenZoneHalfWidth;
-            _isActive = true;
+            _successes       = 0;
+            _failures        = 0;
+
+            var run = Core.RunConfig.Current;
+            GreenZoneHalfWidth = run?.greenZoneHalfWidth ?? _greenZoneHalfWidth;
+
+            _isActive   = true;
             _startFrame = Time.frameCount;
         }
 
@@ -75,10 +72,17 @@ namespace Restless.Dream
             }
 
             // Scale difficulty with restlessness
+            var   run      = Core.RunConfig.Current;
+            float baseSpd  = run?.markerSpeed          ?? _markerSpeed;
+            float maxSpd   = run?.markerSpeedMax        ?? _markerSpeedMax;
+            float halfW    = run?.greenZoneHalfWidth    ?? _greenZoneHalfWidth;
+            float halfWMin = run?.greenZoneHalfWidthMin ?? _greenZoneHalfWidthMin;
+            float speedMul = run?.minigameSpeedMultiplier ?? 1f;
+
             float restT = RestlessnessManager.Instance != null
                 ? RestlessnessManager.Instance.NormalizedValue : 0f;
-            float speed = Mathf.Lerp(_markerSpeed, _markerSpeedMax, restT) * _speedMultiplier;
-            GreenZoneHalfWidth = Mathf.Lerp(_greenZoneHalfWidth, _greenZoneHalfWidthMin, restT);
+            float speed = Mathf.Lerp(baseSpd, maxSpd, restT) * speedMul;
+            GreenZoneHalfWidth = Mathf.Lerp(halfW, halfWMin, restT);
 
             _markerPosition += _markerDirection * speed * Time.deltaTime;
 
@@ -99,12 +103,16 @@ namespace Restless.Dream
             bool pressed = _playerInput.actions["Player/Interact"].WasPressedThisFrame();
             if (!pressed) return;
 
+            var   runC         = Core.RunConfig.Current;
+            int   succRequired = runC?.successesRequired ?? _successesRequired;
+            int   failAllowed  = runC?.failuresAllowed   ?? _failuresAllowed;
+
             float delta = Mathf.Abs(_markerPosition - _greenZoneCenter);
-            if (delta <= _greenZoneHalfWidth)
+            if (delta <= GreenZoneHalfWidth)
             {
                 _successes++;
                 DreamSFXPlayer.Instance?.PlayMinigameHit();
-                if (_successes >= _successesRequired)
+                if (_successes >= succRequired)
                 {
                     _isActive = false;
                     _onSuccess?.Invoke();
@@ -114,7 +122,7 @@ namespace Restless.Dream
             {
                 _failures++;
                 DreamSFXPlayer.Instance?.PlayMinigameMiss();
-                if (_failures > _failuresAllowed)
+                if (_failures > failAllowed)
                 {
                     _isActive = false;
                     _onFailure?.Invoke();

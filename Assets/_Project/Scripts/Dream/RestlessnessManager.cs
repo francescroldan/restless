@@ -39,8 +39,13 @@ namespace Restless.Dream
 
         private void Update()
         {
-            float rate = _baseRate * _rateMultiplier * _passiveMultiplier;
-            if (_minigameActive) rate *= _minigameMultiplier;
+            var   run          = Core.RunConfig.Current;
+            float baseRate     = run?.baseRestlessnessRate          ?? _baseRate;
+            float minigameMult = run?.minigameActiveMultiplier      ?? _minigameMultiplier;
+            float passiveMult  = run?.restlessnessPassiveMultiplier ?? _passiveMultiplier;
+
+            float rate = baseRate * _rateMultiplier * passiveMult;
+            if (_minigameActive) rate *= minigameMult;
 
             _value = Mathf.Clamp(_value + rate * Time.deltaTime, 0f, 100f);
 

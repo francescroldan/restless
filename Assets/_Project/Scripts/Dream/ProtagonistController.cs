@@ -47,8 +47,10 @@ namespace Restless.Dream
 
         private void FixedUpdate()
         {
-            float speed = _isRunning ? _runSpeed : _walkSpeed;
-            _rb.linearVelocity = _moveInput.normalized * speed;
+            var   run  = Core.RunConfig.Current;
+            float walk = run?.walkSpeed ?? _walkSpeed;
+            float spri = run?.runSpeed  ?? _runSpeed;
+            _rb.linearVelocity = _moveInput.normalized * (_isRunning ? spri : walk);
         }
 
         private void UpdateLookDirection()

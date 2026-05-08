@@ -5,55 +5,61 @@ using Restless.Vigil;
 namespace Restless.Dream
 {
     /// <summary>
-    /// Reads SaveData.selectedAllyIds at dream start and applies all passive modifiers.
-    /// Attach to _Managers in the Dream scene alongside DreamSceneBootstrap.
+    /// Reads SaveData.selectedAllyIds and writes all passive modifiers into RunConfig.Current.
+    /// Must be called after RunConfig.Create() and before DreamTimer.StartTimer().
+    /// Attach to _Managers alongside DreamSceneBootstrap.
     /// </summary>
     public class DreamPassiveApplier : MonoBehaviour
     {
         [SerializeField] private AllyRegistry _registry;
 
-        /// <summary>
-        /// Applies ally passives and returns the modified dream duration.
-        /// Must be called before DreamTimer.StartTimer.
-        /// </summary>
         public static DreamPassiveApplier FindApplier() =>
             Object.FindFirstObjectByType<DreamPassiveApplier>();
 
-        public float MinigameSpeedMultiplier { get; private set; } = 1f;
-        public float HealthCostMultiplier    { get; private set; } = 1f;
-        public int   InventoryBonusCells     { get; private set; } = 0;
-
-        public float ApplyPassives(float baseDuration)
+        public void ApplyPassives()
         {
-            MinigameSpeedMultiplier = 1f;
-            HealthCostMultiplier    = 1f;
-            InventoryBonusCells     = 0;
+            var run = RunConfig.Current;
+            if (run == null)
+            {
+                Debug.LogWarning("[DreamPassiveApplier] RunConfig.Current is null — passives not applied.");
+                return;
+            }
 
-            if (_registry == null) { Debug.LogWarning("[DreamPassiveApplier] No AllyRegistry assigned."); return baseDuration; }
+            if (_registry == null)
+            {
+                Debug.LogWarning("[DreamPassiveApplier] No AllyRegistry assigned.");
+                return;
+            }
 
             var selectedIds = SaveManager.Instance?.Data?.selectedAllyIds;
-            if (selectedIds == null || selectedIds.Count == 0) return baseDuration;
+            if (selectedIds == null || selectedIds.Count == 0) return;
 
-            float rateMultiplier  = 1f;
-            float durationBonus   = 0f;
+            float rateMultiplier = 1f;
+            float durationBonus  = 0f;
+            float minigameMult   = 1f;
+            float healthMult     = 1f;
+            int   invBonus       = 0;
 
             foreach (var id in selectedIds)
             {
                 var ally = _registry.GetById(id);
                 if (ally == null) continue;
-                rateMultiplier          += ally.restlessnessRateModifier;
-                durationBonus           += ally.dreamDurationBonus;
-                MinigameSpeedMultiplier *= ally.minigameSpeedMultiplier;
-                HealthCostMultiplier    *= ally.healthCostMultiplier;
-                InventoryBonusCells     += ally.inventoryBonusCells;
+                rateMultiplier += ally.restlessnessRateModifier;
+                durationBonus  += ally.dreamDurationBonus;
+                minigameMult   *= ally.minigameSpeedMultiplier;
+                healthMult     *= ally.healthCostMultiplier;
+                invBonus       += ally.inventoryBonusCells;
             }
 
-            rateMultiplier = Mathf.Max(0.1f, rateMultiplier);
-            RestlessnessManager.Instance?.SetPassiveMultiplier(rateMultiplier);
+            run.restlessnessPassiveMultiplier = Mathf.Max(0.1f, rateMultiplier);
+            run.dreamDuration                += durationBonus;
+            run.minigameSpeedMultiplier       = minigameMult;
+            run.healthCostMultiplier          = healthMult;
+            run.inventoryBonusCells           = invBonus;
 
-            float finalDuration = baseDuration + durationBonus;
-            Debug.Log($"[DreamPassiveApplier] rate×{rateMultiplier:F2}  duration {baseDuration}+{durationBonus}={finalDuration}s  minigame×{MinigameSpeedMultiplier:F2}  health×{HealthCostMultiplier:F2}  invBonus={InventoryBonusCells}");
-            return finalDuration;
+            Debug.Log($"[DreamPassiveApplier] rate×{run.restlessnessPassiveMultiplier:F2}  " +
+                      $"duration {run.dreamDuration}s  minigame×{minigameMult:F2}  " +
+                      $"health×{healthMult:F2}  invBonus={invBonus}");
         }
     }
 }

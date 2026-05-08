@@ -28,18 +28,18 @@ namespace Restless.Dream
         {
             if (_patrolPaused || _waypoints == null || _waypoints.Length == 0) return;
 
-            Transform target = _waypoints[_currentWaypoint];
-            Vector2 direction = ((Vector2)target.position - _rb.position).normalized;
-            float distance = Vector2.Distance(_rb.position, target.position);
+            var   run       = Core.RunConfig.Current;
+            float speed     = run?.entitySpeed             ?? _speed;
+            float threshold = run?.entityWaypointThreshold ?? _waypointReachThreshold;
 
-            if (distance <= _waypointReachThreshold)
-            {
+            Transform target    = _waypoints[_currentWaypoint];
+            Vector2   direction = ((Vector2)target.position - _rb.position).normalized;
+            float     distance  = Vector2.Distance(_rb.position, target.position);
+
+            if (distance <= threshold)
                 _currentWaypoint = (_currentWaypoint + 1) % _waypoints.Length;
-            }
             else
-            {
-                _rb.MovePosition(_rb.position + direction * _speed * Time.fixedDeltaTime);
-            }
+                _rb.MovePosition(_rb.position + direction * speed * Time.fixedDeltaTime);
         }
 
         public void PausePatrol() => _patrolPaused = true;
