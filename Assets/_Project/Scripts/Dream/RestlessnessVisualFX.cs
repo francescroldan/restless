@@ -108,76 +108,89 @@ namespace Restless.Dream
 
         public void TriggerDetectionBuzz()
         {
-            _buzzChromatic = _buzzChromaticStrength;
-            _buzzVignette  = _buzzVignetteStrength;
+            var run = Core.RunConfig.Current;
+            _buzzChromatic = run?.buzzChromaticStrength ?? _buzzChromaticStrength;
+            _buzzVignette  = run?.buzzVignetteStrength  ?? _buzzVignetteStrength;
         }
 
         private void Update()
         {
             if (RestlessnessManager.Instance == null) return;
 
+            var   run = Core.RunConfig.Current;
+            float vigIdle         = run?.vignetteIdle               ?? _vignetteIdle;
+            float vigCritical     = run?.vignetteCritical            ?? _vignetteCritical;
+            float pulseAmp        = run?.vignettePulseAmplitude      ?? _pulseAmplitude;
+            float pulseHigh       = run?.vignettePulseSpeedHigh      ?? _pulseSpeedHigh;
+            float pulseCrit       = run?.vignettePulseSpeedCritical  ?? _pulseSpeedCrit;
+            float chromMedium     = run?.chromaticMedium             ?? _chromaticMedium;
+            float chromHigh       = run?.chromaticHigh               ?? _chromaticHigh;
+            float chromCritical   = run?.chromaticCritical           ?? _chromaticCritical;
+            float distHigh        = run?.lensDistortionHigh          ?? _distortionHigh;
+            float distCritical    = run?.lensDistortionCritical      ?? _distortionCritical;
+            float flashDur        = run?.thresholdFlashDuration      ?? _flashDuration;
+            float flashMax        = run?.thresholdFlashAlphaMax      ?? _flashAlphaMax;
+            float veilBase        = run?.maxVeilBaseAlpha            ?? _maxVeilBaseAlpha;
+            float veilDepth       = run?.maxVeilPulseDepth           ?? _maxVeilPulseDepth;
+            float veilRate        = run?.maxVeilPulseRate            ?? _maxVeilPulseRate;
+            float buzzDecay       = run?.buzzDecaySpeed              ?? _buzzDecaySpeed;
+            float lerpSpd         = run?.fxLerpSpeed                 ?? _lerpSpeed;
+
             float t         = RestlessnessManager.Instance.NormalizedValue;
             var   threshold = RestlessnessManager.Instance.CurrentThreshold;
 
-            // Flash on ascending threshold crossings
             if (threshold != _lastThreshold)
             {
                 if (threshold > _lastThreshold)
                 {
-                    _flashAlpha = _flashAlphaMax;
+                    _flashAlpha = flashMax;
                     _flashColor = FlashColor(threshold);
                 }
                 _lastThreshold = threshold;
             }
 
-            // Flash on entering a higher-danger zone (zone multiplier increase)
             float zone = RestlessnessManager.Instance.ZoneMultiplier;
             if (zone > _lastZoneMultiplier + 0.01f)
             {
-                _flashAlpha = _flashAlphaMax * 0.7f;
+                _flashAlpha = flashMax * 0.7f;
                 _flashColor = zone >= 2f ? new Color(1f, 0.1f, 0.05f) : new Color(1f, 0.55f, 0.05f);
             }
             _lastZoneMultiplier = zone;
 
-            _flashAlpha    = Mathf.MoveTowards(_flashAlpha,    0f, Time.deltaTime / _flashDuration);
-            _buzzChromatic = Mathf.MoveTowards(_buzzChromatic, 0f, Time.deltaTime * _buzzDecaySpeed);
-            _buzzVignette  = Mathf.MoveTowards(_buzzVignette,  0f, Time.deltaTime * _buzzDecaySpeed);
+            _flashAlpha    = Mathf.MoveTowards(_flashAlpha,    0f, Time.deltaTime / flashDur);
+            _buzzChromatic = Mathf.MoveTowards(_buzzChromatic, 0f, Time.deltaTime * buzzDecay);
+            _buzzVignette  = Mathf.MoveTowards(_buzzVignette,  0f, Time.deltaTime * buzzDecay);
             if (_maxReached)
-                _maxVeilTime += Time.deltaTime * _maxVeilPulseRate * Mathf.PI * 2f;
+                _maxVeilTime += Time.deltaTime * veilRate * Mathf.PI * 2f;
 
-            // Pulse (heartbeat) kicks in above 50% restlessness, speeds up at Critical
             float pulseBlend = Mathf.Clamp01(Mathf.InverseLerp(0.5f, 1f, t));
-            float pulseSpeed = Mathf.Lerp(_pulseSpeedHigh, _pulseSpeedCrit, pulseBlend);
+            float pulseSpeed = Mathf.Lerp(pulseHigh, pulseCrit, pulseBlend);
             _pulseTime += Time.deltaTime * pulseSpeed;
-            float pulse = Mathf.Sin(_pulseTime) * _pulseAmplitude * pulseBlend;
+            float pulse = Mathf.Sin(_pulseTime) * pulseAmp * pulseBlend;
 
-            // Vignette: base curve + pulse + dark-red tint at Critical
-            float baseVig = Mathf.Lerp(_vignetteIdle, _vignetteCritical, Mathf.Pow(t, 1.5f));
+            float baseVig = Mathf.Lerp(vigIdle, vigCritical, Mathf.Pow(t, 1.5f));
             _vignette.intensity.Override(Mathf.Lerp(
                 _vignette.intensity.value, baseVig + pulse + _buzzVignette,
-                Time.deltaTime * _lerpSpeed));
+                Time.deltaTime * lerpSpd));
 
-            // Vignette color fades from black to dark red as restlessness passes 0.5
             var vigColor = Color.Lerp(Color.black, new Color(0.45f, 0f, 0f),
                                       Mathf.InverseLerp(0.5f, 1f, t));
             _vignette.color.Override(vigColor);
 
-            // Chromatic aberration: 0 at Low, escalates through thresholds
             float targetChromatic = t < 0.25f ? 0f
-                : t < 0.5f  ? Mathf.InverseLerp(0.25f, 0.5f,  t) * _chromaticMedium
-                : t < 0.75f ? Mathf.Lerp(_chromaticMedium,  _chromaticHigh,     Mathf.InverseLerp(0.5f,  0.75f, t))
-                             : Mathf.Lerp(_chromaticHigh,    _chromaticCritical, Mathf.InverseLerp(0.75f, 1f,    t));
+                : t < 0.5f  ? Mathf.InverseLerp(0.25f, 0.5f,  t) * chromMedium
+                : t < 0.75f ? Mathf.Lerp(chromMedium,  chromHigh,      Mathf.InverseLerp(0.5f,  0.75f, t))
+                             : Mathf.Lerp(chromHigh,    chromCritical,  Mathf.InverseLerp(0.75f, 1f,    t));
             _chromatic.intensity.Override(Mathf.Lerp(
                 _chromatic.intensity.value, targetChromatic + _buzzChromatic,
-                Time.deltaTime * _lerpSpeed));
+                Time.deltaTime * lerpSpd));
 
-            // Lens distortion: starts at High threshold
             float targetDistortion = t < 0.5f ? 0f
-                : t < 0.75f ? Mathf.Lerp(0f, _distortionHigh,     Mathf.InverseLerp(0.5f,  0.75f, t))
-                             : Mathf.Lerp(_distortionHigh, _distortionCritical, Mathf.InverseLerp(0.75f, 1f,    t));
+                : t < 0.75f ? Mathf.Lerp(0f,       distHigh,     Mathf.InverseLerp(0.5f,  0.75f, t))
+                             : Mathf.Lerp(distHigh, distCritical, Mathf.InverseLerp(0.75f, 1f,    t));
             _distortion.intensity.Override(Mathf.Lerp(
                 _distortion.intensity.value, targetDistortion,
-                Time.deltaTime * _lerpSpeed));
+                Time.deltaTime * lerpSpd));
         }
 
         private void OnGUI()

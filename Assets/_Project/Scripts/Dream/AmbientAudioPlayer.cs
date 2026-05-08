@@ -96,6 +96,10 @@ namespace Restless.Dream
         {
             if (RestlessnessManager.Instance == null) return;
 
+            var   run  = Core.RunConfig.Current;
+            float volCalm     = run?.ambientVolumeCalm     ?? _volumeCalm;
+            float volCritical = run?.ambientVolumeCritical ?? _volumeCritical;
+
             float t  = RestlessnessManager.Instance.NormalizedValue;
             float dt = Time.deltaTime * _lerpSpeed;
 
@@ -128,7 +132,7 @@ namespace Restless.Dream
             float rate  = Mathf.Lerp(_tremoloRateCalm,  _tremoloRateCritical,  t);
             _tremoloPhase += rate * Time.deltaTime * Mathf.PI * 2f;
 
-            _baseVolume = Mathf.Lerp(_baseVolume, Mathf.Lerp(_volumeCalm, _volumeCritical, t), dt);
+            _baseVolume = Mathf.Lerp(_baseVolume, Mathf.Lerp(volCalm, volCritical, t), dt);
             float tremolo = 1f - depth * (0.5f + 0.5f * Mathf.Sin(_tremoloPhase));
             _src.volume = _baseVolume * tremolo;
         }

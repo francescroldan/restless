@@ -57,15 +57,19 @@ namespace Restless.Dream
         /// </summary>
         public bool ContainsPoint(Vector3 worldPosition)
         {
+            var   run        = Core.RunConfig.Current;
+            float range      = run?.visionConeRange      ?? _range;
+            float outerAngle = run?.visionConeOuterAngle ?? _outerAngle;
+            float minRadius  = run?.visionConeMinRadius  ?? _minVisibleRadius;
+
             Vector2 toTarget = (Vector2)(worldPosition - transform.position);
             float distance = toTarget.magnitude;
 
-            if (distance <= _minVisibleRadius) return true;
-            if (distance > _range) return false;
+            if (distance <= minRadius) return true;
+            if (distance > range) return false;
 
-            // transform.up is the cone's forward direction after rotation
             float angle = Vector2.Angle(transform.up, toTarget);
-            return angle <= _outerAngle * 0.5f;
+            return angle <= outerAngle * 0.5f;
         }
     }
 }

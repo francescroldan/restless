@@ -79,38 +79,34 @@ GameConfig.asset   ← valores de diseño, tweakeables en Editor
 - [x] Audio: volúmenes ambient, SFX, snapshots
 - [x] FX visuales: vignette, chromatic, distorsión, velo rojo, buzz
 
-### 2. RunConfig — clase de runtime
+### 2. RunConfig — clase de runtime ✅
 
-Crear `Assets/_Project/Scripts/Core/RunConfig.cs`.
+- [x] Clase plain C# con los mismos campos que `GameConfig`
+- [x] `RunConfig.Current` — creado en `DreamSceneBootstrap.Awake`, nulleado en `OnDestroy`
+- [x] Constructor `RunConfig(GameConfig)` que copia todos los valores
+- [x] Campos públicos mutables
 
-- [ ] Clase plain C# (no MonoBehaviour) con los mismos campos que `GameConfig`
-- [ ] Singleton de run: `RunConfig.Current` — creado en `DreamSceneBootstrap`, nulleado al volver a Vigilia
-- [ ] Constructor `RunConfig(GameConfig base)` que copia todos los valores
-- [ ] Campos públicos mutables (no propiedades con lógica, simplicidad primero)
+### 3. DreamSceneBootstrap — inicialización ✅
 
-### 3. DreamSceneBootstrap — inicialización
+- [x] Referencia directa a `GameConfig` en `_Managers`
+- [x] `RunConfig.Create(gameConfig)` en `Awake` antes de `Start`
+- [x] `dreamDuration` se inicializa desde `ProtagonistState.BaseDreamDuration`
 
-- [ ] Cargar `GameConfig` desde Resources o referencia directa en `_Managers`
-- [ ] Crear `RunConfig.Current = new RunConfig(gameConfig)` antes de cualquier otra inicialización
-- [ ] Mover la lógica de `firstRunBonusTime` aquí (ya estaba, solo reubicarla en RunConfig)
+### 4. DreamPassiveApplier — escribir en RunConfig ✅
 
-### 4. DreamPassiveApplier — escribir en RunConfig
-
-- [ ] Refactorizar para que los modificadores de aliados escriban en `RunConfig.Current` en lugar de llamar métodos en sistemas individuales
-- [ ] Ejemplo: en vez de `DreamTimer.Instance.StartTimer(base + bonus)`, hacer `RunConfig.Current.dreamDuration += bonus` antes de que DreamTimer lo lea
+- [x] `ApplyPassives()` escribe en `RunConfig.Current` directamente
+- [x] `restlessnessPassiveMultiplier`, `dreamDuration`, `minigameSpeedMultiplier`, `healthCostMultiplier`, `inventoryBonusCells`
 
 ### 5. Refactorizar sistemas para leer RunConfig
 
-Cada sistema deja sus `[SerializeField]` como **valores de fallback en Editor** (útil para tests rápidos), pero en runtime usa `RunConfig.Current` si existe.
-
-- [ ] `ProtagonistController` — velocidades
-- [ ] `VisionCone` — ángulo, rango; `Halo` — intensidad, radio  
-- [ ] `DreamTimer` — duración, aceleraciones
-- [ ] `RestlessnessManager` — tasa base, multiplicador de minijuego
-- [ ] `DreamEntity` — velocidad
-- [ ] `TimingMinigame` — todos sus parámetros de dificultad
-- [ ] `AmbientAudioPlayer` — volumen base
-- [ ] `RestlessnessVisualFX` — caps de vignette y chromatic, parámetros del velo
+- [x] `ProtagonistController` — velocidades
+- [x] `VisionCone` — ángulo, rango
+- [x] `DreamTimer` — aceleraciones
+- [x] `RestlessnessManager` — tasa base, multiplicador minijuego, pasiva de aliado
+- [x] `DreamEntity` — velocidad, threshold
+- [x] `TimingMinigame` — todos sus parámetros
+- [x] `AmbientAudioPlayer` — volumen base
+- [x] `RestlessnessVisualFX` — vignette, chromatic, velo
 
 ### 6. Validación
 
