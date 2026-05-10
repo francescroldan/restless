@@ -21,7 +21,10 @@ namespace Restless.Dream
         private Light2D _light;
         private ProtagonistController _protagonist;
 
-        public bool IsVisible => _light.enabled;
+        public bool  IsVisible  => _light.enabled;
+        public float Range      => Core.RunConfig.Current?.visionConeRange      ?? _range;
+        public float OuterAngle => Core.RunConfig.Current?.visionConeOuterAngle ?? _outerAngle;
+        public float MinRadius  => Core.RunConfig.Current?.visionConeMinRadius  ?? _minVisibleRadius;
 
         private void Awake()
         {
