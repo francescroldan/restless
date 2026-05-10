@@ -13,6 +13,7 @@ namespace Restless.Vigil
         private Texture2D      _tex;
         private Sprite         _sprite;
         private int            _lastCount = -1;
+        private bool           _filling;
 
         // Urn pixel dimensions
         const int W = 16, H = 32;
@@ -39,14 +40,27 @@ namespace Restless.Vigil
 
         private void Start()
         {
-            Refresh(force: true);
+            int gained     = SaveManager.Instance?.RecentFragmentsGained ?? 0;
+            int totalCount = SaveManager.Instance?.CollectedFragmentCount ?? 0;
 
-            int gained = SaveManager.Instance?.RecentFragmentsGained ?? 0;
-            if (gained > 0)
+            if (gained > 0 && GameManager.Instance != null)
             {
+                // Draw at the level BEFORE this run's fragments, then animate up
+                int   prevCount = totalCount - gained;
+                float prevFill  = Mathf.Clamp01((float)prevCount / GameManager.Instance.DemoFragmentTarget);
+                float newFill   = Mathf.Clamp01((float)totalCount / GameManager.Instance.DemoFragmentTarget);
+
+                DrawUrn(prevFill, false);
+                _lastCount = totalCount;
+
                 SaveManager.Instance.ConsumeRecentGain();
+                float duration = Mathf.Clamp(gained * 0.5f, 0.4f, 2.5f);
                 VigiliaAudioPlayer.Instance?.PlayUrnFill(gained);
-                StartCoroutine(PulseUrn());
+                StartCoroutine(AnimateFill(prevFill, newFill, duration));
+            }
+            else
+            {
+                Refresh(force: true);
             }
         }
 
@@ -54,7 +68,7 @@ namespace Restless.Vigil
 
         private void Update()
         {
-            if (SaveManager.Instance == null) return;
+            if (_filling || SaveManager.Instance == null) return;
             Refresh(force: false);
         }
 
@@ -74,6 +88,26 @@ namespace Restless.Vigil
                 _light.gameObject.SetActive(complete);
                 if (complete) _light.color = new Color(1f, 0.82f, 0.28f);
             }
+        }
+
+        private IEnumerator AnimateFill(float fromFill, float toFill, float duration)
+        {
+            _filling = true;
+            bool complete = _lastCount >= GameManager.Instance.DemoFragmentTarget;
+            float t = 0f;
+
+            while (t < duration)
+            {
+                t += Time.deltaTime;
+                float fill = Mathf.Lerp(fromFill, toFill, Mathf.SmoothStep(0f, 1f, t / duration));
+                DrawUrn(fill, complete && fill >= toFill - 0.01f);
+                yield return null;
+            }
+
+            DrawUrn(toFill, complete);
+            _filling = false;
+
+            yield return StartCoroutine(PulseUrn());
         }
 
         private IEnumerator PulseUrn()
