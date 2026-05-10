@@ -107,7 +107,7 @@ namespace Restless.Core
                 }
             }
 
-            SceneLoader.Instance.LoadVigilia(abrupt);
+            SceneLoader.Instance.LoadVigilia(abrupt, fromDream: true);
         }
 
         public void OnDreamSceneReady() => State = GameState.Dream;

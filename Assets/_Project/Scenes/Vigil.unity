@@ -1408,6 +1408,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Restless.Core.SceneLoader
   _dreamSceneName: Dream
   _vigiliaSceneName: Vigil
+  _gameOverSceneName: GameOver
 --- !u!114 &378742148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1440,18 +1441,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935c2ebe6486f5e4da2efa74dd29fc4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Restless.Vigil.VigiliaAudioPlayer
-  _ambientClip: {fileID: 8300000, guid: 57010c96f39b1b545b6ecf97d7b0461b, type: 3}
+  _ambientClip: {fileID: 8300000, guid: 9ddf92aa760033c429e8c412bc9f8841, type: 3}
+  _clockClip: {fileID: 8300000, guid: 3b0547d9e578b1c45a945b3890894fe4, type: 3}
   _sfxReturnTranquil: {fileID: 8300000, guid: 8c75aecb206423a4fbc2b6cfdac174bd, type: 3}
   _sfxReturnAbrupt: {fileID: 8300000, guid: 7a3ea944ba26e314099a414fd22a717c, type: 3}
   _sfxSleep: {fileID: 8300000, guid: d3eee6b1da5944241a79b105f361b3ba, type: 3}
   _sfxAllyHover: {fileID: 8300000, guid: 40129bb7d76cce943944bce751f4c0cc, type: 3}
   _sfxAllyClick: {fileID: 8300000, guid: 432a6d55f4eddfa4ca06cc243ceb5d3a, type: 3}
   _sfxIncompatible: {fileID: 8300000, guid: d62f5aa726eaccf43954f8ceb6b1e414, type: 3}
+  _sfxUrnFill: {fileID: 8300000, guid: 6ce45d947c69aeb41b11d226fff17994, type: 3}
   _ambientVolume: 0.4
+  _clockVolume: 0.25
   _sfxVolume: 0.7
   _sfxAllyHoverVol: 0.4
   _sfxAllyClickVol: 0.6
   _sfxIncompatibleVol: 0.7
+  _sfxUrnFillVol: 0.8
 --- !u!1 &419068115
 GameObject:
   m_ObjectHideFlags: 0

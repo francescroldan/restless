@@ -12,7 +12,8 @@ namespace Restless.Core
         [SerializeField] private string _vigiliaSceneName  = "Vigil";
         [SerializeField] private string _gameOverSceneName = "GameOver";
 
-        public bool LastWakeUpWasAbrupt { get; private set; }
+        public bool LastWakeUpWasAbrupt  { get; private set; }
+        public bool LastVigiliaCameFromDream { get; private set; }
         public GameManager.GameOverType LastGameOverType { get; private set; }
 
         private void Awake()
@@ -28,9 +29,10 @@ namespace Restless.Core
                 GameManager.Instance?.OnDreamSceneReady()));
         }
 
-        public void LoadVigilia(bool abrupt)
+        public void LoadVigilia(bool abrupt, bool fromDream = false)
         {
-            LastWakeUpWasAbrupt = abrupt;
+            LastWakeUpWasAbrupt      = abrupt;
+            LastVigiliaCameFromDream = fromDream;
             StartCoroutine(LoadScene(_vigiliaSceneName, onLoaded: () =>
                 GameManager.Instance?.OnVigiliaSceneReady()));
         }

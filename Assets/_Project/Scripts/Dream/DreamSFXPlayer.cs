@@ -24,8 +24,8 @@ namespace Restless.Dream
         [SerializeField] private AudioClip _sfxMemoryActivate;
 
         [Header("Entity")]
-        [SerializeField] private AudioClip _sfxEntityNearby;
-        [SerializeField] private AudioClip _sfxEntityDetected;
+        [SerializeField] private AudioClip   _sfxEntityNearby;
+        [SerializeField] private AudioClip[] _sfxEntityDetected;
         [SerializeField] private float     _entityNearbyRadius    = 6f;
         [SerializeField] private float     _entityNearbyCooldown  = 3f;
 
@@ -90,7 +90,13 @@ namespace Restless.Dream
             }
         }
 
-        public void PlayEntityDetected()   => Play(_sfxEntityDetected, 0.8f);
+        public void PlayEntityDetected()
+        {
+            if (_sfxEntityDetected == null || _sfxEntityDetected.Length == 0) return;
+            _src.pitch = Random.Range(0.88f, 1.12f);
+            Play(_sfxEntityDetected[Random.Range(0, _sfxEntityDetected.Length)], 0.8f);
+            _src.pitch = 1f;
+        }
         public void PlayZoneEnter()        => Play(_sfxZoneEnter);
         public void PlayAllyEncounter()    => Play(_sfxAllyEncounter);
         public void PlayWakeupVoluntary()  => Play(_sfxWakeupVoluntary);
@@ -99,7 +105,7 @@ namespace Restless.Dream
         public void PlayMinigameMiss()     => Play(_sfxMinigameMiss);
         public void PlayMinigameSuccess()  => Play(_sfxMinigameSuccess);
         public void PlayMinigameFail()     => Play(_sfxMinigameFail);
-        public void PlayFragmentCollect()  => Play(_sfxFragmentCollect);
+        public void PlayFragmentCollect()  => Play(_sfxFragmentCollect, 0.72f);
         public void PlayMemoryActivate()   => Play(_sfxMemoryActivate);
 
         private void Play(AudioClip clip, float volume = -1f)

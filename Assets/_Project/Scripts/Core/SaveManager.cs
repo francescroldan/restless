@@ -80,18 +80,24 @@ namespace Restless.Core
 
         public int CollectedFragmentCount => Data.collectedFragmentIds.Count;
 
+        /// <summary>How many fragments were gained in the last committed run. Consumed once by MemoryUrnController on Vigilia entry.</summary>
+        public int RecentFragmentsGained { get; private set; }
+
+        public void ConsumeRecentGain() => RecentFragmentsGained = 0;
+
         /// <summary>
         /// Persists fragments from a completed run.
         /// On abrupt wake-up, <paramref name="lossOnAbrupt"/> fragments are dropped from the end of the list.
         /// </summary>
         public void CommitRunFragments(System.Collections.Generic.List<string> ids, bool abrupt, int lossOnAbrupt = 1)
         {
-            if (ids == null || ids.Count == 0) return;
+            if (ids == null || ids.Count == 0) { RecentFragmentsGained = 0; return; }
 
             int saveCount = abrupt ? Mathf.Max(0, ids.Count - lossOnAbrupt) : ids.Count;
             for (int i = 0; i < saveCount; i++)
                 Data.collectedFragmentIds.Add(ids[i]);
 
+            RecentFragmentsGained = saveCount;
             Debug.Log($"[SaveManager] Fragments committed: {saveCount}/{ids.Count} (abrupt={abrupt}, lost={ids.Count - saveCount}). Total: {Data.collectedFragmentIds.Count}");
             Save();
         }

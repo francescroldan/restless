@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Restless.Core;
@@ -36,7 +37,19 @@ namespace Restless.Vigil
             };
         }
 
-        private void Start()  => Refresh(force: true);
+        private void Start()
+        {
+            Refresh(force: true);
+
+            int gained = SaveManager.Instance?.RecentFragmentsGained ?? 0;
+            if (gained > 0)
+            {
+                SaveManager.Instance.ConsumeRecentGain();
+                VigiliaAudioPlayer.Instance?.PlayUrnFill(gained);
+                StartCoroutine(PulseUrn());
+            }
+        }
+
         private void OnEnable() => Refresh(force: true);
 
         private void Update()
@@ -61,6 +74,24 @@ namespace Restless.Vigil
                 _light.gameObject.SetActive(complete);
                 if (complete) _light.color = new Color(1f, 0.82f, 0.28f);
             }
+        }
+
+        private IEnumerator PulseUrn()
+        {
+            Vector3 baseScale = transform.localScale;
+            Vector3 peakScale = baseScale * 1.18f;
+            float   t         = 0f;
+
+            while (t < 1f)
+            {
+                t += Time.deltaTime * 4f;
+                transform.localScale = Vector3.Lerp(baseScale, peakScale, Mathf.Sin(t * Mathf.PI));
+                _sr.color = Color.Lerp(Color.white, new Color(1f, 0.85f, 0.3f), Mathf.Sin(t * Mathf.PI));
+                yield return null;
+            }
+
+            transform.localScale = baseScale;
+            _sr.color = Color.white;
         }
 
         private void DrawUrn(float fill, bool complete)

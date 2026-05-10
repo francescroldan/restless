@@ -35,6 +35,7 @@ namespace Restless.Core
         public float entityWaypointThreshold;
         public int   entitySpawnCount;
         public float entityHauntedFraction;
+        public float entityActivationDwellTime;
 
         // ── Minigame ──────────────────────────────────────────────────────────
         public float markerSpeed;
@@ -102,6 +103,7 @@ namespace Restless.Core
             entityWaypointThreshold      = cfg.entityWaypointThreshold;
             entitySpawnCount             = cfg.entitySpawnCount;
             entityHauntedFraction        = cfg.entityHauntedFraction;
+            entityActivationDwellTime    = cfg.entityActivationDwellTime;
             markerSpeed                  = cfg.markerSpeed;
             markerSpeedMax               = cfg.markerSpeedMax;
             greenZoneHalfWidth           = cfg.greenZoneHalfWidth;

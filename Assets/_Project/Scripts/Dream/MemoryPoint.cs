@@ -91,7 +91,6 @@ namespace Restless.Dream
             _state = State.Collected;
             RestlessnessManager.Instance?.SetMinigameActive(false);
             _visionCone?.Unfreeze();
-            DreamSFXPlayer.Instance?.PlayMinigameSuccess();
             DreamSFXPlayer.Instance?.PlayFragmentCollect();
 
             // Open manual placement UI if available; fall back to auto-place

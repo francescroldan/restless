@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Restless.Dream
@@ -10,8 +11,8 @@ namespace Restless.Dream
     ///
     ///   Perception radius — a small circle around the player. A dormant entity only
     ///                       wakes up when it is BOTH inside the vision cone AND within
-    ///                       this radius. The player has to deliberately aim at something
-    ///                       nearby to activate it, not just glance across the room.
+    ///                       this radius, AND has been held there for entityActivationDwellTime
+    ///                       seconds. Prevents activation from brief glances.
     /// </summary>
     public class EntityDetection : MonoBehaviour
     {
@@ -28,6 +29,9 @@ namespace Restless.Dream
         private bool          _wasDetecting;
         private float         _detectionBuzzCooldown;
 
+        // Tracks how long each dormant entity has been held in cone + perception radius
+        private readonly Dictionary<DreamEntity, float> _dwellTimers = new();
+
         private void Start()
         {
             _visionCone = GetComponentInChildren<VisionCone>();
@@ -41,6 +45,8 @@ namespace Restless.Dream
             if (_interruptCooldown     > 0f) _interruptCooldown     -= Time.deltaTime;
             if (_detectionBuzzCooldown > 0f) _detectionBuzzCooldown -= Time.deltaTime;
 
+            float dwellTime = Core.RunConfig.Current?.entityActivationDwellTime ?? 0.5f;
+
             bool anyInCone = false;
 
             foreach (var entity in _entities)
@@ -51,20 +57,36 @@ namespace Restless.Dream
 
                 if (inCone)
                 {
-                    // Wake up only when close enough — requires deliberate aim, not a distant glance
                     if (entity.IsDormant)
                     {
                         float dist = Vector2.Distance(transform.position, entity.transform.position);
                         if (dist <= _perceptionRadius)
-                            entity.Trigger();
+                        {
+                            _dwellTimers.TryGetValue(entity, out float elapsed);
+                            elapsed += Time.deltaTime;
+                            _dwellTimers[entity] = elapsed;
+
+                            if (elapsed >= dwellTime)
+                            {
+                                entity.Trigger();
+                                _dwellTimers.Remove(entity);
+                            }
+                        }
+                        else
+                        {
+                            _dwellTimers.Remove(entity);
+                        }
                     }
 
-                    // Only triggered (non-dormant) entities cause effects
                     if (!entity.IsDormant)
                     {
                         anyInCone = true;
                         RestlessnessManager.Instance?.AddSpike(_spikePerSecond * Time.deltaTime);
                     }
+                }
+                else
+                {
+                    _dwellTimers.Remove(entity);
                 }
 
                 if (_interruptCooldown <= 0f)

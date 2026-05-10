@@ -86,7 +86,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7807444316620101918, guid: 84b3b7dee73bc2a48bd06addc3d6cc04, type: 3}
-  m_Color: {r: 1, g: 0.2, b: 0.2, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -186,6 +186,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e41940f4310a447be5e01da8c701da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Restless.Dream.FocusReveal
-  _ghostColor: {r: 0.55, g: 0.55, b: 0.65, a: 0.18}
-  _presentColor: {r: 1, g: 1, b: 1, a: 1}
-  _lerpSpeed: 4
+  _ghostMaterial: {fileID: 2100000, guid: 81fb516fcd1a8f7418507408bba725bc, type: 2}
+  _ghostColor: {r: 0.18, g: 0.2, b: 0.28, a: 1}
+  _lerpSpeed: 0.25
+  _coneHalfAngle: 55
+  _maxDistance: 5

@@ -25,7 +25,7 @@ namespace Restless.Core
         // =====================================================================
         [Header("── Vision Cone ──────────────────────────────────────")]
         [Tooltip("Maximum range of the vision cone light (units).")]
-        public float visionConeRange          = 8f;
+        public float visionConeRange          = 4.5f;
         [Tooltip("Outer angle of the vision cone (degrees).")]
         public float visionConeOuterAngle     = 110f;
         [Tooltip("Minimum always-visible radius around the protagonist.")]
@@ -106,6 +106,8 @@ namespace Restless.Core
         [Tooltip("Fraction of spawned presences that are haunted (0=none, 1=all).")]
         [Range(0f, 1f)]
         public float entityHauntedFraction    = 0.4f;
+        [Tooltip("Seconds the entity must remain in cone + perception radius before activating.")]
+        public float entityActivationDwellTime = 0.5f;
 
         // =====================================================================
         // ALLIES (Dream encounter)

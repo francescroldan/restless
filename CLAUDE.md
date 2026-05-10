@@ -132,6 +132,12 @@ Docs/
 
 ---
 
+## Development Rules
+
+- **All tunable values must be defined in `GameConfig.cs`** — no hardcoded defaults left on MonoBehaviour components. Every float/int/bool that affects gameplay, timing, audio, or visuals goes in GameConfig, is copied into `RunConfig` at dream start, and read via `RunConfig.Current?.field ?? _serializeFieldFallback` at runtime.
+
+---
+
 ## Design Pillars
 
 1. **Dual-world cycle** — Dream/Vigilia loop creates constant tension and resource management.

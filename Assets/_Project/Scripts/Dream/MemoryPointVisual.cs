@@ -17,18 +17,22 @@ namespace Restless.Dream
         [SerializeField] private Color _collectedColor  = new Color(0.3f, 0.3f, 0.3f, 0.4f);
         [SerializeField] private Color _failedColor     = new Color(1f, 0.2f, 0.2f, 0.6f);
 
-        private MemoryPoint _mp;
+        private MemoryPoint    _mp;
         private SpriteRenderer _sr;
-        private float _time;
+        private FocusReveal    _focusReveal;
+        private float          _time;
 
         private void Awake()
         {
-            _mp = GetComponent<MemoryPoint>();
-            _sr = GetComponent<SpriteRenderer>();
+            _mp          = GetComponent<MemoryPoint>();
+            _sr          = GetComponent<SpriteRenderer>();
+            _focusReveal = GetComponent<FocusReveal>();
         }
 
         private void Update()
         {
+            if (_focusReveal != null && !_focusReveal.IsRevealed) return;
+
             if (_mp.CurrentState == MemoryPoint.State.Collected ||
                 _mp.CurrentState == MemoryPoint.State.Failed)
             {

@@ -40,7 +40,12 @@ namespace Restless.Dream
         private void PlayNext()
         {
             var clip = _clips[_clipIndex % _clips.Length];
-            if (clip != null) _src.PlayOneShot(clip, _volume);
+            if (clip != null)
+            {
+                _src.pitch = Random.Range(0.9f, 1.1f);
+                _src.PlayOneShot(clip, _volume);
+                _src.pitch = 1f;
+            }
             _clipIndex++;
         }
     }
