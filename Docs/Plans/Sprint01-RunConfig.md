@@ -1,6 +1,6 @@
 # Sprint 01 — RunConfig: parámetros modificables por run
 
-**Estado:** ✅ Completado 2026-05-08  
+**Estado:** ✅ Completado 2026-05-10  
 **Fase:** Post-MOC  
 **Prerequisito:** [M6 — MOC completo y jugable](MOC/M6-MOC-Completo.md) ✅ cerrado 2026-05-08
 

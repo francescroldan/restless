@@ -21,7 +21,8 @@
 | M4 | Hub de Vigilia completo | ✅ Completado | [MOC/M4-Hub-Vigilia.md](MOC/M4-Hub-Vigilia.md) |
 | M5 | Primer aliado end-to-end | ✅ Completado | [MOC/M5-Primer-Aliado.md](MOC/M5-Primer-Aliado.md) |
 | M6 | MOC completo y jugable | ✅ Completado | [MOC/M6-MOC-Completo.md](MOC/M6-MOC-Completo.md) |
-| S1 | RunConfig: parámetros modificables por run | 🔄 En curso | [Sprint01-RunConfig.md](Sprint01-RunConfig.md) |
+| S1 | RunConfig: parámetros modificables por run | ✅ Completado | [Sprint01-RunConfig.md](Sprint01-RunConfig.md) |
+| S2 | UX Polish: feedback, HUD ojo y tileset | 🔄 En curso | [Sprint02-UX-Polish.md](Sprint02-UX-Polish.md) |
 
 **Leyenda:** ⬜ Pendiente · 🔄 En curso · ✅ Completado
 
