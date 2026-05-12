@@ -12,6 +12,7 @@ namespace Restless.Vigil
         private Light2D        _light;
         private Texture2D      _tex;
         private Sprite         _sprite;
+        private ParticleSystem _ps;
         private int            _lastCount = -1;
         private bool           _filling;
 
@@ -35,9 +36,11 @@ namespace Restless.Vigil
             -1,-1,-1                    // y=27-29
         };
 
-        // Interior fill spans body + lower body rows
         const int FillMinRow = 1;
         const int FillMaxRow = 18;
+
+        // Neck position in local space (world units from pivot) — particle spawn point
+        const float NeckLocalY = 19f / 16f;
 
         private void Awake()
         {
@@ -49,7 +52,69 @@ namespace Restless.Vigil
                 filterMode = FilterMode.Point,
                 wrapMode   = TextureWrapMode.Clamp
             };
+
+            BuildParticleSystem();
         }
+
+        // ── Particle system ───────────────────────────────────────────────
+
+        private void BuildParticleSystem()
+        {
+            var go = new GameObject("FillParticles");
+            go.transform.SetParent(transform);
+            go.transform.localPosition = new Vector3(0f, NeckLocalY, -0.1f);
+
+            _ps = go.AddComponent<ParticleSystem>();
+
+            var main = _ps.main;
+            main.loop            = false;
+            main.playOnAwake     = false;
+            main.duration        = 2.5f;
+            main.startLifetime   = new ParticleSystem.MinMaxCurve(0.6f, 1.4f);
+            main.startSpeed      = new ParticleSystem.MinMaxCurve(0.5f, 1.2f);
+            main.startSize       = new ParticleSystem.MinMaxCurve(0.05f, 0.12f);
+            main.startColor      = new ParticleSystem.MinMaxGradient(
+                                       new Color(0.94f, 0.62f, 0.98f),
+                                       new Color(0.65f, 0.15f, 0.80f));
+            main.gravityModifier = 0f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles    = 120;
+
+            var emission = _ps.emission;
+            emission.enabled      = true;
+            emission.rateOverTime = new ParticleSystem.MinMaxCurve(18f);
+
+            var shape = _ps.shape;
+            shape.enabled   = true;
+            shape.shapeType = ParticleSystemShapeType.Circle;
+            shape.radius    = 0.12f;
+
+            var col = _ps.colorOverLifetime;
+            col.enabled = true;
+            var grad = new Gradient();
+            grad.SetKeys(
+                new GradientColorKey[] {
+                    new GradientColorKey(new Color(0.96f, 0.72f, 1.00f), 0.0f),
+                    new GradientColorKey(new Color(0.60f, 0.10f, 0.75f), 1.0f),
+                },
+                new GradientAlphaKey[] {
+                    new GradientAlphaKey(1f, 0.0f),
+                    new GradientAlphaKey(0f, 1.0f),
+                });
+            col.color = new ParticleSystem.MinMaxGradient(grad);
+
+            var vel = _ps.velocityOverLifetime;
+            vel.enabled = true;
+            vel.space   = ParticleSystemSimulationSpace.World;
+            vel.x       = new ParticleSystem.MinMaxCurve(-0.2f, 0.2f);
+            vel.y       = new ParticleSystem.MinMaxCurve(0.4f,  1.0f);
+
+            var renderer = go.GetComponent<ParticleSystemRenderer>();
+            renderer.sortingLayerID = _sr.sortingLayerID;
+            renderer.sortingOrder   = _sr.sortingOrder + 1;
+        }
+
+        // ── Lifecycle ────────────────────────────────────────────────────
 
         private void Start()
         {
@@ -58,7 +123,6 @@ namespace Restless.Vigil
 
             if (gained > 0 && GameManager.Instance != null)
             {
-                // Draw at the level BEFORE this run's fragments, then animate up
                 int   prevCount = totalCount - gained;
                 float prevFill  = Mathf.Clamp01((float)prevCount / GameManager.Instance.DemoFragmentTarget);
                 float newFill   = Mathf.Clamp01((float)totalCount / GameManager.Instance.DemoFragmentTarget);
@@ -92,8 +156,8 @@ namespace Restless.Vigil
             _lastCount = count;
 
             if (GameManager.Instance == null) return;
-            float fill     = Mathf.Clamp01((float)count / GameManager.Instance.DemoFragmentTarget);
-            bool  complete = count >= GameManager.Instance.DemoFragmentTarget;
+            float fill    = Mathf.Clamp01((float)count / GameManager.Instance.DemoFragmentTarget);
+            bool complete = count >= GameManager.Instance.DemoFragmentTarget;
             DrawUrn(fill, complete);
 
             if (_light != null)
@@ -103,12 +167,19 @@ namespace Restless.Vigil
             }
         }
 
+        // ── Animations ───────────────────────────────────────────────────
+
         private IEnumerator AnimateFill(float fromFill, float toFill, float duration)
         {
             _filling = true;
             bool complete = _lastCount >= GameManager.Instance.DemoFragmentTarget;
-            float t = 0f;
 
+            // Configure and play particles for this fill duration
+            var main = _ps.main;
+            main.duration = duration + 0.3f;
+            _ps.Play();
+
+            float t = 0f;
             while (t < duration)
             {
                 t += Time.deltaTime;
@@ -141,15 +212,16 @@ namespace Restless.Vigil
             _sr.color = Color.white;
         }
 
+        // ── Draw ─────────────────────────────────────────────────────────
+
         private void DrawUrn(float fill, bool complete)
         {
-            Color clear   = new Color(0, 0, 0, 0);
-            Color outline = complete
-                ? new Color(0.82f, 0.45f, 0.95f)   // fuchsia outline when full
-                : new Color(0.22f, 0.19f, 0.16f);   // dark brown
-            Color interior = new Color(0.08f, 0.06f, 0.05f, 0.88f);
+            Color clear    = new Color(0, 0, 0, 0);
+            Color outline  = complete
+                ? new Color(0.82f, 0.45f, 0.95f)       // fuchsia when full
+                : new Color(0.22f, 0.19f, 0.16f);       // dark brown
+            Color interior = new Color(0.10f, 0.06f, 0.14f, 0.45f); // dark purple, semi-transparent
 
-            // Fill range in pixels
             int fillTopRow = FillMinRow + Mathf.RoundToInt(fill * (FillMaxRow - FillMinRow));
 
             for (int y = 0; y < H; y++)
@@ -159,9 +231,9 @@ namespace Restless.Vigil
             for (int y = 0; y < H; y++)
             {
                 int l = PL[y], r = PR[y];
-                if (l < 0) continue;                          // empty row
+                if (l < 0) continue;
 
-                bool solidRow = y <= 1 || (y >= 23 && y <= 26); // base and cork = fully solid
+                bool solidRow = y <= 1 || (y >= 23 && y <= 26);
 
                 for (int x = l; x <= r; x++)
                 {
@@ -171,26 +243,23 @@ namespace Restless.Vigil
                     {
                         _tex.SetPixel(x, y, outline);
                     }
+                    else if (y >= FillMinRow && y <= fillTopRow)
+                    {
+                        float rowNorm = (float)(y - FillMinRow) / (FillMaxRow - FillMinRow);
+                        Color fillCol = Color.Lerp(
+                            new Color(0.42f, 0.08f, 0.52f),   // deep violet base
+                            new Color(0.82f, 0.28f, 0.92f),   // bright fuchsia top
+                            rowNorm);
+
+                        // Center highlight stripe
+                        if (x == (l + r) / 2)
+                            fillCol = Color.Lerp(fillCol, new Color(0.96f, 0.72f, 1.00f), 0.55f);
+
+                        _tex.SetPixel(x, y, fillCol);
+                    }
                     else
                     {
-                        if (y >= FillMinRow && y <= fillTopRow)
-                        {
-                            float rowNorm = (float)(y - FillMinRow) / (FillMaxRow - FillMinRow);
-                            Color fillCol = Color.Lerp(
-                                new Color(0.42f, 0.08f, 0.52f),   // deep violet base
-                                new Color(0.78f, 0.22f, 0.88f),   // fuchsia top
-                                rowNorm);
-
-                            int cx = (l + r) / 2;
-                            if (x == cx)
-                                fillCol = Color.Lerp(fillCol, new Color(0.94f, 0.62f, 0.98f), 0.5f);
-
-                            _tex.SetPixel(x, y, fillCol);
-                        }
-                        else
-                        {
-                            _tex.SetPixel(x, y, interior);
-                        }
+                        _tex.SetPixel(x, y, interior);
                     }
                 }
             }
