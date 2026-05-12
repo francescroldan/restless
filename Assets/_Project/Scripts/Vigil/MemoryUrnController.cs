@@ -19,15 +19,16 @@ namespace Restless.Vigil
         const int W = 32, H = 30;
 
         // Profile left/right X per row (y=0 at bottom). -1 = empty row.
+        // PL mirrored from PR so the bottle is symmetric (center ≈ x=15.5).
         static readonly int[] PL = {
-            10, 8, 7, 6, 5, 5, 5, 5,   // y=0-7:  base + lower body
-             6, 7, 9,11,13,15,16,17,   // y=8-15: upper body
-            18,18,15,14,13,13,13,       // y=16-22: shoulder + neck
+            11,10, 9, 8, 7, 6, 5, 5,   // y=0-7:  base + lower body
+             5, 5, 6, 6, 6, 7, 7, 8,   // y=8-15: upper body
+             9,10,11,12,13,13,13,       // y=16-22: shoulder + neck
             12,11,12,13,                // y=23-26: cork
             -1,-1,-1                    // y=27-29: empty
         };
         static readonly int[] PR = {
-            21,23,24,25,26,26,26,26,   // y=0-7
+            20,21,22,23,24,25,26,26,   // y=0-7
             26,26,25,25,25,24,24,23,   // y=8-15
             22,21,20,19,18,18,18,       // y=16-22
             19,20,19,18,                // y=23-26
@@ -98,7 +99,7 @@ namespace Restless.Vigil
             if (_light != null)
             {
                 _light.gameObject.SetActive(complete);
-                if (complete) _light.color = new Color(1f, 0.82f, 0.28f);
+                if (complete) _light.color = new Color(0.78f, 0.22f, 0.92f);
             }
         }
 
@@ -132,7 +133,7 @@ namespace Restless.Vigil
             {
                 t += Time.deltaTime * 4f;
                 transform.localScale = Vector3.Lerp(baseScale, peakScale, Mathf.Sin(t * Mathf.PI));
-                _sr.color = Color.Lerp(Color.white, new Color(1f, 0.85f, 0.3f), Mathf.Sin(t * Mathf.PI));
+                _sr.color = Color.Lerp(Color.white, new Color(0.88f, 0.35f, 0.98f), Mathf.Sin(t * Mathf.PI));
                 yield return null;
             }
 
@@ -144,7 +145,7 @@ namespace Restless.Vigil
         {
             Color clear   = new Color(0, 0, 0, 0);
             Color outline = complete
-                ? new Color(0.86f, 0.70f, 0.24f)   // gold outline when full
+                ? new Color(0.82f, 0.45f, 0.95f)   // fuchsia outline when full
                 : new Color(0.22f, 0.19f, 0.16f);   // dark brown
             Color interior = new Color(0.08f, 0.06f, 0.05f, 0.88f);
 
@@ -176,13 +177,13 @@ namespace Restless.Vigil
                         {
                             float rowNorm = (float)(y - FillMinRow) / (FillMaxRow - FillMinRow);
                             Color fillCol = Color.Lerp(
-                                new Color(0.55f, 0.28f, 0.06f),
-                                new Color(0.92f, 0.75f, 0.24f),
+                                new Color(0.42f, 0.08f, 0.52f),   // deep violet base
+                                new Color(0.78f, 0.22f, 0.88f),   // fuchsia top
                                 rowNorm);
 
                             int cx = (l + r) / 2;
                             if (x == cx)
-                                fillCol = Color.Lerp(fillCol, new Color(0.98f, 0.94f, 0.62f), 0.5f);
+                                fillCol = Color.Lerp(fillCol, new Color(0.94f, 0.62f, 0.98f), 0.5f);
 
                             _tex.SetPixel(x, y, fillCol);
                         }
