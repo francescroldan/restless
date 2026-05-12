@@ -15,16 +15,28 @@ namespace Restless.Vigil
         private int            _lastCount = -1;
         private bool           _filling;
 
-        // Urn pixel dimensions
-        const int W = 16, H = 32;
+        // Urn pixel dimensions — matches bottle sprite (32×30)
+        const int W = 32, H = 30;
 
-        // Profile left/right X per row (y=0 at bottom)
-        static readonly int[] PL = {3,3,4,4,5,5,4,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,4,5,6,6,6,6,5,5};
-        static readonly int[] PR = {12,12,11,11,10,10,11,12,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,12,11,10,9,9,9,9,10,10};
+        // Profile left/right X per row (y=0 at bottom). -1 = empty row.
+        static readonly int[] PL = {
+            10, 8, 7, 6, 5, 5, 5, 5,   // y=0-7:  base + lower body
+             6, 7, 9,11,13,15,16,17,   // y=8-15: upper body
+            18,18,15,14,13,13,13,       // y=16-22: shoulder + neck
+            12,11,12,13,                // y=23-26: cork
+            -1,-1,-1                    // y=27-29: empty
+        };
+        static readonly int[] PR = {
+            21,23,24,25,26,26,26,26,   // y=0-7
+            26,26,25,25,25,24,24,23,   // y=8-15
+            22,21,20,19,18,18,18,       // y=16-22
+            19,20,19,18,                // y=23-26
+            -1,-1,-1                    // y=27-29
+        };
 
-        // Interior fill spans rows 4-22 (body + lower)
-        const int FillMinRow = 4;
-        const int FillMaxRow = 22;
+        // Interior fill spans body + lower body rows
+        const int FillMinRow = 1;
+        const int FillMaxRow = 18;
 
         private void Awake()
         {
@@ -146,7 +158,9 @@ namespace Restless.Vigil
             for (int y = 0; y < H; y++)
             {
                 int l = PL[y], r = PR[y];
-                bool solidRow = y <= 3 || y >= 26;   // base and neck/rim = fully solid
+                if (l < 0) continue;                          // empty row
+
+                bool solidRow = y <= 1 || (y >= 23 && y <= 26); // base and cork = fully solid
 
                 for (int x = l; x <= r; x++)
                 {
@@ -158,16 +172,14 @@ namespace Restless.Vigil
                     }
                     else
                     {
-                        // Interior: filled or empty
                         if (y >= FillMinRow && y <= fillTopRow)
                         {
                             float rowNorm = (float)(y - FillMinRow) / (FillMaxRow - FillMinRow);
                             Color fillCol = Color.Lerp(
-                                new Color(0.55f, 0.28f, 0.06f),   // dark amber
-                                new Color(0.92f, 0.75f, 0.24f),   // bright gold
+                                new Color(0.55f, 0.28f, 0.06f),
+                                new Color(0.92f, 0.75f, 0.24f),
                                 rowNorm);
 
-                            // Center highlight stripe
                             int cx = (l + r) / 2;
                             if (x == cx)
                                 fillCol = Color.Lerp(fillCol, new Color(0.98f, 0.94f, 0.62f), 0.5f);
