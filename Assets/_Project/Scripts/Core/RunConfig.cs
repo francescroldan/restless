@@ -72,6 +72,15 @@ namespace Restless.Core
         public float buzzDecaySpeed;
         public float fxLerpSpeed;
 
+        // ── Dream Presence ────────────────────────────────────────────────────
+        public float presenceManifestSpeed;
+        public float presenceManifestDecay;
+
+        // ── Wandering NPC ─────────────────────────────────────────────────────
+        public float wandererSpeed;
+        public float wandererRadius;
+        public float wandererWaitTime;
+
         // ── Ally modifiers (misc) ─────────────────────────────────────────────
         /// <summary>Written by DreamPassiveApplier. Applied by GameManager on exit.</summary>
         public float healthCostMultiplier = 1f;
@@ -131,6 +140,11 @@ namespace Restless.Core
             buzzVignetteStrength         = cfg.buzzVignetteStrength;
             buzzDecaySpeed               = cfg.buzzDecaySpeed;
             fxLerpSpeed                  = cfg.fxLerpSpeed;
+            presenceManifestSpeed        = cfg.presenceManifestSpeed;
+            presenceManifestDecay        = cfg.presenceManifestDecay;
+            wandererSpeed                = cfg.wandererSpeed;
+            wandererRadius               = cfg.wandererRadius;
+            wandererWaitTime             = cfg.wandererWaitTime;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Restless.Vigil
         [SerializeField] private ProtagonistState _protagonistState;
         [SerializeField] private AllyRegistry     _allyRegistry;
 
-        private bool      _visible = true;
+        private bool      _visible = false;
         private GUIStyle  _headerStyle;
         private GUIStyle  _rowStyle;
         private GUIStyle  _dimStyle;

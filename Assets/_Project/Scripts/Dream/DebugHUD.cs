@@ -7,7 +7,7 @@ namespace Restless.Dream
 {
     public class DebugHUD : MonoBehaviour
     {
-        private bool _visible = true;
+        private bool _visible = false;
         private PlayerInput _playerInput;
         private Texture2D _white;
         private GUIStyle _checkStyle;

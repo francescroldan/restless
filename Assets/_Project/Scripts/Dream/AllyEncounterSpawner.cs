@@ -48,6 +48,10 @@ namespace Restless.Dream
 
             var chosen = candidates[Random.Range(0, candidates.Count)];
             chosen.gameObject.SetActive(true);
+
+            var presence = chosen.gameObject.AddComponent<DreamPresence>();
+            presence.SetType(DreamPresence.PresenceType.AllyEcho);
+
             ActiveAlly = chosen.AllyDataRef;
             ActiveEncounterPosition = chosen.transform.position;
             Debug.Log($"[AllyEncounterSpawner] Encuentro esta run: {ActiveAlly.displayName} @ {ActiveEncounterPosition}");

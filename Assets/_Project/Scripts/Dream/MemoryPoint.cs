@@ -43,6 +43,8 @@ namespace Restless.Dream
         private void Update()
         {
             if (_state != State.Available || _protagonist == null) return;
+            var presence = GetComponent<DreamPresence>();
+            if (presence != null && !presence.IsStable) return;
             if (InventoryPlacementUI.Instance != null && InventoryPlacementUI.Instance.IsOpen) return;
 
             float dist = Vector2.Distance(transform.position, _protagonist.position);

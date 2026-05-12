@@ -55,6 +55,9 @@ namespace Restless.Dream
             {
                 if (entity == null || !entity.gameObject.activeInHierarchy) continue;
 
+                var presence = entity.GetComponent<DreamPresence>();
+                if (presence != null && !presence.IsStable) continue;
+
                 bool inCone = _visionCone != null && _visionCone.ContainsPoint(entity.transform.position);
 
                 if (inCone)

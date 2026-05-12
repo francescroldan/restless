@@ -200,6 +200,38 @@ namespace Restless.Core
         [Range(1, 30)]   public int   demoFragmentTarget         = 12;
 
         // =====================================================================
+        // DREAM PRESENCE
+        // =====================================================================
+        [Header("── Dream Presence — Materialisation ────────────────────")]
+        [Tooltip("Rate at which manifestation increases per second while the player observes the presence.")]
+        public float presenceManifestSpeed = 0.35f;
+        [Tooltip("Rate at which manifestation decays per second while unobserved.")]
+        public float presenceManifestDecay = 0.12f;
+
+        [Header("── Dream Presence — Distribution ───────────────────────")]
+        [Tooltip("Fraction of total spawns that materialise as haunted entities.")]
+        [Range(0f, 1f)] public float fogThreatFraction          = 0.35f;
+        [Tooltip("Fraction of total spawns that materialise as inert wanderers (spectral first).")]
+        [Range(0f, 1f)] public float fogWandererFraction         = 0.30f;
+        [Tooltip("Fraction of total spawns that are inert wanderers visible from the start.")]
+        [Range(0f, 1f)] public float fogWandererVisibleFraction  = 0.10f;
+        [Tooltip("Fraction of total spawns with undefined type — resolved at collapse by restlessness.")]
+        [Range(0f, 1f)] public float presenceUndefinedFraction   = 0.25f;
+        [Tooltip("How many memory fragments spawn as presences each run.")]
+        [Range(0, 6)]   public int   fogFragmentCount            = 2;
+
+        // =====================================================================
+        // WANDERING NPC
+        // =====================================================================
+        [Header("── Wandering NPC ────────────────────────────────────────")]
+        [Tooltip("Movement speed of wandering NPCs (units/s).")]
+        public float wandererSpeed = 0.8f;
+        [Tooltip("Radius within which waypoints are randomly selected.")]
+        public float wandererRadius = 3f;
+        [Tooltip("Wait time at each waypoint before picking the next (seconds).")]
+        public float wandererWaitTime = 1.5f;
+
+        // =====================================================================
         // FOOTSTEPS
         // =====================================================================
         [Header("── Footsteps ────────────────────────────────────────")]
