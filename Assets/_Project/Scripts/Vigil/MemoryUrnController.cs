@@ -12,7 +12,6 @@ namespace Restless.Vigil
         private Light2D        _light;
         private Texture2D      _tex;
         private Sprite         _sprite;
-        private ParticleSystem _ps;
         private int            _lastCount = -1;
         private bool           _filling;
 
@@ -39,9 +38,6 @@ namespace Restless.Vigil
         const int FillMinRow = 1;
         const int FillMaxRow = 18;
 
-        // Neck position in local space (world units from pivot) — particle spawn point
-        const float NeckLocalY = 19f / 16f;
-
         private void Awake()
         {
             _sr    = GetComponent<SpriteRenderer>();
@@ -52,66 +48,6 @@ namespace Restless.Vigil
                 filterMode = FilterMode.Point,
                 wrapMode   = TextureWrapMode.Clamp
             };
-
-            BuildParticleSystem();
-        }
-
-        // ── Particle system ───────────────────────────────────────────────
-
-        private void BuildParticleSystem()
-        {
-            var go = new GameObject("FillParticles");
-            go.transform.SetParent(transform);
-            go.transform.localPosition = new Vector3(0f, NeckLocalY, -0.1f);
-
-            _ps = go.AddComponent<ParticleSystem>();
-
-            var main = _ps.main;
-            main.loop            = false;
-            main.playOnAwake     = false;
-            main.duration        = 2.5f;
-            main.startLifetime   = new ParticleSystem.MinMaxCurve(0.6f, 1.4f);
-            main.startSpeed      = new ParticleSystem.MinMaxCurve(0.5f, 1.2f);
-            main.startSize       = new ParticleSystem.MinMaxCurve(0.05f, 0.12f);
-            main.startColor      = new ParticleSystem.MinMaxGradient(
-                                       new Color(0.94f, 0.62f, 0.98f),
-                                       new Color(0.65f, 0.15f, 0.80f));
-            main.gravityModifier = 0f;
-            main.simulationSpace = ParticleSystemSimulationSpace.World;
-            main.maxParticles    = 120;
-
-            var emission = _ps.emission;
-            emission.enabled      = true;
-            emission.rateOverTime = new ParticleSystem.MinMaxCurve(18f);
-
-            var shape = _ps.shape;
-            shape.enabled   = true;
-            shape.shapeType = ParticleSystemShapeType.Circle;
-            shape.radius    = 0.12f;
-
-            var col = _ps.colorOverLifetime;
-            col.enabled = true;
-            var grad = new Gradient();
-            grad.SetKeys(
-                new GradientColorKey[] {
-                    new GradientColorKey(new Color(0.96f, 0.72f, 1.00f), 0.0f),
-                    new GradientColorKey(new Color(0.60f, 0.10f, 0.75f), 1.0f),
-                },
-                new GradientAlphaKey[] {
-                    new GradientAlphaKey(1f, 0.0f),
-                    new GradientAlphaKey(0f, 1.0f),
-                });
-            col.color = new ParticleSystem.MinMaxGradient(grad);
-
-            var vel = _ps.velocityOverLifetime;
-            vel.enabled = true;
-            vel.space   = ParticleSystemSimulationSpace.World;
-            vel.x       = new ParticleSystem.MinMaxCurve(-0.2f, 0.2f);
-            vel.y       = new ParticleSystem.MinMaxCurve(0.4f,  1.0f);
-
-            var renderer = go.GetComponent<ParticleSystemRenderer>();
-            renderer.sortingLayerID = _sr.sortingLayerID;
-            renderer.sortingOrder   = _sr.sortingOrder + 1;
         }
 
         // ── Lifecycle ────────────────────────────────────────────────────
@@ -173,11 +109,6 @@ namespace Restless.Vigil
         {
             _filling = true;
             bool complete = _lastCount >= GameManager.Instance.DemoFragmentTarget;
-
-            // Configure and play particles for this fill duration
-            var main = _ps.main;
-            main.duration = duration + 0.3f;
-            _ps.Play();
 
             float t = 0f;
             while (t < duration)

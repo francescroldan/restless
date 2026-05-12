@@ -54,9 +54,9 @@ namespace Restless.Dream
         private void OnGUI()
         {
             EnsureStyles();
-            DrawBars();
             DrawProximity();
             if (!_visible) return;
+            DrawBars();
             DrawChecklist();
             DrawKeyLegend();
             DrawStats();

@@ -73,19 +73,9 @@ El ojo puede convivir con las barras de debug (F1) pero reemplaza las barras en 
 
 ---
 
-### V1 — Color del tileset del sueño
+### V1 — Color del tileset del sueño ✅
 
-**Problema:** Los sprites del tileset (`dream_cliff.png`) tienen píxeles en sRGB ~`#1C00 1C`–`#590059` (brillo lineal ~10 %). En juego se ven negros incluso con luz intensa porque cualquier multiplicación por luz da valores cercanos a 0.
-
-**Causa raíz:** El arte fue creado con una paleta demasiado oscura. No es un problema de luces ni de shader.
-
-**Solución:** Aclarar el tileset en un editor externo (Aseprite, Photoshop o GIMP) para que el color dominante del suelo sea un violeta visible (~`#8B5CF6` o similar), manteniendo las variaciones de sombra/luz relativas. Alternativa rápida provisional: ajustar `Tilemap_Cliff.color` en el Inspector de Unity como multiplicador de tinte hasta que el arte esté rehecho.
-
-**Criterios de salida:**
-- [ ] Tileset exportado con colores visibles a brillo lineal ≥ 0.3 en el canal dominante
-- [ ] En juego, dentro del cono de visión los tiles muestran el tono violeta correcto
-- [ ] La iluminación del sueño (GlobalLight + VisionCone) está calibrada para el nuevo rango de brillo
-- [ ] Los valores de luz resultantes documentados en `GameConfig` según las reglas del proyecto
+**Completado** — resuelto mediante el shader MonochromeAccent + FocusReveal: los tiles muestran el tono de color correcto dentro del cono de visión. Cerrado en Sprint 02.
 
 ---
 
