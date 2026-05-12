@@ -24,7 +24,21 @@ namespace Restless.Dream
         static readonly Color LidCol  = new Color(0.13f, 0.10f, 0.10f, 1f);
         static readonly Color Outline = new Color(0.05f, 0.04f, 0.04f, 1f);
         static readonly Color Hilite  = new Color(0.98f, 0.96f, 0.85f, 1f);
+        static readonly Color VeinCol = new Color(0.55f, 0.07f, 0.07f, 1f);
         static readonly Color Clear   = new Color(0, 0, 0, 0);
+
+        // Bloodshot veins — pixel paths in texture space, left and right sclera
+        static readonly (int x, int y)[][] Veins =
+        {
+            // Left side — radiating from edge toward iris
+            new[] { (3,15),(4,15),(5,15),(6,15),(7,15),(8,14),(9,14),(10,14) },
+            new[] { (5,14),(6,14),(7,13),(8,13) },
+            new[] { (5,16),(6,16),(7,17) },
+            // Right side
+            new[] { (43,15),(42,15),(41,15),(40,15),(39,14),(38,14),(37,14),(36,14) },
+            new[] { (41,14),(40,13),(39,13) },
+            new[] { (41,16),(40,17) },
+        };
 
         public static DreamEyeHUD Instance { get; private set; }
 
@@ -215,6 +229,10 @@ namespace Restless.Dream
                 }
             }
 
+            // Bloodshot veins during scared flash
+            if (_scaredFlash > 0f)
+                DrawVeins(pcx, pcy, Mathf.Clamp01(_scaredFlash / 0.45f));
+
             // Specular highlight — only if not covered by lid
             int hx = Mathf.Clamp(pcx + 2, 0, W - 1);
             int hy = Mathf.Clamp(pcy + 2, 0, H - 1);
@@ -223,6 +241,24 @@ namespace Restless.Dream
                 _tex.SetPixel(hx, hy, Hilite);
 
             _tex.Apply();
+        }
+
+        private void DrawVeins(int pcx, int pcy, float strength)
+        {
+            foreach (var vein in Veins)
+            {
+                foreach (var (x, y) in vein)
+                {
+                    if (x < 0 || x >= W || y < 0 || y >= H) continue;
+                    float h = EyeH[x];
+                    if (h <= 0f) continue;
+                    if (Mathf.Abs(y - CY) >= h - 1.3f) continue;           // outline border
+                    if (y > CY + h * (2f * _lid - 1f)) continue;           // under eyelid
+                    float dist = Mathf.Sqrt((x - pcx) * (x - pcx) + (y - pcy) * (y - pcy));
+                    if (dist <= 6.5f) continue;                             // iris/pupil
+                    _tex.SetPixel(x, y, Color.Lerp(Sclera, VeinCol, strength));
+                }
+            }
         }
     }
 }
