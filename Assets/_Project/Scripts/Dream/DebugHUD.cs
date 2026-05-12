@@ -172,30 +172,31 @@ namespace Restless.Dream
         private void DrawBars()
         {
             const float barH        = 18f;
-            const float labelW      = 110f;
+            const float labelW      = 80f;
             const float pad         = 4f;
-            const float x           = 10f;
-            const float rowGap      = 4f;
-            const float rightReserve = 292f; // espacio reservado para checklist/controles
-            float barW = Screen.width - x * 2f - labelW - rightReserve;
-            float y    = 10f;
+            const float topY        = 10f;
+            const float eyeHalf     = 110f;  // pixels reserved left/right of center for eye
+            const float rightMargin = 302f;  // checklist panel + gap
 
-            if (DreamTimer.Instance != null)
+            float cx       = Screen.width * 0.5f;
+            float leftBarW = cx - eyeHalf - 10f - labelW;
+            float rightBarW = Screen.width - rightMargin - (cx + eyeHalf) - labelW;
+
+            if (DreamTimer.Instance != null && leftBarW > 20f)
             {
                 float rem  = DreamTimer.Instance.Remaining;
                 float dur  = DreamTimer.Instance.Duration;
                 float fill = dur > 0f ? Mathf.Clamp01(rem / dur) : 0f;
                 Color col  = Color.Lerp(Color.red, new Color(0.3f, 0.8f, 1f), fill);
-                DrawBar(x, y, labelW, barW, barH, pad, $"SUEÑO  {rem:F0}s / {dur:F0}s", fill, col);
-                y += barH + rowGap;
+                DrawBar(10f, topY, labelW, leftBarW, barH, pad, $"SUEÑO {rem:F0}s", fill, col);
             }
 
-            if (RestlessnessManager.Instance != null)
+            if (RestlessnessManager.Instance != null && rightBarW > 20f)
             {
                 float fill = RestlessnessManager.Instance.NormalizedValue;
                 Color col  = Color.Lerp(new Color(0.2f, 0.85f, 0.35f), new Color(1f, 0.15f, 0.15f), fill);
-                float val = RestlessnessManager.Instance.Value;
-                DrawBar(x, y, labelW, barW, barH, pad, $"INQUIETUD  {val:F1} / 100", fill, col);
+                float val  = RestlessnessManager.Instance.Value;
+                DrawBar(cx + eyeHalf, topY, labelW, rightBarW, barH, pad, $"INQUIETUD {val:F0}", fill, col);
             }
         }
 
@@ -230,7 +231,7 @@ namespace Restless.Dream
         private void DrawStats()
         {
             const int x = 10, lineH = 20;
-            int y = 10 + (18 + 4) * 2 + 8; // below the two bars
+            int y = 10 + 18 + 8; // below the bar row
 
             GUI.color = Color.white;
             GUI.Label(new Rect(x, y, 400, lineH), "=== DEBUG HUD (F1) ===");

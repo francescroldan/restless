@@ -23,8 +23,9 @@ namespace Restless.Dream
         [Header("Perception radius (activation only)")]
         [SerializeField] private float _perceptionRadius = 3f;
 
-        private VisionCone    _visionCone;
-        private DreamEntity[] _entities;
+        private VisionCone          _visionCone;
+        private ProtagonistAnimator _protagonistAnimator;
+        private DreamEntity[]       _entities;
         private float         _interruptCooldown;
         private bool          _wasDetecting;
         private float         _detectionBuzzCooldown;
@@ -34,7 +35,8 @@ namespace Restless.Dream
 
         private void Start()
         {
-            _visionCone = GetComponentInChildren<VisionCone>();
+            _visionCone          = GetComponentInChildren<VisionCone>();
+            _protagonistAnimator = GetComponent<ProtagonistAnimator>();
         }
 
         private void Update()
@@ -70,6 +72,11 @@ namespace Restless.Dream
                             {
                                 entity.Trigger();
                                 _dwellTimers.Remove(entity);
+                                if (!entity.IsDormant)
+                                {
+                                    _protagonistAnimator?.TriggerScared();
+                                    DreamEyeHUD.Instance?.TriggerScared();
+                                }
                             }
                         }
                         else

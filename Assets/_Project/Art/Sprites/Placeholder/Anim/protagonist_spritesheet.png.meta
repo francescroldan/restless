@@ -1,0 +1,1197 @@
+fileFormatVersion: 2
+guid: 5cc1a9055dab8e144945c3f8ae9672ed
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8470222541246932328
+    second: stage_one_0
+  - first:
+      213: -6833195167339645698
+    second: stage_one_1
+  - first:
+      213: -2721157155893867311
+    second: stage_one_2
+  - first:
+      213: -6203539288975241788
+    second: stage_one_3
+  - first:
+      213: -6993776930568147474
+    second: stage_one_4
+  - first:
+      213: -5122612292066809247
+    second: stage_one_5
+  - first:
+      213: 8322101502178171161
+    second: stage_one_6
+  - first:
+      213: 6295156891199268065
+    second: stage_one_7
+  - first:
+      213: -2666105240910323980
+    second: stage_one_8
+  - first:
+      213: 459429381752293991
+    second: stage_one_9
+  - first:
+      213: 8744707398889440234
+    second: stage_one_10
+  - first:
+      213: -7530477187132388370
+    second: stage_one_11
+  - first:
+      213: -8157677823006133257
+    second: stage_one_12
+  - first:
+      213: 313410131633190335
+    second: stage_one_13
+  - first:
+      213: 4180114537312504759
+    second: stage_one_14
+  - first:
+      213: 247938535980055372
+    second: stage_one_15
+  - first:
+      213: 3896679592727158974
+    second: stage_one_16
+  - first:
+      213: -1522517067657633041
+    second: stage_one_17
+  - first:
+      213: -2605658993539063984
+    second: stage_one_18
+  - first:
+      213: 3472251911854400842
+    second: stage_one_19
+  - first:
+      213: 5102197573564767764
+    second: stage_one_20
+  - first:
+      213: -6616987354969452257
+    second: stage_one_21
+  - first:
+      213: 390618322332811964
+    second: stage_one_22
+  - first:
+      213: -1275556795475427413
+    second: stage_one_23
+  - first:
+      213: 753805316488793551
+    second: stage_one_24
+  - first:
+      213: 3279431840210215918
+    second: stage_one_25
+  - first:
+      213: 5653618997933421686
+    second: stage_one_26
+  - first:
+      213: -2201038568552568805
+    second: stage_one_27
+  - first:
+      213: 4672843968636448632
+    second: stage_one_28
+  - first:
+      213: 3771757243041459137
+    second: stage_one_29
+  - first:
+      213: -3628614705951019276
+    second: stage_one_30
+  - first:
+      213: 2262379850759015020
+    second: stage_one_31
+  - first:
+      213: 3147163921669299836
+    second: stage_one_32
+  - first:
+      213: -3755025117780594494
+    second: stage_one_33
+  - first:
+      213: -3366506790777645828
+    second: stage_one_34
+  - first:
+      213: 5323348639950864137
+    second: stage_one_35
+  - first:
+      213: -1054714466467902736
+    second: protagonist_spritesheet_0
+  - first:
+      213: -8151541144427841789
+    second: protagonist_spritesheet_1
+  - first:
+      213: -4891273668432425130
+    second: protagonist_spritesheet_2
+  - first:
+      213: 1050141452752868153
+    second: protagonist_spritesheet_3
+  - first:
+      213: 588289550218855143
+    second: protagonist_spritesheet_4
+  - first:
+      213: 5404257984249719018
+    second: protagonist_spritesheet_5
+  - first:
+      213: 2510248523675975220
+    second: protagonist_spritesheet_6
+  - first:
+      213: 2555396686453815931
+    second: protagonist_spritesheet_7
+  - first:
+      213: 3746484233538411871
+    second: protagonist_spritesheet_8
+  - first:
+      213: -2241300902715886960
+    second: protagonist_spritesheet_9
+  - first:
+      213: 6886217018082373579
+    second: protagonist_spritesheet_10
+  - first:
+      213: -5291425885020589096
+    second: protagonist_spritesheet_11
+  - first:
+      213: 8251584543210336837
+    second: protagonist_spritesheet_12
+  - first:
+      213: -372116897550251436
+    second: protagonist_spritesheet_13
+  - first:
+      213: 612520675985311381
+    second: protagonist_spritesheet_14
+  - first:
+      213: -7091475227384799096
+    second: protagonist_spritesheet_15
+  - first:
+      213: -6116264028609863331
+    second: protagonist_spritesheet_16
+  - first:
+      213: 5692177761722040947
+    second: protagonist_spritesheet_17
+  - first:
+      213: 4247861795363067282
+    second: protagonist_spritesheet_18
+  - first:
+      213: 3586978696761460436
+    second: protagonist_spritesheet_19
+  - first:
+      213: 5858662866772954015
+    second: protagonist_spritesheet_20
+  - first:
+      213: 5301452476859257793
+    second: protagonist_spritesheet_21
+  - first:
+      213: 6035493300013629431
+    second: protagonist_spritesheet_22
+  - first:
+      213: 297264958202947852
+    second: protagonist_spritesheet_23
+  - first:
+      213: 4934490677390024242
+    second: protagonist_spritesheet_24
+  - first:
+      213: 426803826662208838
+    second: protagonist_spritesheet_25
+  - first:
+      213: -1194567043097248826
+    second: protagonist_spritesheet_26
+  - first:
+      213: 3934870971054612580
+    second: protagonist_spritesheet_27
+  - first:
+      213: 157339012209748531
+    second: protagonist_spritesheet_28
+  - first:
+      213: -3186941212734943128
+    second: protagonist_spritesheet_29
+  - first:
+      213: 7756801724645295329
+    second: protagonist_spritesheet_30
+  - first:
+      213: -8800160906548850156
+    second: protagonist_spritesheet_31
+  - first:
+      213: 2683210686217035807
+    second: protagonist_spritesheet_32
+  - first:
+      213: -2603603259917782776
+    second: protagonist_spritesheet_33
+  - first:
+      213: -2203398718846291517
+    second: protagonist_spritesheet_34
+  - first:
+      213: 7338798711612527144
+    second: protagonist_spritesheet_35
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: protagonist_spritesheet_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0fa07b6e7c6ec51f0800000000000000
+      internalID: -1054714466467902736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 256
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 307b5629488efde80800000000000000
+      internalID: -8151541144427841789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 256
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65f0ddd7384be1cb0800000000000000
+      internalID: -4891273668432425130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_3
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 256
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9335f3f561ad29e00800000000000000
+      internalID: 1050141452752868153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 224
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e28ed1aa360a2800800000000000000
+      internalID: 588289550218855143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_5
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 224
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae8e5c1f008cffa40800000000000000
+      internalID: 5404257984249719018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_6
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 224
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43eb7af7bb136d220800000000000000
+      internalID: 2510248523675975220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 224
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7a3a4c4fb7967320800000000000000
+      internalID: 2555396686453815931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5d98a88f8f2ef330800000000000000
+      internalID: 3746484233538411871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 192
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0927bd234bc45e0e0800000000000000
+      internalID: -2241300902715886960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_10
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 192
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcfac09a4e1c09f50800000000000000
+      internalID: 6886217018082373579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_11
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 192
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d37a0851341196b0800000000000000
+      internalID: -5291425885020589096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 160
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 542f72c5c64838270800000000000000
+      internalID: 8251584543210336837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_13
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 160
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45ac89a37a9f5daf0800000000000000
+      internalID: -372116897550251436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_14
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 160
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 596cfad3f4c108800800000000000000
+      internalID: 612520675985311381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_15
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 160
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8802f3a5ad4069d90800000000000000
+      internalID: -7091475227384799096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d51a536754aae1ba0800000000000000
+      internalID: -6116264028609863331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_17
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 128
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37202dd048daefe40800000000000000
+      internalID: 5692177761722040947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_18
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 128
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2959197fbcf63fa30800000000000000
+      internalID: 4247861795363067282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_19
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 128
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d64c5dbe1287c130800000000000000
+      internalID: 3586978696761460436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9b06c836d62e4150800000000000000
+      internalID: 5858662866772954015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_21
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 96
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c39fcc70fa829940800000000000000
+      internalID: 5301452476859257793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_22
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 96
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ffff8fcd2162c350800000000000000
+      internalID: 6035493300013629431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_23
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 96
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c09abdd87e8102400800000000000000
+      internalID: 297264958202947852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23e1f458025da7440800000000000000
+      internalID: 4934490677390024242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_25
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 64
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6457afca1df4ce500800000000000000
+      internalID: 426803826662208838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_26
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 64
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6cbbcc77a9b0c6fe0800000000000000
+      internalID: -1194567043097248826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_27
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 64
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 460e4b2ec487b9630800000000000000
+      internalID: 3934870971054612580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_28
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33aa21c7ffafe2200800000000000000
+      internalID: 157339012209748531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_29
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 32
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86091e62ad5b5c3d0800000000000000
+      internalID: -3186941212734943128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_30
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 32
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e4ce9e3212b5ab60800000000000000
+      internalID: 7756801724645295329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_31
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 32
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41250eed74c8fd580800000000000000
+      internalID: -8800160906548850156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_32
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f10af7127edac3520800000000000000
+      internalID: 2683210686217035807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_33
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8013d8c21a42edbd0800000000000000
+      internalID: -2603603259917782776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_34
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c1bd901a84fb61e0800000000000000
+      internalID: -2203398718846291517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: protagonist_spritesheet_35
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82252cbab86a8d560800000000000000
+      internalID: 7338798711612527144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      protagonist_spritesheet_0: -1054714466467902736
+      protagonist_spritesheet_1: -8151541144427841789
+      protagonist_spritesheet_10: 6886217018082373579
+      protagonist_spritesheet_11: -5291425885020589096
+      protagonist_spritesheet_12: 8251584543210336837
+      protagonist_spritesheet_13: -372116897550251436
+      protagonist_spritesheet_14: 612520675985311381
+      protagonist_spritesheet_15: -7091475227384799096
+      protagonist_spritesheet_16: -6116264028609863331
+      protagonist_spritesheet_17: 5692177761722040947
+      protagonist_spritesheet_18: 4247861795363067282
+      protagonist_spritesheet_19: 3586978696761460436
+      protagonist_spritesheet_2: -4891273668432425130
+      protagonist_spritesheet_20: 5858662866772954015
+      protagonist_spritesheet_21: 5301452476859257793
+      protagonist_spritesheet_22: 6035493300013629431
+      protagonist_spritesheet_23: 297264958202947852
+      protagonist_spritesheet_24: 4934490677390024242
+      protagonist_spritesheet_25: 426803826662208838
+      protagonist_spritesheet_26: -1194567043097248826
+      protagonist_spritesheet_27: 3934870971054612580
+      protagonist_spritesheet_28: 157339012209748531
+      protagonist_spritesheet_29: -3186941212734943128
+      protagonist_spritesheet_3: 1050141452752868153
+      protagonist_spritesheet_30: 7756801724645295329
+      protagonist_spritesheet_31: -8800160906548850156
+      protagonist_spritesheet_32: 2683210686217035807
+      protagonist_spritesheet_33: -2603603259917782776
+      protagonist_spritesheet_34: -2203398718846291517
+      protagonist_spritesheet_35: 7338798711612527144
+      protagonist_spritesheet_4: 588289550218855143
+      protagonist_spritesheet_5: 5404257984249719018
+      protagonist_spritesheet_6: 2510248523675975220
+      protagonist_spritesheet_7: 2555396686453815931
+      protagonist_spritesheet_8: 3746484233538411871
+      protagonist_spritesheet_9: -2241300902715886960
+      stage_one_0: -8470222541246932328
+      stage_one_1: -6833195167339645698
+      stage_one_10: 8744707398889440234
+      stage_one_11: -7530477187132388370
+      stage_one_12: -8157677823006133257
+      stage_one_13: 313410131633190335
+      stage_one_14: 4180114537312504759
+      stage_one_15: 247938535980055372
+      stage_one_16: 3896679592727158974
+      stage_one_17: -1522517067657633041
+      stage_one_18: -2605658993539063984
+      stage_one_19: 3472251911854400842
+      stage_one_2: -2721157155893867311
+      stage_one_20: 5102197573564767764
+      stage_one_21: -6616987354969452257
+      stage_one_22: 390618322332811964
+      stage_one_23: -1275556795475427413
+      stage_one_24: 753805316488793551
+      stage_one_25: 3279431840210215918
+      stage_one_26: 5653618997933421686
+      stage_one_27: -2201038568552568805
+      stage_one_28: 4672843968636448632
+      stage_one_29: 3771757243041459137
+      stage_one_3: -6203539288975241788
+      stage_one_30: -3628614705951019276
+      stage_one_31: 2262379850759015020
+      stage_one_32: 3147163921669299836
+      stage_one_33: -3755025117780594494
+      stage_one_34: -3366506790777645828
+      stage_one_35: 5323348639950864137
+      stage_one_4: -6993776930568147474
+      stage_one_5: -5122612292066809247
+      stage_one_6: 8322101502178171161
+      stage_one_7: 6295156891199268065
+      stage_one_8: -2666105240910323980
+      stage_one_9: 459429381752293991
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
