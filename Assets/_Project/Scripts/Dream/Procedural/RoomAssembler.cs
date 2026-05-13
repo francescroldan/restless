@@ -68,9 +68,21 @@ namespace Restless.Dream.Procedural
 
                     var newRoom = PlaceNode(neighbour, Vector2.zero, currentRoom, fromSocket, rng);
                     if (newRoom == null)
-                        Debug.LogWarning($"[RoomAssembler] Could not place node {neighbour.Index} ({neighbour.Type})");
+                        Debug.LogWarning($"[RoomAssembler] Could not place node {neighbour.Index} ({neighbour.Type}) from {currentRoom.name}.{fromSocket.direction}");
                 }
             }
+
+            // Close unused sockets: replace inner-corner frames with straight wall tiles
+            // so unconnected doors show a solid wall with no visual door hint.
+            foreach (var room in _placed)
+                foreach (var s in room.Sockets)
+                    if (!s.isOccupied)
+                        room.CloseSocket(s);
+
+            var sb = new System.Text.StringBuilder("[RoomAssembler] Layout:\n");
+            foreach (var r in _placed)
+                sb.AppendLine($"  {r.name}  pos={r.transform.position}  sockets={string.Join(",", System.Array.ConvertAll(r.Sockets, s => s.direction + (s.isOccupied ? "✓" : "○")))}");
+            Debug.Log(sb.ToString());
 
             return true;
         }
@@ -105,7 +117,7 @@ namespace Restless.Dream.Procedural
                         pos = fallbackPos;
                     }
 
-                    if (HasOverlap(prefab, pos))
+                    if (HasOverlap(prefab, pos, fromRoom))
                         continue;
 
                     // Place it
@@ -125,6 +137,14 @@ namespace Restless.Dream.Procedural
                             instSocket.isOccupied       = true;
                             fromSocket.connectedSocket   = instSocket;
                             instSocket.connectedSocket   = fromSocket;
+
+                            // Open wall tiles and disable blocker colliders
+                            fromRoom.OpenSocket(fromSocket);
+                            instance.OpenSocket(instSocket);
+                            var fc = fromSocket.GetComponent<BoxCollider2D>();
+                            if (fc != null) fc.enabled = false;
+                            var ic = instSocket.GetComponent<BoxCollider2D>();
+                            if (ic != null) ic.enabled = false;
                         }
                     }
 
@@ -137,14 +157,20 @@ namespace Restless.Dream.Procedural
 
         private Vector2 CalculatePosition(DoorSocket fromSocket, DoorSocket toSocket, RoomController prefab)
         {
-            // We want toSocket's world pos after placement == fromSocket's current world pos.
-            // toSocket's offset from prefab root = toSocket.position - prefab.transform.position
-            // (handles any nesting depth, not just one level below root)
-            Vector2 fromPos         = fromSocket.transform.position;
+            // We want toSocket's world pos after placement == fromSocket's current world pos,
+            // plus 1 unit of gap in the connection direction so adjacent wall tiles don't
+            // occupy the same world-space cell (which causes Z-fighting on tilemaps).
+            Vector2 fromPos          = fromSocket.transform.position;
             Vector2 toOffsetFromRoot = (Vector2)(toSocket.transform.position - prefab.transform.position);
-            Vector2 result           = fromPos - toOffsetFromRoot;
-            Debug.Log($"[RoomAssembler] CalcPos: from={fromSocket.direction}@{fromPos}  toOffset={toOffsetFromRoot}  → newRoomPos={result}");
-            return result;
+            Vector2 gap = fromSocket.direction switch
+            {
+                SocketDirection.North => Vector2.up,
+                SocketDirection.South => Vector2.down,
+                SocketDirection.East  => Vector2.right,
+                SocketDirection.West  => Vector2.left,
+                _                     => Vector2.zero
+            };
+            return fromPos - toOffsetFromRoot + gap;
         }
 
         // ── Helpers ───────────────────────────────────────────────────────────
@@ -156,7 +182,7 @@ namespace Restless.Dream.Procedural
             {
                 if (p.Definition == null) continue;
                 if (!p.Definition.HasType(node.Type)) continue;
-                if (node.PreferredSize != RoomSize.Medium && p.Definition.size != node.PreferredSize) continue;
+                if (p.Definition.size != node.PreferredSize) continue;
                 result.Add(p);
             }
             // Size-agnostic fallback: any prefab with matching type
@@ -171,10 +197,17 @@ namespace Restless.Dream.Procedural
             return result;
         }
 
+        private static readonly SocketDirection[] _socketPriority =
+        {
+            SocketDirection.North, SocketDirection.East,
+            SocketDirection.South, SocketDirection.West
+        };
+
         private DoorSocket FindFreeSocket(RoomController room)
         {
-            foreach (var s in room.Sockets)
-                if (!s.isOccupied) return s;
+            foreach (var dir in _socketPriority)
+                foreach (var s in room.Sockets)
+                    if (!s.isOccupied && s.direction == dir) return s;
             return null;
         }
 
@@ -187,27 +220,23 @@ namespace Restless.Dream.Procedural
 
         private DoorSocket GetMatchingSocket(RoomController instance, DoorSocket prefabSocket)
         {
-            // After instantiation, find the socket that matches prefabSocket by direction + local position
             foreach (var s in instance.Sockets)
-                if (s.direction == prefabSocket.direction &&
-                    Vector2.Distance(s.transform.localPosition, prefabSocket.transform.localPosition) < 0.05f)
-                    return s;
+                if (s.direction == prefabSocket.direction) return s;
             return null;
         }
 
-        private bool HasOverlap(RoomController prefab, Vector2 pos)
+        private bool HasOverlap(RoomController prefab, Vector2 pos, RoomController excludeRoom = null)
         {
             if (_placed.Count == 0) return false;
 
-            // Derive 2D bounds from the prefab's socket extents.
-            // TilemapRenderer.bounds is unreliable on prefab assets (not in scene),
-            // so we use the socket positions as a proxy for room extents.
             Vector2 size = GetSizeFromSockets(prefab);
             var bounds = new Bounds((Vector3)pos, new Vector3(size.x - _overlapCheckPadding,
                                                                size.y - _overlapCheckPadding, 1f));
 
             foreach (var placed in _placed)
             {
+                if (placed == excludeRoom) continue;
+
                 Vector2 ps = GetSizeFromSockets(placed);
                 var placedBounds = new Bounds((Vector3)(Vector2)placed.transform.position,
                                               new Vector3(ps.x - _overlapCheckPadding,
@@ -229,17 +258,23 @@ namespace Restless.Dream.Procedural
 
             if (sockets == null || sockets.Length < 2) return defaultSize;
 
+            float xMin = float.MaxValue, xMax = float.MinValue;
             float yMin = float.MaxValue, yMax = float.MinValue;
             foreach (var s in sockets)
             {
+                float x = s.transform.localPosition.x;
                 float y = s.transform.localPosition.y;
+                if (x < xMin) xMin = x;
+                if (x > xMax) xMax = x;
                 if (y < yMin) yMin = y;
                 if (y > yMax) yMax = y;
             }
 
+            float w = xMax - xMin;
             float h = yMax - yMin;
+            if (w < 1f) w = defaultSize.x;   // all sockets on same column — use enum fallback
             if (h < 1f) h = defaultSize.y;   // all sockets on same row — use enum fallback
-            return new Vector2(defaultSize.x, h);
+            return new Vector2(w, h);
         }
 
         private static Vector2 SizeEnumToVector(RoomSize size) => size switch
@@ -258,5 +293,25 @@ namespace Restless.Dream.Procedural
                 (list[i], list[j]) = (list[j], list[i]);
             }
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (_placed == null) return;
+            var colors = new[] {
+                new Color(0f,1f,0f,0.4f), new Color(0f,0.5f,1f,0.4f),
+                new Color(1f,0.5f,0f,0.4f), new Color(1f,1f,0f,0.4f),
+                new Color(1f,0f,1f,0.4f), new Color(0f,1f,1f,0.4f),
+            };
+            for (int i = 0; i < _placed.Count; i++)
+            {
+                var r = _placed[i];
+                if (r == null) continue;
+                Vector2 sz = GetSizeFromSockets(r);
+                Gizmos.color = colors[i % colors.Length];
+                Gizmos.DrawWireCube(r.transform.position, new Vector3(sz.x, sz.y, 0.1f));
+            }
+        }
+#endif
     }
 }

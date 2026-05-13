@@ -52,6 +52,18 @@ namespace Restless.Dream.Procedural
                 graph.Nodes[memIdx].MustHaveFragment = true;
             }
 
+            // ── Exit / Landmark ───────────────────────────────────────────
+            // Added before forks so BFS assigns exit the North socket on the
+            // last spine node, not a leftover East/West after branches claim it.
+            var exit = new GraphNode(idx++, RoomType.Landmark, RoomSize.Large)
+            {
+                IsExit     = true,
+                DangerHint = 0.8f
+            };
+            graph.Nodes.Add(exit);
+            graph.AddEdge(prev, exit);
+            graph.Exit = exit;
+
             // ── Forks and dead ends ───────────────────────────────────────
             int forksAdded = 0;
             int maxForks   = Mathf.Max(1, targetRooms - graph.Nodes.Count - 1);
@@ -61,10 +73,11 @@ namespace Restless.Dream.Procedural
                 if (forksAdded >= maxForks) break;
                 if (graph.Nodes.Count >= targetRooms - 1) break;
                 if (node.IsEntrance || node.Type == RoomType.DeadEnd) continue;
+                if (node.IsExit) continue;
                 if (node.Neighbours.Count >= 3) continue;
                 if (rng.NextDouble() > 0.45f) continue;
 
-                var branch = new GraphNode(idx++, RoomType.DeadEnd, RoomSize.Small)
+                var branch = new GraphNode(idx++, RoomType.DeadEnd, RoomSize.Medium)
                 {
                     DangerHint = node.DangerHint * 1.2f
                 };
@@ -72,16 +85,6 @@ namespace Restless.Dream.Procedural
                 graph.AddEdge(node, branch);
                 forksAdded++;
             }
-
-            // ── Exit / Landmark ───────────────────────────────────────────
-            var exit = new GraphNode(idx++, RoomType.Landmark, RoomSize.Large)
-            {
-                IsExit     = true,
-                DangerHint = 0.8f
-            };
-            graph.Nodes.Add(exit);
-            graph.AddEdge(prev, exit);
-            graph.Exit = exit;
 
             return graph;
         }
@@ -97,7 +100,7 @@ namespace Restless.Dream.Procedural
 
             if (progress < 0.3f)
             {
-                type   = rng.NextDouble() < 0.6 ? RoomType.Corridor : RoomType.Safe;
+                type   = rng.NextDouble() < 0.6 ? RoomType.Safe : RoomType.Safe;
                 danger = Mathf.Lerp(0.1f, 0.3f, (float)progress / 0.3f);
             }
             else if (progress < 0.7f)
@@ -109,7 +112,7 @@ namespace Restless.Dream.Procedural
                     memoryPlaced = true;
                 }
                 else
-                    type = roll < 0.5 ? RoomType.Encounter : RoomType.Corridor;
+                    type = roll < 0.5 ? RoomType.Encounter : RoomType.Safe;
 
                 danger = Mathf.Lerp(0.3f, 0.65f, (float)(progress - 0.3f) / 0.4f);
             }

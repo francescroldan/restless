@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RoomDef_collapsed_wing
   m_EditorClassIdentifier: Assembly-CSharp::Restless.Dream.Procedural.RoomDefinition
   id: collapsed_wing
-  size: 0
+  size: 1
   types: 08000000
   tags:
   - deadend

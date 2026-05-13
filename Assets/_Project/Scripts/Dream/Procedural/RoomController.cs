@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Restless.Dream.Procedural
 {
@@ -34,6 +35,58 @@ namespace Restless.Dream.Procedural
             foreach (var s in Sockets)
                 if (!s.isOccupied) return s;
             return null;
+        }
+
+        // Removes the wall tiles at this socket's door slot so the player can pass through.
+        // Inner-corner frames are already baked into the prefab by the editor tool.
+        public void OpenSocket(DoorSocket socket)
+        {
+            Tilemap cliff = null;
+            foreach (var tm in GetComponentsInChildren<Tilemap>())
+                if (tm.gameObject.name == "Tilemap_Cliff") { cliff = tm; break; }
+            if (cliff == null)
+            {
+                Debug.LogWarning($"[RoomController] OpenSocket: Tilemap_Cliff not found on {gameObject.name}");
+                return;
+            }
+
+            bool       horizontal = socket.direction == SocketDirection.North || socket.direction == SocketDirection.South;
+            Vector3Int step       = horizontal ? Vector3Int.right : Vector3Int.up;
+            Vector3Int baseCell   = cliff.WorldToCell(socket.transform.position);
+            Vector3Int cell2      = baseCell + step;
+
+            cliff.SetTile(baseCell, null);
+            cliff.SetTile(cell2,    null);
+            cliff.RefreshTile(baseCell);
+            cliff.RefreshTile(cell2);
+        }
+
+        // Replaces the inner-corner frame tiles beside an unused socket with the straight
+        // wall tile sampled from the adjacent wall cell — no tile asset references needed.
+        public void CloseSocket(DoorSocket socket)
+        {
+            Tilemap cliff = null;
+            foreach (var tm in GetComponentsInChildren<Tilemap>())
+                if (tm.gameObject.name == "Tilemap_Cliff") { cliff = tm; break; }
+            if (cliff == null) return;
+
+            bool       horizontal = socket.direction == SocketDirection.North || socket.direction == SocketDirection.South;
+            Vector3Int step       = horizontal ? Vector3Int.right : Vector3Int.up;
+            Vector3Int baseCell   = cliff.WorldToCell(socket.transform.position);
+            Vector3Int cell2      = baseCell + step;
+
+            // Corner cells flank the (blocked) door opening.
+            var cornerA = baseCell - step;
+            var cornerB = cell2    + step;
+
+            // Sample the straight wall tile from the next cell outward on the same wall edge.
+            var tileA = cliff.GetTile(cornerA - step);
+            var tileB = cliff.GetTile(cornerB + step);
+
+            cliff.SetTile(cornerA, tileA);
+            cliff.SetTile(cornerB, tileB);
+            cliff.RefreshTile(cornerA);
+            cliff.RefreshTile(cornerB);
         }
 
         public DoorSocket GetFreeSocketFacing(SocketDirection incomingDirection)
