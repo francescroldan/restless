@@ -3,19 +3,14 @@ using UnityEngine;
 namespace Restless.Core
 {
     /// <summary>
-    /// Smooth camera follow with configurable deadzone and room bounds clamping.
-    /// Attach to the Main Camera.
+    /// Smooth camera follow. Attach to the Main Camera.
+    /// Bounds clamping is intentionally removed — procedural rooms have dynamic
+    /// layouts, and wall colliders are the authority on player containment.
     /// </summary>
     public class CameraFollow : MonoBehaviour
     {
-        [SerializeField] private float _smoothSpeed  = 5f;
-        [SerializeField] private float _orthoSize    = 6f;
-
-        [Header("Room bounds (world units, match wall positions)")]
-        [SerializeField] private float _boundsXMin = -14f;
-        [SerializeField] private float _boundsXMax =  44f;
-        [SerializeField] private float _boundsYMin =  -9f;
-        [SerializeField] private float _boundsYMax =   9f;
+        [SerializeField] private float _smoothSpeed = 5f;
+        [SerializeField] private float _orthoSize   = 6f;
 
         private Transform _target;
         private Camera    _cam;
@@ -32,7 +27,6 @@ namespace Restless.Core
             if (player != null)
             {
                 _target = player.transform;
-                // Snap immediately so there's no initial slide
                 SnapToTarget();
             }
             else
@@ -41,30 +35,23 @@ namespace Restless.Core
             }
         }
 
+        public void SetTarget(Transform t)
+        {
+            _target = t;
+            SnapToTarget();
+        }
+
         private void LateUpdate()
         {
             if (_target == null) return;
-
             Vector3 desired = new Vector3(_target.position.x, _target.position.y, transform.position.z);
-            Vector3 smoothed = Vector3.Lerp(transform.position, desired, _smoothSpeed * Time.deltaTime);
-            transform.position = Clamp(smoothed);
+            transform.position = Vector3.Lerp(transform.position, desired, _smoothSpeed * Time.deltaTime);
         }
 
         private void SnapToTarget()
         {
             if (_target == null) return;
-            transform.position = Clamp(new Vector3(_target.position.x, _target.position.y, transform.position.z));
-        }
-
-        private Vector3 Clamp(Vector3 pos)
-        {
-            float halfH = _cam.orthographicSize;
-            float halfW = halfH * _cam.aspect;
-
-            float clampedX = Mathf.Clamp(pos.x, _boundsXMin + halfW, _boundsXMax - halfW);
-            float clampedY = Mathf.Clamp(pos.y, _boundsYMin + halfH, _boundsYMax - halfH);
-
-            return new Vector3(clampedX, clampedY, pos.z);
+            transform.position = new Vector3(_target.position.x, _target.position.y, transform.position.z);
         }
 
 #if UNITY_EDITOR
