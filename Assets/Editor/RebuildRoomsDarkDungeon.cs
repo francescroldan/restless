@@ -63,6 +63,13 @@ public static class RebuildRoomsDarkDungeon
 
         Vector2 extents = SizeToHalfExtents(ctrl.Definition?.size ?? RoomSize.Medium);
 
+        // Determine which directions this room supports.
+        // If socketDirections is empty/null → default to all four.
+        var dirConfig = ctrl.Definition?.socketDirections;
+        var allowedDirs = (dirConfig != null && dirConfig.Length > 0)
+            ? new System.Collections.Generic.HashSet<SocketDirection>(dirConfig)
+            : null; // null = all four
+
         Transform socketsParent = root.transform.Find("Sockets");
         if (socketsParent == null)
         {
@@ -73,11 +80,23 @@ public static class RebuildRoomsDarkDungeon
         bool changed = false;
         foreach (SocketDirection dir in System.Enum.GetValues(typeof(SocketDirection)))
         {
+            bool allowed = allowedDirs == null || allowedDirs.Contains(dir);
             Vector3 targetPos = SocketLocalPos(dir, extents);
 
             DoorSocket existing = null;
             foreach (var s in root.GetComponentsInChildren<DoorSocket>(true))
                 if (s.direction == dir) { existing = s; break; }
+
+            if (!allowed)
+            {
+                // Remove socket if this direction is not in the definition
+                if (existing != null)
+                {
+                    Object.DestroyImmediate(existing.gameObject);
+                    changed = true;
+                }
+                continue;
+            }
 
             if (existing != null)
             {

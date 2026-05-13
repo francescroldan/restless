@@ -35,6 +35,10 @@ namespace Restless.Dream.Procedural
         [Tooltip("Ally encounters can spawn here.")]
         public bool supportsAllies    = false;
 
+        [Header("Socket configuration")]
+        [Tooltip("Which door directions this room supports. Leave empty for all four (default).")]
+        public SocketDirection[] socketDirections;
+
         [Header("Intensity")]
         [Range(0f, 1f)]
         [Tooltip("How dangerous this room feels. Scales presence density.")]

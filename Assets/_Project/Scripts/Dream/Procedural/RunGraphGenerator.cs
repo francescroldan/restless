@@ -91,16 +91,16 @@ namespace Restless.Dream.Procedural
 
         private static GraphNode BuildSpineNode(int idx, float progress, System.Random rng, ref bool memoryPlaced)
         {
-            // Early (0–0.3): safe / corridor
-            // Mid (0.3–0.7): encounter / memory / traversal
-            // Late (0.7–1.0): encounter / ritual / collapse
+            // Early (0–0.3): safe
+            // Mid (0.3–0.7): encounter / memory
+            // Late (0.7–1.0): encounter / ritual
 
             RoomType type;
             float    danger;
 
             if (progress < 0.3f)
             {
-                type   = rng.NextDouble() < 0.6 ? RoomType.Safe : RoomType.Safe;
+                type   = RoomType.Safe;
                 danger = Mathf.Lerp(0.1f, 0.3f, (float)progress / 0.3f);
             }
             else if (progress < 0.7f)
@@ -123,7 +123,10 @@ namespace Restless.Dream.Procedural
                 danger = Mathf.Lerp(0.65f, 0.9f, (float)(progress - 0.7f) / 0.3f);
             }
 
-            var node = new GraphNode(idx, type)
+            // Mid and late rooms have a 30 % chance of being Large for visual variety.
+            RoomSize size = (progress >= 0.3f && rng.NextDouble() < 0.3) ? RoomSize.Large : RoomSize.Medium;
+
+            var node = new GraphNode(idx, type, size)
             {
                 DangerHint       = danger,
                 MustHaveFragment = type == RoomType.Memory
