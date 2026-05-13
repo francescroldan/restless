@@ -153,13 +153,21 @@ namespace Restless.Dream
             float speed    = Core.RunConfig.Current?.presenceManifestSpeed ?? _manifestSpeed;
             float decay    = Core.RunConfig.Current?.presenceManifestDecay ?? _manifestDecay;
 
+            bool manifesting = _state == PresenceState.Manifesting;
+
             if (observed)
             {
                 _manifestation = Mathf.Clamp01(_manifestation + speed * Time.deltaTime);
                 _state = PresenceState.Manifesting;
             }
+            else if (manifesting)
+            {
+                // Already triggered — keep advancing without the player's gaze.
+                _manifestation = Mathf.Clamp01(_manifestation + speed * Time.deltaTime);
+            }
             else if (_degradesWhenUnseen)
             {
+                // Not yet triggered — decay back to spectral.
                 _manifestation = Mathf.Clamp01(_manifestation - decay * Time.deltaTime);
                 if (_manifestation <= 0f)
                     _state = PresenceState.Spectral;
