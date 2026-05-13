@@ -62,7 +62,8 @@ namespace Restless.Dream.Procedural
         }
 
         // Replaces the inner-corner frame tiles beside an unused socket with the straight
-        // wall tile sampled from the adjacent wall cell — no tile asset references needed.
+        // wall tile. The door cells (baseCell, cell2) were never opened so they still
+        // hold the correct straight wall tile — sample from there directly.
         public void CloseSocket(DoorSocket socket)
         {
             Tilemap cliff = null;
@@ -75,16 +76,16 @@ namespace Restless.Dream.Procedural
             Vector3Int baseCell   = cliff.WorldToCell(socket.transform.position);
             Vector3Int cell2      = baseCell + step;
 
-            // Corner cells flank the (blocked) door opening.
+            // Sample the wall tile from the door opening itself — never opened, so it
+            // still holds the correct straight wall tile regardless of room width.
+            var wallTile = cliff.GetTile(baseCell);
+            if (wallTile == null) wallTile = cliff.GetTile(cell2);
+
             var cornerA = baseCell - step;
             var cornerB = cell2    + step;
 
-            // Sample the straight wall tile from the next cell outward on the same wall edge.
-            var tileA = cliff.GetTile(cornerA - step);
-            var tileB = cliff.GetTile(cornerB + step);
-
-            cliff.SetTile(cornerA, tileA);
-            cliff.SetTile(cornerB, tileB);
+            cliff.SetTile(cornerA, wallTile);
+            cliff.SetTile(cornerB, wallTile);
             cliff.RefreshTile(cornerA);
             cliff.RefreshTile(cornerB);
         }

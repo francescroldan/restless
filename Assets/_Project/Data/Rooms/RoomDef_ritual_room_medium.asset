@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06353563bd585f049982ff9d77851272, type: 3}
-  m_Name: RoomDef_dead_end_small
+  m_Name: RoomDef_ritual_room_medium
   m_EditorClassIdentifier: Assembly-CSharp::Restless.Dream.Procedural.RoomDefinition
-  id: dead_end_small
-  size: 0
-  types: 08000000
+  id: ritual_room_medium
+  size: 1
+  types: 03000000
   tags: []
   supportsThreats: 1
   supportsFragments: 0
   supportsAllies: 0
   socketDirections: 
-  tileExtents: {x: 4, y: 3}
-  dangerLevel: 0.4
-  surrealism: 0.35
+  tileExtents: {x: 6, y: 4}
+  dangerLevel: 0.7
+  surrealism: 0.6

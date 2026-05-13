@@ -20,5 +20,6 @@ MonoBehaviour:
   supportsFragments: 0
   supportsAllies: 0
   socketDirections: 0000000002000000
+  tileExtents: {x: 4, y: 3}
   dangerLevel: 0.15
   surrealism: 0.15

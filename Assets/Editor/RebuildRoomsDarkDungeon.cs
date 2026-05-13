@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Tilemaps;
@@ -67,7 +68,7 @@ public static class RebuildRoomsDarkDungeon
         // If socketDirections is empty/null → default to all four.
         var dirConfig = ctrl.Definition?.socketDirections;
         var allowedDirs = (dirConfig != null && dirConfig.Length > 0)
-            ? new System.Collections.Generic.HashSet<SocketDirection>(dirConfig)
+            ? new HashSet<SocketDirection>(dirConfig)
             : null; // null = all four
 
         Transform socketsParent = root.transform.Find("Sockets");
@@ -129,7 +130,7 @@ public static class RebuildRoomsDarkDungeon
     {
         SocketDirection.North => new Vector3(-0.5f,  extents.y,       0),
         SocketDirection.South => new Vector3(-0.5f, -extents.y,       0),
-        SocketDirection.East  => new Vector3( extents.x - 1f, -0.5f,  0),
+        SocketDirection.East  => new Vector3( extents.x,       -0.5f,  0),
         SocketDirection.West  => new Vector3(-extents.x,       -0.5f, 0),
         _                     => Vector3.zero
     };
@@ -169,7 +170,9 @@ public static class RebuildRoomsDarkDungeon
             {
                 AddMissingDirectionSockets(scope.prefabContentsRoot);
                 EnsureSocketBlockers(scope.prefabContentsRoot);
-                RebuildTilemaps(scope.prefabContentsRoot, ctrl);
+                // Use ctrl from scope for fresh definition data (avoids stale cache)
+                var scopeCtrl = scope.prefabContentsRoot.GetComponent<RoomController>();
+                RebuildTilemaps(scope.prefabContentsRoot, scopeCtrl != null ? scopeCtrl : ctrl);
                 rebuilt++;
                 Debug.Log($"[RebuildRooms] Rebuilt {prefab.name}");
             }
@@ -178,6 +181,66 @@ public static class RebuildRoomsDarkDungeon
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log($"[RebuildRooms] Done — {rebuilt} prefabs rebuilt with DarkDungeon tileset.");
+
+        RegisterAllRoomPrefabs();
+    }
+
+    // ── Register prefabs in Dream scene ──────────────────────────────────────
+
+    /// <summary>
+    /// Scans Assets/_Project/Prefabs/Rooms/ and ensures every RoomController
+    /// prefab is registered in the RoomAssembler component in Dream.unity.
+    /// Called automatically at the end of RebuildAll().
+    /// </summary>
+    [MenuItem("Tools/Restless/Register All Room Prefabs")]
+    public static void RegisterAllRoomPrefabs()
+    {
+        const string ScenePath = "Assets/_Project/Scenes/Dream.unity";
+
+        var prefabGuids = AssetDatabase.FindAssets("t:Prefab", new[] { PrefabDir });
+        var prefabs = new List<RoomController>();
+        foreach (var guid in prefabGuids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (go == null) continue;
+            var rc = go.GetComponent<RoomController>();
+            if (rc != null) prefabs.Add(rc);
+        }
+
+        // Open the Dream scene as a serialized object to update the array field
+        var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
+        if (sceneAsset == null) { Debug.LogWarning("[RebuildRooms] Dream.unity not found."); return; }
+
+        // Use the scene manager to find the RoomAssembler in the loaded scene.
+        // The scene must not be dirty — we use SerializedObject on the prefab instances.
+        var dreamScene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(ScenePath, UnityEditor.SceneManagement.OpenSceneMode.Additive);
+
+        RoomAssembler assembler = null;
+        foreach (var root in dreamScene.GetRootGameObjects())
+        {
+            var found = root.GetComponentsInChildren<RoomAssembler>(true);
+            if (found.Length > 0) { assembler = found[0]; break; }
+        }
+
+        if (assembler == null)
+        {
+            Debug.LogWarning("[RebuildRooms] RoomAssembler not found in Dream.unity.");
+            UnityEditor.SceneManagement.EditorSceneManager.CloseScene(dreamScene, true);
+            return;
+        }
+
+        var so   = new SerializedObject(assembler);
+        var prop = so.FindProperty("_roomPrefabs");
+        prop.arraySize = prefabs.Count;
+        for (int i = 0; i < prefabs.Count; i++)
+            prop.GetArrayElementAtIndex(i).objectReferenceValue = prefabs[i];
+        so.ApplyModifiedProperties();
+
+        UnityEditor.SceneManagement.EditorSceneManager.SaveScene(dreamScene);
+        UnityEditor.SceneManagement.EditorSceneManager.CloseScene(dreamScene, true);
+
+        Debug.Log($"[RebuildRooms] Registered {prefabs.Count} room prefabs in Dream.unity.");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -200,13 +263,26 @@ public static class RebuildRoomsDarkDungeon
             return;
         }
 
-        // Wall rows/columns are driven by socket local positions so that
-        // WorldToCell(socket.transform.position) at runtime targets exactly the
-        // same cells painted here — regardless of the existing tilemap bounds.
-        int xMin = SocketCol(root, SocketDirection.West,  bounds.xMin);
-        int xMax = SocketCol(root, SocketDirection.East,  bounds.xMax - 1);
-        int yMin = SocketRow(root, SocketDirection.South, bounds.yMin);
-        int yMax = SocketRow(root, SocketDirection.North, bounds.yMax - 1);
+        // When the definition stores explicit tileExtents (set by CreateRoomVariants),
+        // use those to drive the painted area so non-square rooms (corridors, corners)
+        // get the correct shape regardless of what was seeded in the cliff tilemap.
+        var def = ctrl.Definition;
+        int xMin, xMax, yMin, yMax;
+        if (def != null && def.tileExtents.x > 0f)
+        {
+            int ex = (int)def.tileExtents.x;
+            int ey = (int)def.tileExtents.y;
+            xMin = -ex; xMax = ex;
+            yMin = -ey; yMax = ey;
+        }
+        else
+        {
+            // Wall rows/columns driven by socket local positions for pre-existing prefabs.
+            xMin = SocketCol(root, SocketDirection.West,  bounds.xMin);
+            xMax = SocketCol(root, SocketDirection.East,  bounds.xMax - 1);
+            yMin = SocketRow(root, SocketDirection.South, bounds.yMin);
+            yMax = SocketRow(root, SocketDirection.North, bounds.yMax - 1);
+        }
         int xIn0 = xMin + 1, xIn1 = xMax - 1;
         int yIn0 = yMin + 1, yIn1 = yMax - 1;
 

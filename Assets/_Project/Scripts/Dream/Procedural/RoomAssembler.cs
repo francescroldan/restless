@@ -58,17 +58,18 @@ namespace Restless.Dream.Procedural
                     visited.Add(neighbour.Index);
                     queue.Enqueue(neighbour);
 
-                    // Find a free socket on the current room
-                    var fromSocket = FindFreeSocket(currentRoom);
-                    if (fromSocket == null)
+                    // Try free sockets in random order; fall back to next if placement fails
+                    RoomController newRoom = null;
+                    var triedSockets = new HashSet<DoorSocket>();
+                    while (newRoom == null)
                     {
-                        Debug.LogWarning($"[RoomAssembler] No free socket on {currentRoom.name} for node {neighbour.Index}");
-                        continue;
+                        var fromSocket = FindFreeSocket(currentRoom, rng, triedSockets);
+                        if (fromSocket == null) break;
+                        triedSockets.Add(fromSocket);
+                        newRoom = PlaceNode(neighbour, Vector2.zero, currentRoom, fromSocket, rng);
                     }
-
-                    var newRoom = PlaceNode(neighbour, Vector2.zero, currentRoom, fromSocket, rng);
                     if (newRoom == null)
-                        Debug.LogWarning($"[RoomAssembler] Could not place node {neighbour.Index} ({neighbour.Type}) from {currentRoom.name}.{fromSocket.direction}");
+                        Debug.LogWarning($"[RoomAssembler] Could not place node {neighbour.Index} ({neighbour.Type}) after trying all free sockets on {currentRoom.name}.");
                 }
             }
 
@@ -162,6 +163,7 @@ namespace Restless.Dream.Procedural
             // occupy the same world-space cell (which causes Z-fighting on tilemaps).
             Vector2 fromPos          = fromSocket.transform.position;
             Vector2 toOffsetFromRoot = (Vector2)(toSocket.transform.position - prefab.transform.position);
+            // All sockets sit at the wall edge — uniform 1-unit gap prevents Z-fighting.
             Vector2 gap = fromSocket.direction switch
             {
                 SocketDirection.North => Vector2.up,
@@ -197,18 +199,15 @@ namespace Restless.Dream.Procedural
             return result;
         }
 
-        private static readonly SocketDirection[] _socketPriority =
+        private DoorSocket FindFreeSocket(RoomController room, System.Random rng,
+            HashSet<DoorSocket> exclude = null)
         {
-            SocketDirection.North, SocketDirection.East,
-            SocketDirection.South, SocketDirection.West
-        };
-
-        private DoorSocket FindFreeSocket(RoomController room)
-        {
-            foreach (var dir in _socketPriority)
-                foreach (var s in room.Sockets)
-                    if (!s.isOccupied && s.direction == dir) return s;
-            return null;
+            var free = new List<DoorSocket>();
+            foreach (var s in room.Sockets)
+                if (!s.isOccupied && (exclude == null || !exclude.Contains(s))) free.Add(s);
+            if (free.Count == 0) return null;
+            Shuffle(free, rng);
+            return free[0];
         }
 
         private DoorSocket FindCompatibleSocket(RoomController prefab, DoorSocket fromSocket)
@@ -253,8 +252,13 @@ namespace Restless.Dream.Procedural
         // Falls back to size enum when fewer than 2 sockets exist.
         private Vector2 GetSizeFromSockets(RoomController room)
         {
-            var sockets     = room.Sockets;
-            var defaultSize = SizeEnumToVector(room.Definition?.size ?? RoomSize.Medium);
+            var sockets = room.Sockets;
+
+            // Use stored tile extents from definition when available (set by CreateRoomVariants)
+            var def = room.Definition;
+            var defaultSize = (def != null && def.tileExtents.x > 0f)
+                ? def.tileExtents * 2f
+                : SizeEnumToVector(def?.size ?? RoomSize.Medium);
 
             if (sockets == null || sockets.Length < 2) return defaultSize;
 

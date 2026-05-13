@@ -31,6 +31,13 @@ public static class CreateRoomVariants
     {
         // ── Safe variants ─────────────────────────────────────────────────────
         new RoomVariant {
+            id = "safe_room_medium",
+            size = RoomSize.Medium,
+            types = new[]{ RoomType.Safe },
+            sockets = null,
+            danger = 0.15f, surrealism = 0.1f, supportsThreats = false
+        },
+        new RoomVariant {
             id = "safe_corridor",
             size = RoomSize.Medium,
             types = new[]{ RoomType.Safe },
@@ -53,6 +60,13 @@ public static class CreateRoomVariants
         },
 
         // ── Encounter variants ────────────────────────────────────────────────
+        new RoomVariant {
+            id = "encounter_room_medium",
+            size = RoomSize.Medium,
+            types = new[]{ RoomType.Encounter },
+            sockets = null,
+            danger = 0.5f, surrealism = 0.3f, supportsThreats = true
+        },
         new RoomVariant {
             id = "encounter_corridor",
             size = RoomSize.Medium,
@@ -85,6 +99,13 @@ public static class CreateRoomVariants
         },
 
         // ── Ritual variants ───────────────────────────────────────────────────
+        new RoomVariant {
+            id = "ritual_room_medium",
+            size = RoomSize.Medium,
+            types = new[]{ RoomType.Ritual },
+            sockets = null,
+            danger = 0.7f, surrealism = 0.6f, supportsThreats = true
+        },
         new RoomVariant {
             id = "ritual_corridor",
             size = RoomSize.Medium,
@@ -129,7 +150,15 @@ public static class CreateRoomVariants
             string prefabPath = $"{PrefabDir}/{v.id}.prefab";
             if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
             {
-                Debug.Log($"[CreateRoomVariants] Skipping {v.id} — prefab already exists.");
+                // Keep the existing prefab but refresh tileExtents on the definition
+                // so RebuildRoomsDarkDungeon can repaint with the correct room shape.
+                string defPath = $"{DataDir}/RoomDef_{v.id}.asset";
+                var existing = AssetDatabase.LoadAssetAtPath<RoomDefinition>(defPath);
+                if (existing != null)
+                {
+                    existing.tileExtents = ShapeHalfExtents(v);
+                    EditorUtility.SetDirty(existing);
+                }
                 skipped++;
                 continue;
             }
@@ -160,8 +189,9 @@ public static class CreateRoomVariants
         def.socketDirections = v.sockets;
         def.dangerLevel      = v.danger;
         def.surrealism       = v.surrealism;
-        def.supportsThreats  = v.supportsThreats;
+        def.supportsThreats   = v.supportsThreats;
         def.supportsFragments = v.supportsFragments;
+        def.tileExtents       = ShapeHalfExtents(v);
 
         AssetDatabase.CreateAsset(def, assetPath);
         return def;
@@ -209,7 +239,7 @@ public static class CreateRoomVariants
         // Seed the cliff tilemap with a single placeholder tile so the bounds
         // are non-zero — RebuildRoomsDarkDungeon reads cellBounds to paint walls.
         // The Rebuild tool will replace this with the correct tiles.
-        SeedCliffBounds(cliffTilemap, def.size);
+        SeedCliffBounds(cliffTilemap, ShapeHalfExtents(v));
 
         // ── Sockets ───────────────────────────────────────────────────────────
         var socketsGO = new GameObject("Sockets");
@@ -219,7 +249,7 @@ public static class CreateRoomVariants
             ? v.sockets
             : new[]{ SocketDirection.North, SocketDirection.South, SocketDirection.East, SocketDirection.West };
 
-        Vector2 extents = SizeToHalfExtents(v.size);
+        Vector2 extents = ShapeHalfExtents(v);
 
         foreach (var dir in dirs)
         {
@@ -245,9 +275,8 @@ public static class CreateRoomVariants
 
     // Seeds the cliff tilemap bounds so RebuildRoomsDarkDungeon can read cellBounds.
     // Places corner tiles at the expected wall positions for the given size.
-    static void SeedCliffBounds(Tilemap cliff, RoomSize size)
+    static void SeedCliffBounds(Tilemap cliff, Vector2 ext)
     {
-        Vector2 ext = SizeToHalfExtents(size);
         int xMin = -(int)ext.x;
         int xMax =  (int)ext.x;
         int yMin = -(int)ext.y;
@@ -273,7 +302,7 @@ public static class CreateRoomVariants
     {
         SocketDirection.North => new Vector3(-0.5f,  extents.y,       0),
         SocketDirection.South => new Vector3(-0.5f, -extents.y,       0),
-        SocketDirection.East  => new Vector3( extents.x - 1f, -0.5f,  0),
+        SocketDirection.East  => new Vector3( extents.x,       -0.5f,  0),
         SocketDirection.West  => new Vector3(-extents.x,       -0.5f, 0),
         _                     => Vector3.zero
     };
@@ -285,4 +314,22 @@ public static class CreateRoomVariants
         RoomSize.Landmark => new Vector2(8f, 5f),
         _                 => new Vector2(6f, 4f),
     };
+
+    // Returns the actual tile half-extents for a variant, considering its shape.
+    // Pure N-S corridors are narrow in X; pure E-W corridors narrow in Y.
+    static Vector2 ShapeHalfExtents(RoomVariant v)
+    {
+        var base_ = SizeToHalfExtents(v.size);
+        var dirs   = v.sockets;
+        if (dirs == null || dirs.Length == 0 || dirs.Length >= 4) return base_;
+
+        bool hasN = System.Array.IndexOf(dirs, SocketDirection.North) >= 0;
+        bool hasS = System.Array.IndexOf(dirs, SocketDirection.South) >= 0;
+        bool hasE = System.Array.IndexOf(dirs, SocketDirection.East)  >= 0;
+        bool hasW = System.Array.IndexOf(dirs, SocketDirection.West)  >= 0;
+
+        if (hasN && hasS && !hasE && !hasW) return new Vector2(3f, base_.y);  // N-S corridor
+        if (hasE && hasW && !hasN && !hasS) return new Vector2(base_.x, 3f);  // E-W corridor
+        return base_;
+    }
 }

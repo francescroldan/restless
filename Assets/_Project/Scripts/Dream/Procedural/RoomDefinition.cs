@@ -39,6 +39,9 @@ namespace Restless.Dream.Procedural
         [Tooltip("Which door directions this room supports. Leave empty for all four (default).")]
         public SocketDirection[] socketDirections;
 
+        [Tooltip("Half-extents of the painted tile area (world units). Set by CreateRoomVariants — used for overlap detection.")]
+        public Vector2 tileExtents;
+
         [Header("Intensity")]
         [Range(0f, 1f)]
         [Tooltip("How dangerous this room feels. Scales presence density.")]
