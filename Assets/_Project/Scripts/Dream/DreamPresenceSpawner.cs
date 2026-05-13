@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Restless.Dream.Procedural;
 
 namespace Restless.Dream
 {
@@ -28,12 +29,17 @@ namespace Restless.Dream
         [SerializeField, Range(1, 8)] private int _minFragments = 2;
         [SerializeField, Range(1, 8)] private int _maxFragments = 4;
 
-        [Header("Spawn zones")]
+        [Header("Spawn zones (static fallback)")]
         [SerializeField] private FogSpawnZone[] _zones;
         [SerializeField] private Tilemap        _floorTilemap;
         [SerializeField] private LayerMask      _obstacleLayer;
         [SerializeField] private float          _clearanceRadius = 0.5f;
         [SerializeField] private int            _maxAttempts     = 20;
+
+        // Set by DreamSceneBootstrap when procedural generation is active
+        private IReadOnlyList<RoomController> _rooms;
+
+        public void SetRooms(IReadOnlyList<RoomController> rooms) => _rooms = rooms;
 
         private void Start()
         {
@@ -102,7 +108,7 @@ namespace Restless.Dream
 
             for (int i = 0; i < count; i++)
             {
-                var pos = FindFreePosition();
+                var pos = FindFreePosition(requiresFragment: true);
                 if (pos == null) { Debug.LogWarning("[DreamPresenceSpawner] No free position for fragment — skipping."); continue; }
 
                 var go       = Instantiate(_memoryPointPrefab, pos.Value, Quaternion.identity);
@@ -114,8 +120,28 @@ namespace Restless.Dream
             }
         }
 
-        private Vector2? FindFreePosition()
+        private Vector2? FindFreePosition(bool requiresFragment = false)
         {
+            // Procedural mode — use room spawn bounds
+            if (_rooms != null && _rooms.Count > 0)
+            {
+                for (int attempt = 0; attempt < _maxAttempts * 2; attempt++)
+                {
+                    var room = _rooms[Random.Range(0, _rooms.Count)];
+                    if (room.Definition == null) continue;
+                    if (requiresFragment && !room.Definition.supportsFragments) continue;
+
+                    var b   = room.SpawnBounds;
+                    var pos = new Vector2(
+                        Random.Range(b.min.x, b.max.x),
+                        Random.Range(b.min.y, b.max.y));
+
+                    if (!IsBlocked(pos)) return pos;
+                }
+                return null;
+            }
+
+            // Static fallback (pre-procedural scene)
             if (_zones == null || _zones.Length == 0) return null;
 
             for (int attempt = 0; attempt < _maxAttempts; attempt++)

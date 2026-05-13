@@ -12,8 +12,7 @@ namespace Restless.Core
         [SerializeField] private float _fadeInDuration  = 2.5f;
         [SerializeField] private float _textDelay       = 4.0f;
         [SerializeField] private float _textFadeDuration = 2.5f;
-        [SerializeField] private float _promptDelay     = 7.5f;
-        [SerializeField] private string _vigilSceneName = "Vigil";
+[SerializeField] private string _vigilSceneName = "Vigil";
 
         private float       _elapsed;
         private float       _imageAlpha;
