@@ -63,23 +63,59 @@ namespace Restless.Dream.Procedural
             if (_doorRoomTypes == null || _doorRoomTypes.Length == 0)
                 _doorRoomTypes = new[] { RoomType.Ritual };
 
-            _placed.Clear();
-            _doorApproachSockets.Clear();
-            var rng = new System.Random(seed ^ 0xDEAD);
+            const int maxAttempts = 3;
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                // Destroy rooms from the previous attempt and reset graph state
+                foreach (var r in _placed)
+                    if (r != null) Destroy(r.gameObject);
+                _placed.Clear();
+                _doorApproachSockets.Clear();
+                foreach (var node in graph.Nodes) node.PlacedRoom = null;
 
-            // BFS
+                var rng = new System.Random((seed + attempt) ^ 0xDEAD);
+
+                TryPlaceAll(graph, rng);
+
+                // Close unused sockets before navigability check
+                foreach (var room in _placed)
+                    foreach (var s in room.Sockets)
+                        if (!s.isOccupied)
+                            room.CloseSocket(s);
+
+                if (!IsNavigable(graph))
+                {
+                    Debug.LogWarning($"[RoomAssembler] Attempt {attempt + 1}/{maxAttempts}: no path entrance→exit, retrying (seed {seed + attempt + 1}).");
+                    continue;
+                }
+
+                PaintRitualRooms(graph);
+
+                var sb = new System.Text.StringBuilder($"[RoomAssembler] Layout (attempt {attempt + 1}):\n");
+                foreach (var r in _placed)
+                    sb.AppendLine($"  {r.name}  pos={r.transform.position}  sockets={string.Join(",", System.Array.ConvertAll(r.Sockets, s => s.direction + (s.isOccupied ? "✓" : "○")))}");
+                Debug.Log(sb.ToString());
+
+                return true;
+            }
+
+            Debug.LogError($"[RoomAssembler] Could not generate a navigable layout in {maxAttempts} attempts.");
+            return false;
+        }
+
+        private void TryPlaceAll(RunGraph graph, System.Random rng)
+        {
             var queue   = new Queue<GraphNode>();
             var visited = new HashSet<int>();
 
             queue.Enqueue(graph.Entrance);
             visited.Add(graph.Entrance.Index);
 
-            // Place entrance at world origin
             var entranceRoom = PlaceNode(graph.Entrance, Vector2.zero, null, null, rng);
             if (entranceRoom == null)
             {
                 Debug.LogError("[RoomAssembler] Could not place entrance room.");
-                return false;
+                return;
             }
 
             while (queue.Count > 0)
@@ -94,8 +130,7 @@ namespace Restless.Dream.Procedural
                     visited.Add(neighbour.Index);
                     queue.Enqueue(neighbour);
 
-                    // Try free sockets in random order; fall back to next if placement fails
-                    RoomController newRoom = null;
+                    RoomController newRoom  = null;
                     var triedSockets = new HashSet<DoorSocket>();
                     while (newRoom == null)
                     {
@@ -108,23 +143,33 @@ namespace Restless.Dream.Procedural
                         Debug.LogWarning($"[RoomAssembler] Could not place node {neighbour.Index} ({neighbour.Type}) after trying all free sockets on {currentRoom.name}.");
                 }
             }
+        }
 
-            // Close unused sockets: fix corner frames; show closed-door tile if assigned.
-            foreach (var room in _placed)
-                foreach (var s in room.Sockets)
-                    if (!s.isOccupied)
-                        room.CloseSocket(s);
+        // BFS through the graph; a node is traversable only if its room was placed.
+        // Returns true when the exit node is reachable from the entrance.
+        private bool IsNavigable(RunGraph graph)
+        {
+            if (graph.Exit?.PlacedRoom == null) return false;
 
-            PaintRitualRooms(graph);
+            var visited = new HashSet<int>();
+            var queue   = new Queue<GraphNode>();
+            queue.Enqueue(graph.Entrance);
+            visited.Add(graph.Entrance.Index);
 
-            // Door triggers are added per-connection in PlaceNode; no per-room triggers needed.
+            while (queue.Count > 0)
+            {
+                var node = queue.Dequeue();
+                if (node == graph.Exit) return true;
 
-            var sb = new System.Text.StringBuilder("[RoomAssembler] Layout:\n");
-            foreach (var r in _placed)
-                sb.AppendLine($"  {r.name}  pos={r.transform.position}  sockets={string.Join(",", System.Array.ConvertAll(r.Sockets, s => s.direction + (s.isOccupied ? "✓" : "○")))}");
-            Debug.Log(sb.ToString());
-
-            return true;
+                foreach (var neighbour in graph.GetNeighbours(node))
+                {
+                    if (visited.Contains(neighbour.Index)) continue;
+                    if (neighbour.PlacedRoom == null) continue;
+                    visited.Add(neighbour.Index);
+                    queue.Enqueue(neighbour);
+                }
+            }
+            return false;
         }
 
         // ── Placement ─────────────────────────────────────────────────────────
