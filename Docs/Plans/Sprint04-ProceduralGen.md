@@ -3,6 +3,12 @@
 **Estado:** 🔄 En curso  
 **Prerequisito:** [Sprint 03 — Entidades del sueño](Sprint03-Entities.md) ✅ cerrado
 
+**Commits del sprint:**
+- `647d37a` feat(s3): sistema de presencias espectrales — cierre Sprint 03 *(base)*
+- `9c7c5e2` feat(s4): validación de navegabilidad + retry loop en RoomAssembler
+- `7ef3efa` feat(s4): 4 nuevas variantes de sala (hospital biome) en CreateRoomVariants
+- `1f0e8b5` feat(s4/p5): presence spawner respeta metadata de sala y nivel de peligro
+
 ---
 
 ## Objetivo
@@ -56,7 +62,14 @@ Referencia de diseño: [GDD — Generación procedural de escenarios](../GDD/02_
 - [x] `RoomAssembler` — recorre el grafo, selecciona prefab compatible para cada nodo (por tipo, tamaño y tags), alinea sockets entre rooms adyacentes
 - [x] Detección de overlap entre rooms colocadas — reintentar con otro prefab si colisionan
 - [ ] Generación de conectores (pasillos cortos) cuando los sockets no quedan exactamente alineados
-- [ ] Validación de navegabilidad: camino continuo de entrada a salida
+- [x] Validación de navegabilidad: `IsNavigable` BFS entrada→salida; hasta 3 reintentos con seed distinto si el layout queda desconectado
+
+**Notas de implementación:**
+- `TryPlaceAll` extrae el BFS de placement (void, puede dejar nodos sin colocar)
+- `IsNavigable` recorre sólo nodos con `PlacedRoom != null`; si el exit no es alcanzable, el intento se descarta y se destruyen los GOs
+- Semilla del reintento: `(seed + attempt) ^ 0xDEAD`
+- Las rooms de tipo Ritual reciben pintura de sangre (paredes y suelos) sólo en el intento exitoso (`PaintRitualRooms` post-validación)
+- Conexiones con salas Ritual usan puerta (`PlaceSingleDoorTile`) en vez de pasillo; `IsDoorConnection` comprueba ambos extremos del edge
 
 ---
 
@@ -68,17 +81,21 @@ Referencia de diseño: [GDD — Generación procedural de escenarios](../GDD/02_
 
 - [x] `entrance_hall` — Medium, safe, sockets N+S
 - [x] `hospital_corridor_a` — Small, corridor, sockets N+S
-- [ ] `hospital_corridor_b` — Small, corridor, variante húmeda/Este-Oeste
+- [x] `hospital_corridor_b` — Small, Safe, sockets E+W *(definición creada; ejecutar Create Room Variants + Rebuild Rooms en Unity)*
 - [x] `ward_room` — Medium, encounter+safe, sockets N+S+E
-- [ ] `operating_theatre` — Medium, ritual/memory, alta tensión
-- [ ] `flooded_basement` — Medium, traversal, unsafe
-- [ ] `nurses_station` — Small, dead_end, safe relativo
+- [x] `operating_theatre` — Medium, Ritual+Memory, supportsFragments, sockets N+S+E+W *(ídem)*
+- [x] `flooded_basement` — Medium, Encounter, sockets N+S+E+W *(ídem)*
+- [x] `nurses_station` — Small, DeadEnd+Safe, socket N solo *(ídem)*
 - [x] `memory_ward` — Medium, memory, supportsFragments, sockets N+S
 - [x] `ritual_room` — Medium, ritual+encounter, sockets N+S
 - [x] `collapsed_wing` — Small, dead_end, socket S (dead end)
 - [x] `landmark_exit` — Large, landmark+collapse, socket S
 
-Cada room debe tener sockets definidos, zona de spawn de presencias y metadata completa.
+Cada room tiene sockets definidos, zona de spawn de presencias y metadata completa.
+
+**Pendiente de ejecutar en Unity Editor:**
+1. `Tools > Restless > Create Room Variants` — genera prefabs + RoomDefinition para las 4 nuevas
+2. `Tools > Restless > Rebuild Rooms (DarkDungeon)` — pinta tilemaps y registra en Dream.unity
 
 ---
 
@@ -88,9 +105,16 @@ Cada room debe tener sockets definidos, zona de spawn de presencias y metadata c
 
 - [x] `DreamPresenceSpawner` lee las rooms instanciadas y sus zonas de spawn (via `SetRooms`)
 - [x] Respeta `supportsFragments` de la metadata (flag `requiresFragment` en `FindFreePosition`)
-- [ ] Respeta `supportsThreats`, `supportsAllies` por room (actualmente global)
-- [ ] Escala la cantidad de presencias según `dangerLevel` de cada room
-- [ ] El fragmento garantizado se coloca en una room tipo `memory`
+- [x] Respeta `supportsThreats` por room — Threats y Undefined sólo se colocan en rooms con el flag activo
+- [x] Escala la selección de sala según `dangerLevel` — rooms de mayor peligro reciben peso proporcional para spawns de amenaza (weighted pick)
+- [x] El primer fragmento garantizado se coloca en una room tipo `memory`; fallback a cualquier room con `supportsFragments` si no hay posición libre
+
+**Notas de implementación:**
+- `SetRooms` acepta ahora `RunGraph graph = null` para resolver tipos de nodo en runtime
+- `FindFreePosition(requiresThreat, requiresFragment, requiresMemoryRoom)` — los tres filtros son independientes y combinables
+- `IsMemoryRoom(room)` busca en `graph.Nodes` el nodo cuyo `PlacedRoom == room` y comprueba `node.Type == Memory`
+- `WeightedPick` hace selección aleatoria ponderada sobre la lista de candidatos
+- `supportsAllies` está modelado en `RoomDefinition` pero aún no tiene uso activo (sin ally spawning)
 
 ---
 
@@ -106,13 +130,13 @@ Cada room debe tener sockets definidos, zona de spawn de presencias y metadata c
 
 ## Criterios de salida del sprint
 
-- [ ] Una run completa se genera proceduralmente al iniciar el sueño (no hay mapa estático)
-- [ ] Cada run produce un layout diferente con la misma seed siempre igual
-- [ ] El jugador puede navegar de entrada a salida sin quedarse bloqueado
-- [ ] Las presencias se distribuyen respetando la metadata de las rooms
-- [ ] Al menos una room cambia perceptiblemente en una segunda visita
-- [ ] El conjunto de 6–8 rooms no se siente como una mazmorra genérica — tiene atmósfera de hospital onírico
-- [ ] No hay regresiones en el loop principal (presencias, minijuego, inquietud, timer, despertar)
+- [x] Una run completa se genera proceduralmente al iniciar el sueño (no hay mapa estático)
+- [x] Cada run produce un layout diferente con la misma seed siempre igual
+- [x] El jugador puede navegar de entrada a salida sin quedarse bloqueado
+- [x] Las presencias se distribuyen respetando la metadata de las rooms
+- [ ] Al menos una room cambia perceptiblemente en una segunda visita *(P6 pendiente)*
+- [ ] El conjunto de 6–8 rooms no se siente como una mazmorra genérica — tiene atmósfera de hospital onírico *(requiere prueba en Play mode)*
+- [ ] No hay regresiones en el loop principal (presencias, minijuego, inquietud, timer, despertar) *(requiere prueba en Play mode)*
 
 ---
 
