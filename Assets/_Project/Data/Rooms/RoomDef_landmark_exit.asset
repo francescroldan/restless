@@ -17,7 +17,7 @@ MonoBehaviour:
   types: 0900000006000000
   tags:
   - landmark
-  - hospital
+  - dungeon
   - boss
   - exit
   supportsThreats: 1

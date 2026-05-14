@@ -17,7 +17,7 @@ MonoBehaviour:
   types: 07000000
   tags:
   - memory
-  - hospital
+  - dungeon
   - quiet
   supportsThreats: 0
   supportsFragments: 1

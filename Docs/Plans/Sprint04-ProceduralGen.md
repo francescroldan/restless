@@ -6,7 +6,7 @@
 **Commits del sprint:**
 - `647d37a` feat(s3): sistema de presencias espectrales — cierre Sprint 03 *(base)*
 - `9c7c5e2` feat(s4): validación de navegabilidad + retry loop en RoomAssembler
-- `7ef3efa` feat(s4): 4 nuevas variantes de sala (hospital biome) en CreateRoomVariants
+- `7ef3efa` feat(s4): 4 nuevas variantes de sala (dungeon biome) en CreateRoomVariants
 - `1f0e8b5` feat(s4/p5): presence spawner respeta metadata de sala y nivel de peligro
 
 ---
@@ -27,7 +27,7 @@ Referencia de diseño: [GDD — Generación procedural de escenarios](../GDD/02_
 | Rooms handcrafted a construir | 6–8 |
 | Sistema | Grafo modular con sockets |
 | Arquitectura imposible | Topología inconsistente (no geometría física real) |
-| Primer biome | Hospital onírico |
+| Primer biome | Dungeon onírico |
 
 ---
 
@@ -61,7 +61,7 @@ Referencia de diseño: [GDD — Generación procedural de escenarios](../GDD/02_
 
 - [x] `RoomAssembler` — recorre el grafo, selecciona prefab compatible para cada nodo (por tipo, tamaño y tags), alinea sockets entre rooms adyacentes
 - [x] Detección de overlap entre rooms colocadas — reintentar con otro prefab si colisionan
-- [ ] Generación de conectores (pasillos cortos) cuando los sockets no quedan exactamente alineados
+- [x] Generación de conectores — `CalculatePosition` garantiza alineación exacta de sockets con gap de 1 unidad; `OpenSocket` en ambos lados abre el paso sin prefab conector
 - [x] Validación de navegabilidad: `IsNavigable` BFS entrada→salida; hasta 3 reintentos con seed distinto si el layout queda desconectado
 
 **Notas de implementación:**
@@ -73,15 +73,15 @@ Referencia de diseño: [GDD — Generación procedural de escenarios](../GDD/02_
 
 ---
 
-### P4 — Rooms handcrafted (hospital onírico, biome 1)
+### P4 — Rooms handcrafted (dungeon onírico, biome 1)
 
 **Objetivo:** producir el contenido mínimo necesario para que el sistema tenga algo que ensamblar.
 
 6–8 rooms diseñadas manualmente con tileset existente:
 
 - [x] `entrance_hall` — Medium, safe, sockets N+S
-- [x] `hospital_corridor_a` — Small, corridor, sockets N+S
-- [x] `hospital_corridor_b` — Small, Safe, sockets E+W *(definición creada; ejecutar Create Room Variants + Rebuild Rooms en Unity)*
+- [x] `dungeon_corridor_a` — Small, corridor, sockets N+S
+- [x] `dungeon_corridor_b` — Small, Safe, sockets E+W *(definición creada; ejecutar Create Room Variants + Rebuild Rooms en Unity)*
 - [x] `ward_room` — Medium, encounter+safe, sockets N+S+E
 - [x] `operating_theatre` — Medium, Ritual+Memory, supportsFragments, sockets N+S+E+W *(ídem)*
 - [x] `flooded_basement` — Medium, Encounter, sockets N+S+E+W *(ídem)*
@@ -135,7 +135,7 @@ Cada room tiene sockets definidos, zona de spawn de presencias y metadata comple
 - [x] El jugador puede navegar de entrada a salida sin quedarse bloqueado
 - [x] Las presencias se distribuyen respetando la metadata de las rooms
 - [ ] Al menos una room cambia perceptiblemente en una segunda visita *(P6 pendiente)*
-- [ ] El conjunto de 6–8 rooms no se siente como una mazmorra genérica — tiene atmósfera de hospital onírico *(requiere prueba en Play mode)*
+- [ ] El conjunto de 6–8 rooms no se siente como una mazmorra genérica — tiene atmósfera de dungeon onírico *(requiere prueba en Play mode)*
 - [ ] No hay regresiones en el loop principal (presencias, minijuego, inquietud, timer, despertar) *(requiere prueba en Play mode)*
 
 ---

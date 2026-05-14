@@ -137,9 +137,9 @@ public static class CreateRoomVariants
             danger = 0.3f, surrealism = 0.5f, supportsThreats = false, supportsFragments = true
         },
 
-        // ── Hospital biome — Sprint 4 additions ───────────────────────────────
+        // ── Dungeon biome — Sprint 4 additions ───────────────────────────────
         new RoomVariant {
-            id = "hospital_corridor_b",
+            id = "dungeon_corridor_b",
             size = RoomSize.Small,
             types = new[]{ RoomType.Safe },
             sockets = new[]{ SocketDirection.East, SocketDirection.West },

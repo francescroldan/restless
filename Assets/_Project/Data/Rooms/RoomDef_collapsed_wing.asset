@@ -17,7 +17,7 @@ MonoBehaviour:
   types: 08000000
   tags:
   - deadend
-  - hospital
+  - dungeon
   - ruin
   supportsThreats: 1
   supportsFragments: 1

@@ -17,7 +17,7 @@ MonoBehaviour:
   types: 0300000004000000
   tags:
   - ritual
-  - hospital
+  - dungeon
   - high-tension
   supportsThreats: 1
   supportsFragments: 0

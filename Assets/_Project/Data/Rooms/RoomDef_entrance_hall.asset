@@ -17,7 +17,7 @@ MonoBehaviour:
   types: 02000000
   tags:
   - entrance
-  - hospital
+  - dungeon
   - safe
   supportsThreats: 0
   supportsFragments: 0

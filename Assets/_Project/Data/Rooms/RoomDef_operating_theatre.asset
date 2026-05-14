@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06353563bd585f049982ff9d77851272, type: 3}
-  m_Name: RoomDef_ward_room
+  m_Name: RoomDef_operating_theatre
   m_EditorClassIdentifier: Assembly-CSharp::Restless.Dream.Procedural.RoomDefinition
-  id: ward_room
+  id: operating_theatre
   size: 1
-  types: 0400000002000000
-  tags:
-  - ward
-  - dungeon
-  - encounter
+  types: 0300000007000000
+  tags: []
   supportsThreats: 1
-  supportsFragments: 0
-  supportsAllies: 1
-  dangerLevel: 0.45
-  surrealism: 0.25
+  supportsFragments: 1
+  supportsAllies: 0
+  socketDirections: 
+  tileExtents: {x: 6, y: 4}
+  dangerLevel: 0.75
+  surrealism: 0.65

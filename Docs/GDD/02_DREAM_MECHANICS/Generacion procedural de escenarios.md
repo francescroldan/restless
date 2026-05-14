@@ -10,7 +10,7 @@
 | Rooms handcrafted para primer sprint | 6–8 |
 | Sistema | Grafo modular con sockets |
 | Arquitectura imposible | Topología inconsistente controlada (no geometría física real) |
-| Primer biome | Hospital onírico |
+| Primer biome | Dungeon onírico |
 | Objetivo del sprint | Validar atmósfera, pacing, navegación y tensión psicológica |
 
 ---
@@ -67,27 +67,27 @@ Para producción inicial: **6–8 rooms handcrafted**, reutilizadas proceduralme
 
 ---
 
-## Primer biome — Hospital onírico
+## Primer biome — Dungeon onírico
 
-El primer biome es un **hospital onírico**. Motivos:
+El primer biome es un **dungeon onírico** con estética de mazmorra oscura (tileset DarkDungeon). Motivos:
 
-- Encaja perfectamente con horror psicológico
+- Encaja perfectamente con horror psicológico y atmósfera lovecraftiana
 - Permite gran variedad visual con módulos reutilizables
 - Combina bien espacios abiertos y cerrados
 - Facilita iluminación inquietante y surrealismo progresivo
 - Facilita loops y pérdida de orientación
 
-El hospital permite variaciones internas sin necesidad de un segundo biome:
+El dungeon permite variaciones internas sin necesidad de un segundo biome:
 
 | Variante | Atmósfera |
 |---|---|
-| Clínico limpio | Tensión contenida, asepsia perturbadora |
+| Piedra limpia | Tensión contenida, frialdad perturbadora |
 | Abandonado | Deterioro, tiempo detenido |
 | Húmedo / inundado | Claustrofobia, pérdida de control |
-| Ritualizado | Horror cósmico, presencia activa |
+| Ritualizado | Horror cósmico, presencia activa, sangre |
 | Orgánico / vivo | Cuerpo, infección, lo imposible |
 
-El objetivo no es un hospital realista, sino un espacio que se siente **parcialmente hospital, parcialmente recuerdo roto, parcialmente sueño**.
+El objetivo no es un dungeon realista, sino un espacio que se siente **parcialmente mazmorra, parcialmente recuerdo roto, parcialmente sueño**.
 
 ---
 
@@ -178,9 +178,9 @@ No todas las rooms pueden conectar con todas. Ejemplo:
 
 ```json
 {
-  "id": "hospital_corridor_01",
+  "id": "dungeon_corridor_01",
   "size": "medium",
-  "biome": "hospital",
+  "biome": "dungeon",
   "type": ["corridor", "traversal"],
   "tags": ["claustrophobic", "wet", "unsafe", "low_visibility"],
   "supportsThreats": true,
