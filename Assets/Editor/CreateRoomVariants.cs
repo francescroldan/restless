@@ -265,9 +265,11 @@ public static class CreateRoomVariants
         var cliffRenderer = cliffGO.AddComponent<TilemapRenderer>();
         cliffRenderer.sortingOrder = 0;
 
-        // Composite collider for walls
+        // Composite collider for walls (TilemapCollider2D must be added before CompositeCollider2D)
         var rb = cliffGO.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Static;
+        var tilemapCol = cliffGO.AddComponent<TilemapCollider2D>();
+        tilemapCol.usedByComposite = true;
         var composite = cliffGO.AddComponent<CompositeCollider2D>();
         composite.geometryType = CompositeCollider2D.GeometryType.Outlines;
 

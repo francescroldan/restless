@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 6409819003955684079}
   - component: {fileID: 4064204066864899563}
   - component: {fileID: 3360784981119951811}
+  - component: {fileID: 8109305945481195022}
   m_Layer: 0
   m_Name: Tilemap_Cliff
   m_TagString: Untagged
@@ -634,13 +635,77 @@ CompositeCollider2D:
   m_GeometryType: 0
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths: []
+  m_ColliderPaths:
+  - m_Collider: {fileID: 8109305945481195022}
+    m_ColliderPaths:
+    - - X: 40000000
+        Y: 50000000
+      - X: -30000000
+        Y: 50000000
+      - X: -30000000
+        Y: -40000000
+      - X: 40000000
+        Y: -40000000
+    - - X: -20000000
+        Y: -30000000
+      - X: -20000000
+        Y: 40000000
+      - X: 30000000
+        Y: 40000000
+      - X: 30000000
+        Y: -30000000
   m_CompositePaths:
-    m_Paths: []
+    m_Paths:
+    - - {x: 3.999971, y: -4}
+      - {x: 3.999971, y: 5}
+      - {x: -3, y: 4.999971}
+      - {x: -2.999971, y: -4}
+    - - {x: 3, y: -2.9999707}
+      - {x: -2, y: -2.9999707}
+      - {x: -1.9999707, y: 4}
+      - {x: 3, y: 3.9999704}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
   m_UseDelaunayMesh: 0
   m_CompositeGameObject: {fileID: 3432839321447942309}
+--- !u!19719996 &8109305945481195022
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3432839321447942309}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 1
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_MaximumTileChangeCount: 1000
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1 &4527222547793334710
 GameObject:
   m_ObjectHideFlags: 0

@@ -75,8 +75,14 @@ namespace Restless.Dream.Procedural
             Vector3Int baseCell   = cliff.WorldToCell(socket.transform.position);
             Vector3Int cell2      = baseCell + step;
 
-            var wallTile = cliff.GetTile(baseCell);
-            if (wallTile == null) wallTile = cliff.GetTile(cell2);
+            // Read wall tile from 2 cells past the inner corner — safely outside the door
+            // frame. Reading from baseCell (the first door cell) risks picking up a null or
+            // an inner-corner tile when the socket position is off by a cell, which would
+            // propagate the wrong tile to the corners instead of sealing them.
+            var wallTile = cliff.GetTile(cell2 + step + step)
+                        ?? cliff.GetTile(baseCell - step - step)
+                        ?? cliff.GetTile(baseCell)
+                        ?? cliff.GetTile(cell2);
 
             if (closedDoorTile != null)
             {
@@ -85,6 +91,8 @@ namespace Restless.Dream.Procedural
                 cliff.RefreshTile(baseCell);
                 cliff.RefreshTile(cell2);
             }
+
+            if (wallTile == null) return;
 
             var cornerA = baseCell - step;
             var cornerB = cell2    + step;

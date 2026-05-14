@@ -156,12 +156,13 @@ namespace Restless.Dream
 
                 for (int attempt = 0; attempt < _maxAttempts * 2; attempt++)
                 {
-                    var room = WeightedPick(candidates);
-                    var b    = room.SpawnBounds;
-                    var pos  = new Vector2(
+                    var room      = WeightedPick(candidates);
+                    var b         = room.SpawnBounds;
+                    var roomFloor = GetRoomFloor(room);
+                    var pos       = new Vector2(
                         Random.Range(b.min.x, b.max.x),
                         Random.Range(b.min.y, b.max.y));
-                    if (!IsBlocked(pos)) return pos;
+                    if (!IsBlocked(pos, roomFloor)) return pos;
                 }
                 return null;
             }
@@ -204,13 +205,15 @@ namespace Restless.Dream
             return candidates[candidates.Count - 1].room;
         }
 
-        private bool IsBlocked(Vector2 pos)
+        private bool IsBlocked(Vector2 pos, Tilemap floor = null)
         {
-            // Must have a floor tile underneath
-            if (_floorTilemap != null)
+            // Procedural mode: use the room's own Tilemap_Floor.
+            // Static fallback: use the scene-level _floorTilemap.
+            var tileSource = floor ?? _floorTilemap;
+            if (tileSource != null)
             {
-                var cell = _floorTilemap.WorldToCell(pos);
-                if (!_floorTilemap.HasTile(cell)) return true;
+                var cell = tileSource.WorldToCell(pos);
+                if (!tileSource.HasTile(cell)) return true;
             }
 
             // Must not overlap a wall collider
@@ -219,6 +222,13 @@ namespace Restless.Dream
                 if (!hit.isTrigger) return true;
 
             return false;
+        }
+
+        private static Tilemap GetRoomFloor(RoomController room)
+        {
+            foreach (var tm in room.GetComponentsInChildren<Tilemap>())
+                if (tm.gameObject.name == "Tilemap_Floor") return tm;
+            return null;
         }
 
 #if UNITY_EDITOR

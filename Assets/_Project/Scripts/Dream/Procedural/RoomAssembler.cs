@@ -334,18 +334,22 @@ namespace Restless.Dream.Procedural
         {
             if (_placed.Count == 0) return false;
 
-            Vector2 size = GetSizeFromSockets(prefab);
-            var bounds = new Bounds((Vector3)pos, new Vector3(size.x - _overlapCheckPadding,
-                                                               size.y - _overlapCheckPadding, 1f));
+            // Tile area is socket-span + 1 unit (cells extend past the far-edge socket),
+            // centered at pos + (0.5, 0.5). Padding shrinks the box so adjacent rooms
+            // sharing a 1-unit gap corridor are not considered overlapping.
+            Vector2 size   = GetSizeFromSockets(prefab);
+            var     center = (Vector3)pos + new Vector3(0.5f, 0.5f, 0f);
+            var bounds = new Bounds(center, new Vector3(size.x + 1f - _overlapCheckPadding,
+                                                        size.y + 1f - _overlapCheckPadding, 1f));
 
             foreach (var placed in _placed)
             {
                 if (placed == excludeRoom) continue;
 
                 Vector2 ps = GetSizeFromSockets(placed);
-                var placedBounds = new Bounds((Vector3)(Vector2)placed.transform.position,
-                                              new Vector3(ps.x - _overlapCheckPadding,
-                                                          ps.y - _overlapCheckPadding, 1f));
+                var pc = (Vector3)(Vector2)placed.transform.position + new Vector3(0.5f, 0.5f, 0f);
+                var placedBounds = new Bounds(pc, new Vector3(ps.x + 1f - _overlapCheckPadding,
+                                                              ps.y + 1f - _overlapCheckPadding, 1f));
                 if (bounds.Intersects(placedBounds)) return true;
             }
 
@@ -803,7 +807,12 @@ namespace Restless.Dream.Procedural
                 if (r == null) continue;
                 Vector2 sz = GetSizeFromSockets(r);
                 Gizmos.color = colors[i % colors.Length];
-                Gizmos.DrawWireCube(r.transform.position, new Vector3(sz.x, sz.y, 0.1f));
+                // GetSizeFromSockets returns socket-to-socket span; tile cells extend one
+                // unit past the far-edge socket, and the grid origin sits at cell (0,0)
+                // bottom-left, so the tile area is offset (+0.5, +0.5) and 1 unit larger.
+                Gizmos.DrawWireCube(
+                    r.transform.position + new Vector3(0.5f, 0.5f, 0f),
+                    new Vector3(sz.x + 1f, sz.y + 1f, 0.1f));
             }
         }
 #endif

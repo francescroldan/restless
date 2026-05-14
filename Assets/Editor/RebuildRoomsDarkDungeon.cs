@@ -169,6 +169,7 @@ public static class RebuildRoomsDarkDungeon
             using (var scope = new PrefabUtility.EditPrefabContentsScope(path))
             {
                 AddMissingDirectionSockets(scope.prefabContentsRoot);
+                EnsureCliffColliders(scope.prefabContentsRoot);
                 EnsureSocketBlockers(scope.prefabContentsRoot);
                 // Use ctrl from scope for fresh definition data (avoids stale cache)
                 var scopeCtrl = scope.prefabContentsRoot.GetComponent<RoomController>();
@@ -380,6 +381,29 @@ public static class RebuildRoomsDarkDungeon
         return null;
     }
 
+    // Ensures Tilemap_Cliff has the full collider stack: TilemapCollider2D (usedByComposite)
+    // + Rigidbody2D (Static) + CompositeCollider2D. Adds any missing components without
+    // touching ones that are already correctly configured.
+    static void EnsureCliffColliders(GameObject root)
+    {
+        Tilemap cliff = FindTilemap(root, "Tilemap_Cliff");
+        if (cliff == null) return;
+        var go = cliff.gameObject;
+
+        var rb = go.GetComponent<Rigidbody2D>();
+        if (rb == null) rb = go.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Static;
+
+        var tmCol = go.GetComponent<TilemapCollider2D>();
+        if (tmCol == null) tmCol = go.AddComponent<TilemapCollider2D>();
+        tmCol.usedByComposite = true;
+
+        var composite = go.GetComponent<CompositeCollider2D>();
+        if (composite == null) composite = go.AddComponent<CompositeCollider2D>();
+        composite.geometryType  = CompositeCollider2D.GeometryType.Outlines;
+        composite.generationType = CompositeCollider2D.GenerationType.Synchronous;
+    }
+
     // Adds a BoxCollider2D to any DoorSocket that doesn't have one.
     // The collider acts as a door blocker — the assembler disables it at runtime
     // when the socket is connected to an adjacent room.
@@ -417,5 +441,75 @@ public static class RebuildRoomsDarkDungeon
             if (s.direction == dir)
                 return Mathf.RoundToInt(s.transform.localPosition.x);
         return fallback;
+    }
+
+    // ── Debug: Spawn Test Room ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Instantiates the first room prefab found in the active scene at (0,0) with all
+    /// sockets closed (no connections). Logs a full diagnostic of every collider
+    /// component on Tilemap_Cliff so you can confirm the stack is correct at runtime.
+    /// Run via Tools > Restless > Spawn Test Room.
+    /// </summary>
+    [MenuItem("Tools/Restless/Spawn Test Room (Collider Debug)")]
+    public static void SpawnTestRoom()
+    {
+        var prefabGuids = AssetDatabase.FindAssets("t:Prefab", new[] { PrefabDir });
+        GameObject prefab = null;
+        foreach (var guid in prefabGuids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (go != null && go.GetComponent<Restless.Dream.Procedural.RoomController>() != null)
+            { prefab = go; break; }
+        }
+        if (prefab == null) { Debug.LogError("[SpawnTestRoom] No room prefab found."); return; }
+
+        var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        instance.transform.position = Vector3.zero;
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+
+        // ── Diagnostic log ────────────────────────────────────────────────────
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"[SpawnTestRoom] Spawned '{prefab.name}' at (0,0)");
+
+        foreach (var tm in instance.GetComponentsInChildren<UnityEngine.Tilemaps.Tilemap>(true))
+        {
+            if (tm.gameObject.name != "Tilemap_Cliff") continue;
+            var go = tm.gameObject;
+
+            var rb      = go.GetComponent<Rigidbody2D>();
+            var tmCol   = go.GetComponent<TilemapCollider2D>();
+            var comp    = go.GetComponent<CompositeCollider2D>();
+
+            tm.CompressBounds();
+            int tileCount = 0;
+            foreach (var pos in tm.cellBounds.allPositionsWithin)
+                if (tm.HasTile(pos)) tileCount++;
+
+            sb.AppendLine($"  Tilemap_Cliff on '{go.name}':");
+            sb.AppendLine($"    Tiles painted   : {tileCount}");
+            sb.AppendLine($"    Rigidbody2D     : {(rb   != null ? $"found (bodyType={rb.bodyType})"         : "MISSING")}");
+            sb.AppendLine($"    TilemapCollider : {(tmCol != null ? $"found (usedByComposite={tmCol.usedByComposite})" : "MISSING")}");
+            sb.AppendLine($"    CompositeCollider: {(comp != null ? $"found (genType={comp.generationType}, pathCount={comp.pathCount})" : "MISSING")}");
+
+            if (tmCol != null)
+            {
+                // Sample a few wall tile collider types
+                int gridCount = 0, noneCount = 0;
+                foreach (var pos in tm.cellBounds.allPositionsWithin)
+                {
+                    var tile = tm.GetTile<UnityEngine.Tilemaps.Tile>(pos);
+                    if (tile == null) continue;
+                    if (tile.colliderType == UnityEngine.Tilemaps.Tile.ColliderType.None) noneCount++;
+                    else gridCount++;
+                }
+                sb.AppendLine($"    Tile colliderType Grid/Sprite: {gridCount}  None: {noneCount}");
+            }
+        }
+
+        Debug.Log(sb.ToString());
+        Selection.activeGameObject = instance;
     }
 }
