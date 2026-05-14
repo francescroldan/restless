@@ -136,6 +136,36 @@ public static class CreateRoomVariants
             sockets = new[]{ SocketDirection.North, SocketDirection.South },
             danger = 0.3f, surrealism = 0.5f, supportsThreats = false, supportsFragments = true
         },
+
+        // ── Hospital biome — Sprint 4 additions ───────────────────────────────
+        new RoomVariant {
+            id = "hospital_corridor_b",
+            size = RoomSize.Small,
+            types = new[]{ RoomType.Safe },
+            sockets = new[]{ SocketDirection.East, SocketDirection.West },
+            danger = 0.2f, surrealism = 0.15f, supportsThreats = false
+        },
+        new RoomVariant {
+            id = "operating_theatre",
+            size = RoomSize.Medium,
+            types = new[]{ RoomType.Ritual, RoomType.Memory },
+            sockets = null,
+            danger = 0.75f, surrealism = 0.65f, supportsThreats = true, supportsFragments = true
+        },
+        new RoomVariant {
+            id = "flooded_basement",
+            size = RoomSize.Medium,
+            types = new[]{ RoomType.Encounter },
+            sockets = null,
+            danger = 0.6f, surrealism = 0.5f, supportsThreats = true
+        },
+        new RoomVariant {
+            id = "nurses_station",
+            size = RoomSize.Small,
+            types = new[]{ RoomType.DeadEnd, RoomType.Safe },
+            sockets = new[]{ SocketDirection.North },
+            danger = 0.2f, surrealism = 0.25f, supportsThreats = false
+        },
     };
 
     // ── Entry point ───────────────────────────────────────────────────────────
@@ -205,9 +235,14 @@ public static class CreateRoomVariants
 
         // RoomController on root
         var ctrl = root.AddComponent<RoomController>();
-        // Assign definition via SerializedObject so it survives prefab save
+        // Assign definition + default spawn bounds via SerializedObject so they survive prefab save
+        var ext = ShapeHalfExtents(v);
         var so = new SerializedObject(ctrl);
         so.FindProperty("_definition").objectReferenceValue = def;
+        var spawnProp = so.FindProperty("_spawnBounds");
+        spawnProp.FindPropertyRelative("m_Center").vector3Value = Vector3.zero;
+        spawnProp.FindPropertyRelative("m_Extent").vector3Value =
+            new Vector3(Mathf.Max(0.5f, ext.x - 1.5f), Mathf.Max(0.5f, ext.y - 1.5f), 1f);
         so.ApplyModifiedPropertiesWithoutUndo();
 
         // ── Tilemaps hierarchy ────────────────────────────────────────────────
