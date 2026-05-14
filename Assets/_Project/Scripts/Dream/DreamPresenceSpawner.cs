@@ -38,8 +38,13 @@ namespace Restless.Dream
 
         // Set by DreamSceneBootstrap when procedural generation is active
         private IReadOnlyList<RoomController> _rooms;
+        private RunGraph                      _graph;
 
-        public void SetRooms(IReadOnlyList<RoomController> rooms) => _rooms = rooms;
+        public void SetRooms(IReadOnlyList<RoomController> rooms, RunGraph graph = null)
+        {
+            _rooms = rooms;
+            _graph = graph;
+        }
 
         private void Start()
         {
@@ -65,21 +70,22 @@ namespace Restless.Dream
             fragmentCount      = Mathf.Clamp(Random.Range(_minFragments, _maxFragments + 1),
                                              _minFragments, fragmentCount > 0 ? fragmentCount : _maxFragments);
 
-            SpawnPresences(threatCount,    DreamPresence.PresenceType.Threat,    withPresence: true);
+            SpawnPresences(threatCount,    DreamPresence.PresenceType.Threat,    withPresence: true,  requiresThreat: true);
             SpawnPresences(wandererSpec,   DreamPresence.PresenceType.Wanderer,  withPresence: true);
             SpawnPresences(wandererVis,    DreamPresence.PresenceType.Wanderer,  withPresence: false);
-            SpawnPresences(undefinedCount, DreamPresence.PresenceType.Undefined, withPresence: true);
+            SpawnPresences(undefinedCount, DreamPresence.PresenceType.Undefined, withPresence: true,  requiresThreat: true);
             SpawnFragments(fragmentCount);
 
             Debug.Log($"[DreamPresenceSpawner] threat×{threatCount} wanderer(spec)×{wandererSpec} " +
                       $"wanderer(vis)×{wandererVis} undefined×{undefinedCount} fragment×{fragmentCount}");
         }
 
-        private void SpawnPresences(int count, DreamPresence.PresenceType type, bool withPresence)
+        private void SpawnPresences(int count, DreamPresence.PresenceType type, bool withPresence,
+                                    bool requiresThreat = false)
         {
             for (int i = 0; i < count; i++)
             {
-                var pos = FindFreePosition();
+                var pos = FindFreePosition(requiresThreat: requiresThreat);
                 if (pos == null) { Debug.LogWarning("[DreamPresenceSpawner] No free position — skipping."); continue; }
 
                 var go = Instantiate(_entityPrefab, pos.Value, Quaternion.identity);
@@ -108,7 +114,14 @@ namespace Restless.Dream
 
             for (int i = 0; i < count; i++)
             {
-                var pos = FindFreePosition(requiresFragment: true);
+                // First fragment is guaranteed to land in a Memory-type room.
+                // Subsequent fragments use any room that supports fragments.
+                bool forceMemory = (i == 0);
+                var pos = forceMemory
+                    ? (FindFreePosition(requiresFragment: true, requiresMemoryRoom: true)
+                       ?? FindFreePosition(requiresFragment: true))
+                    : FindFreePosition(requiresFragment: true);
+
                 if (pos == null) { Debug.LogWarning("[DreamPresenceSpawner] No free position for fragment — skipping."); continue; }
 
                 var go       = Instantiate(_memoryPointPrefab, pos.Value, Quaternion.identity);
@@ -120,22 +133,34 @@ namespace Restless.Dream
             }
         }
 
-        private Vector2? FindFreePosition(bool requiresFragment = false)
+        private Vector2? FindFreePosition(bool requiresFragment  = false,
+                                          bool requiresThreat   = false,
+                                          bool requiresMemoryRoom = false)
         {
             // Procedural mode — use room spawn bounds
             if (_rooms != null && _rooms.Count > 0)
             {
+                // Build weighted candidate list; threats prefer high-danger rooms
+                var candidates = new List<(RoomController room, float weight)>(_rooms.Count);
+                foreach (var room in _rooms)
+                {
+                    if (room.Definition == null) continue;
+                    if (requiresFragment   && !room.Definition.supportsFragments) continue;
+                    if (requiresThreat     && !room.Definition.supportsThreats)   continue;
+                    if (requiresMemoryRoom && !IsMemoryRoom(room))                continue;
+                    float weight = requiresThreat ? Mathf.Max(0.05f, room.Definition.dangerLevel) : 1f;
+                    candidates.Add((room, weight));
+                }
+
+                if (candidates.Count == 0) return null;
+
                 for (int attempt = 0; attempt < _maxAttempts * 2; attempt++)
                 {
-                    var room = _rooms[Random.Range(0, _rooms.Count)];
-                    if (room.Definition == null) continue;
-                    if (requiresFragment && !room.Definition.supportsFragments) continue;
-
-                    var b   = room.SpawnBounds;
-                    var pos = new Vector2(
+                    var room = WeightedPick(candidates);
+                    var b    = room.SpawnBounds;
+                    var pos  = new Vector2(
                         Random.Range(b.min.x, b.max.x),
                         Random.Range(b.min.y, b.max.y));
-
                     if (!IsBlocked(pos)) return pos;
                 }
                 return null;
@@ -155,6 +180,28 @@ namespace Restless.Dream
             }
 
             return null;
+        }
+
+        private bool IsMemoryRoom(RoomController room)
+        {
+            if (_graph == null) return false;
+            foreach (var node in _graph.Nodes)
+                if (node.PlacedRoom == room && node.Type == RoomType.Memory) return true;
+            return false;
+        }
+
+        private static RoomController WeightedPick(List<(RoomController room, float weight)> candidates)
+        {
+            float total = 0f;
+            foreach (var (_, w) in candidates) total += w;
+            float r = Random.Range(0f, total);
+            float acc = 0f;
+            foreach (var (room, w) in candidates)
+            {
+                acc += w;
+                if (r <= acc) return room;
+            }
+            return candidates[candidates.Count - 1].room;
         }
 
         private bool IsBlocked(Vector2 pos)

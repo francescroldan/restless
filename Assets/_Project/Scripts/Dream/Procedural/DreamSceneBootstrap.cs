@@ -51,10 +51,10 @@ namespace Restless.Dream.Procedural
                 return;
             }
 
-            // Pass placed rooms to the presence spawner so it can use room spawn zones
+            // Pass placed rooms + graph so the spawner can filter by room type and danger
             var spawner = GetComponent<DreamPresenceSpawner>();
             if (spawner != null)
-                spawner.SetRooms(_assembler.PlacedRooms);
+                spawner.SetRooms(_assembler.PlacedRooms, graph);
 
             // Initialize room camera: show entrance, hide all other rooms.
             // RoomCamera is added automatically to Camera.main if not already present.
