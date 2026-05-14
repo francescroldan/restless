@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Restless.Core;
 using Restless.Vigil;
+using Restless.Dream.Procedural;
 
 namespace Restless.Dream
 {
@@ -54,7 +55,6 @@ namespace Restless.Dream
         private void OnGUI()
         {
             EnsureStyles();
-            DrawProximity();
             if (!_visible) return;
             DrawBars();
             DrawChecklist();
@@ -230,6 +230,7 @@ namespace Restless.Dream
 
         private void DrawStats()
         {
+            DrawRoomInfo();
             const int x = 10, lineH = 20;
             int y = 10 + 18 + 8; // below the bar row
 
@@ -446,37 +447,78 @@ namespace Restless.Dream
             GUI.color = Color.white;
         }
 
-        // ── Proximity indicator (always visible, bottom-left) ───────────────
+        // ── Current room info (F1-toggled, bottom-left) ─────────────────────
 
-        private void DrawProximity()
+        private void DrawRoomInfo()
         {
-            var protagonist = GameObject.FindWithTag("Player");
-            if (protagonist == null) return;
+            var room = RoomCamera.ActiveRoom;
 
-            var memoryPoints = FindObjectsByType<MemoryPoint>(FindObjectsSortMode.None);
-            float closest = float.MaxValue;
-            MemoryPoint closestMp = null;
-            foreach (var mp in memoryPoints)
+            float panelW = 340f;
+            float lineH  = 18f;
+            float pad    = 8f;
+
+            // Build content lines
+            var lines = new System.Collections.Generic.List<(Color col, string text)>();
+
+            if (room == null)
             {
-                if (mp.CurrentState != MemoryPoint.State.Available) continue;
-                float d = Vector2.Distance(protagonist.transform.position, mp.transform.position);
-                if (d < closest) { closest = d; closestMp = mp; }
+                lines.Add((new Color(0.5f, 0.5f, 0.55f), "No active room"));
+            }
+            else
+            {
+                var def = room.Definition;
+                lines.Add((new Color(0.95f, 0.85f, 0.4f),
+                    $"Room: {(def != null ? def.id : room.name)}"));
+
+                if (def != null)
+                {
+                    string types = def.types != null && def.types.Length > 0
+                        ? string.Join(", ", System.Array.ConvertAll(def.types, t => t.ToString()))
+                        : "—";
+                    lines.Add((new Color(0.7f, 0.85f, 1f),  $"Type:    {types}"));
+                    lines.Add((new Color(0.7f, 0.7f, 0.75f), $"Size:    {def.size}"));
+                    lines.Add((new Color(0.7f, 0.7f, 0.75f), $"Danger:  {def.dangerLevel:F2}"));
+                    lines.Add((new Color(0.7f, 0.7f, 0.75f), $"Surreal: {def.surrealism:F2}"));
+                }
+
+                var sockets = room.Sockets;
+                if (sockets != null)
+                {
+                    foreach (var s in sockets)
+                    {
+                        bool occ = s.isOccupied;
+                        string connName = occ && s.connectedSocket != null
+                            ? s.connectedSocket.GetComponentInParent<RoomController>()?.name ?? "?"
+                            : "—";
+                        Color c = occ ? new Color(0.4f, 0.9f, 0.5f) : new Color(0.45f, 0.45f, 0.5f);
+                        lines.Add((c, $"  {s.direction,-6} {(occ ? "→ " + connName : "○ closed")}"));
+                    }
+                }
+
+                Vector3 wp = room.transform.position;
+                lines.Add((new Color(0.55f, 0.55f, 0.6f),
+                    $"Pos: ({wp.x:F0}, {wp.y:F0})  node#{room.GraphNodeIndex}"));
             }
 
-            if (closestMp == null) return;
+            float panelH = pad * 2 + lineH + lines.Count * lineH;
+            float x = 10f;
+            float y = Screen.height - panelH - 10f;
 
-            bool inRange = closest <= 3f;
-            string label = inRange
-                ? $"[E] {closestMp.name}  dist={closest:F1}  EN RANGO"
-                : $"{closestMp.name}  dist={closest:F1}  (rango=3.0)";
+            GUI.color = new Color(0.05f, 0.05f, 0.07f, 0.88f);
+            GUI.DrawTexture(new Rect(x - 4f, y - 2f, panelW + 8f, panelH + 4f), _white);
 
-            float w = 320f, h = 22f;
-            float x = 10f, y = Screen.height - h - 10f;
+            y += pad;
+            GUI.color = new Color(0.8f, 0.8f, 0.85f);
+            GUI.Label(new Rect(x, y, panelW, lineH), "HABITACIÓN ACTUAL", _headerStyle);
+            y += lineH;
 
-            GUI.color = new Color(0.05f, 0.05f, 0.07f, 0.85f);
-            GUI.DrawTexture(new Rect(x - 4f, y - 2f, w + 8f, h + 4f), Texture2D.whiteTexture);
-            GUI.color = inRange ? Color.green : new Color(0.7f, 0.7f, 0.7f);
-            GUI.Label(new Rect(x, y, w, h), label, _checkStyle);
+            foreach (var (col, text) in lines)
+            {
+                GUI.color = col;
+                GUI.Label(new Rect(x, y, panelW, lineH), text, _checkStyle);
+                y += lineH;
+            }
+
             GUI.color = Color.white;
         }
 

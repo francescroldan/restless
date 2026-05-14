@@ -1211,6 +1211,13 @@ MonoBehaviour:
   - {fileID: 1680263472110701142, guid: 1d0fb3ec8b1fd7f49a4cbbc6dc87053d, type: 3}
   _maxPlacementRetries: 8
   _overlapCheckPadding: 0.3
+  _doorNS_Open: {fileID: 0}
+  _doorNS_Closed: {fileID: 0}
+  _doorE_Open: {fileID: 0}
+  _doorW_Open: {fileID: 0}
+  _doorRoomTypes: 03000000
+  _allTiles: []
+  _spawnOffset: 2
 --- !u!1 &643268062
 GameObject:
   m_ObjectHideFlags: 0

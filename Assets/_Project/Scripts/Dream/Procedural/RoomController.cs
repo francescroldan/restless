@@ -38,7 +38,6 @@ namespace Restless.Dream.Procedural
         }
 
         // Removes the wall tiles at this socket's door slot so the player can pass through.
-        // Inner-corner frames are already baked into the prefab by the editor tool.
         public void OpenSocket(DoorSocket socket)
         {
             Tilemap cliff = null;
@@ -62,9 +61,9 @@ namespace Restless.Dream.Procedural
         }
 
         // Replaces the inner-corner frame tiles beside an unused socket with the straight
-        // wall tile. The door cells (baseCell, cell2) were never opened so they still
-        // hold the correct straight wall tile — sample from there directly.
-        public void CloseSocket(DoorSocket socket)
+        // wall tile. If closedDoorTile is provided, also places a closed-door visual on
+        // the door cells so the socket is recognisable as a locked door.
+        public void CloseSocket(DoorSocket socket, TileBase closedDoorTile = null)
         {
             Tilemap cliff = null;
             foreach (var tm in GetComponentsInChildren<Tilemap>())
@@ -76,10 +75,16 @@ namespace Restless.Dream.Procedural
             Vector3Int baseCell   = cliff.WorldToCell(socket.transform.position);
             Vector3Int cell2      = baseCell + step;
 
-            // Sample the wall tile from the door opening itself — never opened, so it
-            // still holds the correct straight wall tile regardless of room width.
             var wallTile = cliff.GetTile(baseCell);
             if (wallTile == null) wallTile = cliff.GetTile(cell2);
+
+            if (closedDoorTile != null)
+            {
+                cliff.SetTile(baseCell, closedDoorTile);
+                cliff.SetTile(cell2,    closedDoorTile);
+                cliff.RefreshTile(baseCell);
+                cliff.RefreshTile(cell2);
+            }
 
             var cornerA = baseCell - step;
             var cornerB = cell2    + step;

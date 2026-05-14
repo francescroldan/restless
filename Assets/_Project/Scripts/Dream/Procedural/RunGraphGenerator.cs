@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Restless.Dream.Procedural
@@ -6,136 +7,185 @@ namespace Restless.Dream.Procedural
     /// Builds the abstract graph for a run.
     /// No prefabs, no geometry — only nodes and edges.
     ///
-    /// Guaranteed structure every run:
-    ///   Entrance (Safe) → main path → Exit (Collapse/Landmark)
-    ///   At least 1 Memory node (for fragments)
-    ///   At least 1 fork with a dead end
+    /// Graph shape every run:
+    ///   Entrance fans out to 2-3 rooms immediately.
+    ///   Each of those may branch further (depth 1 → 1-2 children).
+    ///   Depth 2+ nodes are mostly leaves (exploration dead ends).
+    ///   Exit attaches to the highest-danger leaf.
+    ///   At least 1 Memory node guaranteed.
     /// </summary>
     public static class RunGraphGenerator
     {
         public static RunGraph Generate(int seed, int targetRooms)
         {
-            var rng   = new System.Random(seed);
+            var rng = new System.Random(seed);
             var graph = new RunGraph();
-            int idx   = 0;
+            int idx = 0;
 
-            targetRooms = Mathf.Clamp(targetRooms, 6, 12);
+            targetRooms = Mathf.Clamp(targetRooms, 7, 14);
 
             // ── Entrance ──────────────────────────────────────────────────
             var entrance = new GraphNode(idx++, RoomType.Safe, RoomSize.Medium)
             {
-                IsEntrance  = true,
-                DangerHint  = 0f
+                IsEntrance = true,
+                DangerHint = 0f
             };
             graph.Nodes.Add(entrance);
 
-            // ── Main path ─────────────────────────────────────────────────
-            // Build a spine from entrance to exit, inserting variety
-            var prev         = entrance;
-            int spineLength  = Rng(rng, 3, 5);
+            // ── BFS expansion ─────────────────────────────────────────────
+            // Budget = total interior rooms (entrance and exit not counted).
+            int budget = targetRooms - 2;
             bool memoryPlaced = false;
 
-            for (int i = 0; i < spineLength; i++)
+            var frontier = new Queue<(GraphNode node, int depth)>();
+            frontier.Enqueue((entrance, 0));
+
+            while (frontier.Count > 0 && budget > 0)
             {
-                float progress = (float)(i + 1) / spineLength;
-                var   node     = BuildSpineNode(idx++, progress, rng, ref memoryPlaced);
-                graph.Nodes.Add(node);
-                graph.AddEdge(prev, node);
-                prev = node;
+                var (parent, depth) = frontier.Dequeue();
+
+                int children = Mathf.Min(ChildCount(depth, budget, rng), budget);
+
+                for (int i = 0; i < children; i++)
+                {
+                    if (budget <= 0) break;
+
+                    // Progress 0→1 based on depth (max depth ~3)
+                    float progress = Mathf.Clamp01(depth * 0.28f + 0.15f +
+                                                   (float)rng.NextDouble() * 0.12f);
+
+                    var node = BuildNode(idx++, progress, rng, ref memoryPlaced);
+                    graph.Nodes.Add(node);
+                    graph.AddEdge(parent, node);
+                    budget--;
+
+                    frontier.Enqueue((node, depth + 1));
+                }
             }
 
-            // Guarantee memory node on spine if not placed yet
+            // ── Guarantee memory node ─────────────────────────────────────
             if (!memoryPlaced)
             {
-                int memIdx = Rng(rng, 1, graph.Nodes.Count - 1);
-                graph.Nodes[memIdx].Type             = RoomType.Memory;
-                graph.Nodes[memIdx].MustHaveFragment = true;
+                int midIdx = Rng(rng, 1, graph.Nodes.Count - 1);
+                graph.Nodes[midIdx].Type             = RoomType.Memory;
+                graph.Nodes[midIdx].MustHaveFragment = true;
             }
 
-            // ── Exit / Landmark ───────────────────────────────────────────
-            // Added before forks so BFS assigns exit the North socket on the
-            // last spine node, not a leftover East/West after branches claim it.
+            // ── Guarantee ritual node ──────────────────────────────────────
+            // With shallow graphs (≤10 rooms) progress never exceeds 0.65, so
+            // Ritual nodes are never generated organically. Convert the highest-
+            // danger non-special interior node to Ritual to ensure one always exists.
+            bool ritualPlaced = false;
+            foreach (var n in graph.Nodes)
+                if (n.Type == RoomType.Ritual) { ritualPlaced = true; break; }
+
+            if (!ritualPlaced)
+            {
+                GraphNode best      = null;
+                float     bestScore = -1f;
+                foreach (var n in graph.Nodes)
+                {
+                    if (n.IsEntrance || n.IsExit) continue;
+                    if (n.Type == RoomType.Memory || n.Type == RoomType.Landmark) continue;
+                    float score = n.DangerHint + (float)rng.NextDouble() * 0.05f;
+                    if (score > bestScore) { bestScore = score; best = n; }
+                }
+                if (best != null) best.Type = RoomType.Ritual;
+            }
+
+            // ── Exit ──────────────────────────────────────────────────────
+            // Attach to the highest-danger leaf that isn't the entrance.
+            // A leaf has only 1 neighbour in the graph (no children yet).
+            var exitParent = FindExitParent(graph, rng);
             var exit = new GraphNode(idx++, RoomType.Landmark, RoomSize.Large)
             {
                 IsExit     = true,
-                DangerHint = 0.8f
+                DangerHint = 0.9f
             };
             graph.Nodes.Add(exit);
-            graph.AddEdge(prev, exit);
+            graph.AddEdge(exitParent, exit);
             graph.Exit = exit;
-
-            // ── Forks and dead ends ───────────────────────────────────────
-            int forksAdded = 0;
-            int maxForks   = Mathf.Max(1, targetRooms - graph.Nodes.Count - 1);
-
-            foreach (var node in graph.Nodes.ToArray())
-            {
-                if (forksAdded >= maxForks) break;
-                if (graph.Nodes.Count >= targetRooms - 1) break;
-                if (node.IsEntrance || node.Type == RoomType.DeadEnd) continue;
-                if (node.IsExit) continue;
-                if (node.Neighbours.Count >= 3) continue;
-                if (rng.NextDouble() > 0.45f) continue;
-
-                var branch = new GraphNode(idx++, RoomType.DeadEnd, RoomSize.Medium)
-                {
-                    DangerHint = node.DangerHint * 1.2f
-                };
-                graph.Nodes.Add(branch);
-                graph.AddEdge(node, branch);
-                forksAdded++;
-            }
 
             return graph;
         }
 
-        private static GraphNode BuildSpineNode(int idx, float progress, System.Random rng, ref bool memoryPlaced)
+        // ── Child count per depth ─────────────────────────────────────────
+
+        // depth 0 (entrance): 2-3 exits — wide open start.
+        // depth 1: 55 % chance of 2 children, 45 % of 1 — creates branch clusters.
+        // depth 2: 25 % chance of 1 child, otherwise leaf — mostly closes out.
+        // depth 3+: always leaf.
+        private static int ChildCount(int depth, int budget, System.Random rng)
         {
-            // Early (0–0.3): safe
-            // Mid (0.3–0.7): encounter / memory
-            // Late (0.7–1.0): encounter / ritual
+            if (budget <= 0) return 0;
+            return depth switch
+            {
+                0 => Rng(rng, 2, 3),
+                1 => rng.NextDouble() < 0.55 ? 2 : 1,
+                2 => rng.NextDouble() < 0.25 ? 1 : 0,
+                _ => 0
+            };
+        }
 
+        // ── Node builder ──────────────────────────────────────────────────
+
+        private static GraphNode BuildNode(int idx, float progress,
+                                           System.Random rng, ref bool memoryPlaced)
+        {
             RoomType type;
-            float    danger;
-
             if (progress < 0.3f)
             {
-                type   = RoomType.Safe;
-                danger = Mathf.Lerp(0.1f, 0.3f, (float)progress / 0.3f);
+                type = RoomType.Safe;
             }
-            else if (progress < 0.7f)
+            else if (progress < 0.65f)
             {
                 double roll = rng.NextDouble();
-                if (!memoryPlaced && roll < 0.4)
-                {
-                    type         = RoomType.Memory;
-                    memoryPlaced = true;
-                }
+                if (!memoryPlaced && roll < 0.35)
+                    type = RoomType.Memory;
                 else
-                    type = roll < 0.5 ? RoomType.Encounter : RoomType.Safe;
-
-                danger = Mathf.Lerp(0.3f, 0.65f, (float)(progress - 0.3f) / 0.4f);
+                    type = roll < 0.55 ? RoomType.Encounter : RoomType.Safe;
             }
             else
             {
-                double roll = rng.NextDouble();
-                type   = roll < 0.5 ? RoomType.Encounter : RoomType.Ritual;
-                danger = Mathf.Lerp(0.65f, 0.9f, (float)(progress - 0.7f) / 0.3f);
+                type = rng.NextDouble() < 0.5 ? RoomType.Encounter : RoomType.Ritual;
             }
 
-            // Mid and late rooms have a 30 % chance of being Large for visual variety.
-            RoomSize size = (progress >= 0.3f && rng.NextDouble() < 0.3) ? RoomSize.Large : RoomSize.Medium;
+            if (type == RoomType.Memory) memoryPlaced = true;
 
-            var node = new GraphNode(idx, type, size)
+            float danger = Mathf.Clamp01(progress * 0.85f + (float)rng.NextDouble() * 0.1f);
+            RoomSize size = progress >= 0.3f && rng.NextDouble() < 0.3
+                ? RoomSize.Large : RoomSize.Medium;
+
+            return new GraphNode(idx, type, size)
             {
                 DangerHint       = danger,
                 MustHaveFragment = type == RoomType.Memory
             };
-
-            if (type == RoomType.Memory) memoryPlaced = true;
-
-            return node;
         }
+
+        // ── Exit parent selection ─────────────────────────────────────────
+
+        // Prefer leaf nodes (1 neighbour = no children) with high danger,
+        // with a small random nudge to vary the chosen branch each run.
+        private static GraphNode FindExitParent(RunGraph graph, System.Random rng)
+        {
+            GraphNode best      = null;
+            float     bestScore = -1f;
+
+            foreach (var n in graph.Nodes)
+            {
+                if (n.IsEntrance) continue;
+
+                float leafBonus = n.Neighbours.Count == 1 ? 0.5f : 0f;
+                float score     = n.DangerHint + leafBonus + (float)rng.NextDouble() * 0.15f;
+
+                if (score > bestScore) { bestScore = score; best = n; }
+            }
+
+            return best ?? graph.Nodes[graph.Nodes.Count - 1];
+        }
+
+        // ── Helpers ───────────────────────────────────────────────────────
 
         private static int Rng(System.Random rng, int min, int max) =>
             rng.Next(min, max + 1);

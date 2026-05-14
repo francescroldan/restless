@@ -56,6 +56,19 @@ namespace Restless.Dream.Procedural
             if (spawner != null)
                 spawner.SetRooms(_assembler.PlacedRooms);
 
+            // Initialize room camera: show entrance, hide all other rooms.
+            // RoomCamera is added automatically to Camera.main if not already present.
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                var roomCam = cam.GetComponent<RoomCamera>() ?? cam.gameObject.AddComponent<RoomCamera>();
+                roomCam.Init(_assembler.PlacedRooms, graph.Entrance.PlacedRoom);
+            }
+            else
+            {
+                Debug.LogWarning("[DreamSceneBootstrap] Camera.main not found — RoomCamera not initialized.");
+            }
+
             Debug.Log($"[DreamSceneBootstrap] Generated run — seed={seed} rooms={_assembler.PlacedRooms.Count}");
         }
     }
