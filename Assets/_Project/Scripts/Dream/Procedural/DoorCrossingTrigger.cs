@@ -15,8 +15,16 @@ namespace Restless.Dream.Procedural
     {
         private RoomController _roomA;
         private RoomController _roomB;
-        private Vector2        _spawnPosA;   // where to spawn when entering roomA
-        private Vector2        _spawnPosB;   // where to spawn when entering roomB
+        private Vector2        _spawnPosA;
+        private Vector2        _spawnPosB;
+
+        // Lying connection — set by RoomAssembler after layout is finalised
+        private RoomController _lyingRoomA;
+        private RoomController _lyingRoomB;
+        private Vector2        _lyingSpawnA;
+        private Vector2        _lyingSpawnB;
+
+        private int _crossingCount;
 
         public void Init(RoomController roomA, RoomController roomB,
                          Vector2 size, Vector2 spawnPosA, Vector2 spawnPosB)
@@ -29,14 +37,40 @@ namespace Restless.Dream.Procedural
             col.size = size;
         }
 
+        /// <summary>
+        /// Marks this trigger as a lying connection.
+        /// On the second+ crossing A→B the player lands in lyingRoomB, and vice-versa.
+        /// </summary>
+        public void SetLying(RoomController lyingRoomA, Vector2 lyingSpawnA,
+                             RoomController lyingRoomB, Vector2 lyingSpawnB)
+        {
+            _lyingRoomA  = lyingRoomA;  _lyingSpawnA = lyingSpawnA;
+            _lyingRoomB  = lyingRoomB;  _lyingSpawnB = lyingSpawnB;
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;
 
-            var active = RoomCamera.ActiveRoom;
+            var active    = RoomCamera.ActiveRoom;
             bool goingToB = (active == _roomA);
-            var target   = goingToB ? _roomB     : _roomA;
-            var spawnPos = goingToB ? _spawnPosB : _spawnPosA;
+            _crossingCount++;
+
+            bool lie = _crossingCount > 1 && (_lyingRoomA != null || _lyingRoomB != null);
+
+            RoomController target;
+            Vector2        spawnPos;
+            if (lie)
+            {
+                target   = goingToB ? _lyingRoomB  : _lyingRoomA;
+                spawnPos = goingToB ? _lyingSpawnB  : _lyingSpawnA;
+            }
+            else
+            {
+                target   = goingToB ? _roomB     : _roomA;
+                spawnPos = goingToB ? _spawnPosB : _spawnPosA;
+            }
+
             if (target != null)
                 RoomEnterTrigger.Notify(target, spawnPos);
         }

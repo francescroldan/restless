@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Restless.Core;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -38,8 +39,9 @@ namespace Restless.Dream.Procedural
         [Header("Transition")]
         [SerializeField] private float _spawnOffset = 2f;
 
-        private readonly List<RoomController>              _placed              = new();
+        private readonly List<RoomController>               _placed              = new();
         private readonly List<(RoomController, DoorSocket)> _doorApproachSockets = new();
+        private readonly List<DoorCrossingTrigger>          _crossingTriggers    = new();
 
         public IReadOnlyList<RoomController> PlacedRooms => _placed;
 
@@ -71,6 +73,7 @@ namespace Restless.Dream.Procedural
                     if (r != null) Destroy(r.gameObject);
                 _placed.Clear();
                 _doorApproachSockets.Clear();
+                _crossingTriggers.Clear();
                 foreach (var node in graph.Nodes) node.PlacedRoom = null;
 
                 var rng = new System.Random((seed + attempt) ^ 0xDEAD);
@@ -90,6 +93,7 @@ namespace Restless.Dream.Procedural
                 }
 
                 PaintRitualRooms(graph);
+                WireUpMutators(rng);
 
                 var sb = new System.Text.StringBuilder($"[RoomAssembler] Layout (attempt {attempt + 1}):\n");
                 foreach (var r in _placed)
@@ -455,7 +459,9 @@ namespace Restless.Dream.Procedural
             go.transform.position = worldPos;
             go.transform.SetParent(parent, true);
             go.AddComponent<BoxCollider2D>();
-            go.AddComponent<DoorCrossingTrigger>().Init(roomA, roomB, size, spawnA, spawnB);
+            var trigger = go.AddComponent<DoorCrossingTrigger>();
+            trigger.Init(roomA, roomB, size, spawnA, spawnB);
+            _crossingTriggers.Add(trigger);
         }
 
         private Tile GetDoorTile(SocketDirection dir) => dir switch
@@ -790,6 +796,40 @@ namespace Restless.Dream.Procedural
 
             foreach (var pos in positions)
                 cliff.SetTile(pos, remap[cliff.GetTile(pos)]);
+        }
+
+        private void WireUpMutators(System.Random rng)
+        {
+            // Add a RoomMutator to every placed room
+            foreach (var room in _placed)
+            {
+                var mutator = room.gameObject.AddComponent<RoomMutator>();
+                mutator.Init(room);
+            }
+
+            // Pick one crossing trigger at random to be the lying connection
+            float lyingProb = RunConfig.Current?.lyingConnectionProbability ?? 1f;
+            if (_crossingTriggers.Count == 0 || Random.value > lyingProb) return;
+
+            var lyingTrigger = _crossingTriggers[rng.Next(_crossingTriggers.Count)];
+
+            // Pick two random placed rooms that differ from the trigger's own rooms
+            // as lying destinations (one per direction of travel)
+            var candidates = _placed.FindAll(r =>
+                r != lyingTrigger.gameObject.GetComponentInParent<RoomController>());
+
+            if (candidates.Count < 2) return;
+
+            Shuffle(candidates, rng);
+            var lyingA = candidates[0];
+            var lyingB = candidates[1];
+
+            lyingTrigger.SetLying(
+                lyingA, (Vector2)lyingA.transform.position + (Vector2)lyingA.transform.TransformDirection(Vector2.up),
+                lyingB, (Vector2)lyingB.transform.position + (Vector2)lyingB.transform.TransformDirection(Vector2.up)
+            );
+
+            Debug.Log($"[RoomAssembler] Lying connection wired: {lyingTrigger.name} → A={lyingA.name} B={lyingB.name}");
         }
 
 #if UNITY_EDITOR

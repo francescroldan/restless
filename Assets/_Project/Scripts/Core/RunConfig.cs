@@ -81,6 +81,13 @@ namespace Restless.Core
         public float wandererRadius;
         public float wandererWaitTime;
 
+        // ── Room Mutation ─────────────────────────────────────────────────────
+        public float roomMutationProbability;
+        public float mutationHueShift;
+        public float mutationValueMult;
+        public float mutationFadeDuration;
+        public float lyingConnectionProbability;
+
         // ── Ally modifiers (misc) ─────────────────────────────────────────────
         /// <summary>Written by DreamPassiveApplier. Applied by GameManager on exit.</summary>
         public float healthCostMultiplier = 1f;
@@ -145,6 +152,11 @@ namespace Restless.Core
             wandererSpeed                = cfg.wandererSpeed;
             wandererRadius               = cfg.wandererRadius;
             wandererWaitTime             = cfg.wandererWaitTime;
+            roomMutationProbability      = cfg.roomMutationProbability;
+            mutationHueShift             = cfg.mutationHueShift;
+            mutationValueMult            = cfg.mutationValueMult;
+            mutationFadeDuration         = cfg.mutationFadeDuration;
+            lyingConnectionProbability   = cfg.lyingConnectionProbability;
         }
     }
 }

@@ -331,5 +331,17 @@ namespace Restless.Core
         public float buzzDecaySpeed                            = 3.5f;
         [Tooltip("General interpolation speed for visual effects.")]
         public float fxLerpSpeed                               = 2f;
+
+        [Header("── Room Mutation ────────────────────────────────────")]
+        [Tooltip("Chance (0-1) that a room mutates visually on revisit.")]
+        [Range(0f, 1f)] public float roomMutationProbability  = 0.7f;
+        [Tooltip("Hue shift applied to floor tilemap on revisit.")]
+        [Range(0f, 0.4f)] public float mutationHueShift       = 0.10f;
+        [Tooltip("Value multiplier applied to floor tilemap on revisit (< 1 = darker).")]
+        [Range(0.4f, 1.0f)] public float mutationValueMult    = 0.70f;
+        [Tooltip("Duration of the mutation fade in seconds.")]
+        public float mutationFadeDuration                     = 2.5f;
+        [Tooltip("Chance (0-1) that one connection per run is a lying door.")]
+        [Range(0f, 1f)] public float lyingConnectionProbability = 1f;
     }
 }
