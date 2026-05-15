@@ -1,144 +1,60 @@
-# Sprint 03 — Entidades del sueño: presencias espectrales
+# Sprint 03 — Presencias espectrales
 
 **Estado:** ✅ Completado  
-**Fase:** Post-MOC  
-**Prerequisito:** [Sprint 02 — UX Polish](Sprint02-UX-Polish.md) ✅ cerrado
-
-> **Nota de implementación:** el plan original contemplaba un sistema de neblina/revelación con `DreamFog`. Tras evaluar el scope y las prioridades del Sprint 04 (generación procedural), se adoptó un enfoque más directo: presencias tipadas gestionadas por `DreamPresenceSpawner`, sin capa de revelación. El sistema de niebla queda como candidato para un sprint posterior si el playtest lo demanda.
+**Fase:** 1 — Infraestructura del Sueño  
+**Prerequisito:** [Sprint 02 — UX Polish](Sprint02-UX-Polish.md) ✅
 
 ---
 
 ## Objetivo
 
-Transformar las entidades del sueño de obstáculos simples y predecibles en elementos de incertidumbre activa. El jugador debe decidir constantemente si vale la pena revelar lo que tiene delante. El cono de visión pasa de ser herramienta defensiva a herramienta de exploración con coste.
+Poblar el sueño con entidades que respondan al contexto: qué tipo de sala es, qué nivel de peligro tiene, qué aliados lleva el jugador. Las entidades dejan de ser decorado estático y pasan a ser parte del sistema.
 
 ---
 
-## Concepto central: la neblina
+## Lo que se construyó
 
-Cualquier entidad del sueño puede aparecer inicialmente como una **neblina** — una presencia translúcida, indefinida, sin forma clara. Al entrar en el cono de visión del protagonista durante un tiempo mínimo (dwell time), la neblina se **revela**: colapsa en lo que realmente es.
+### `DreamPresenceSpawner`
 
-El jugador nunca sabe de antemano qué es. Mirar tiene coste potencial; no mirar también.
+Gestiona la distribución de presencias por run. Recibe la lista de rooms instanciadas y el grafo (`SetRooms(rooms, graph)`) y coloca entidades según la metadata de cada sala.
 
-### Tipos de revelación
+Tipos de presencia:
 
-| Tipo | Al revelarse | Efecto | Frecuencia orientativa |
-|------|-------------|--------|----------------------|
-| **Amenaza** | Entidad activa (la estatua u otras) | Se activa, sube inquietud al estar en cono | ~35% |
-| **NPC errante** | Presencia inofensiva del sueño | Deambula o desaparece, sin efecto | ~30% |
-| **Fragmento** | Punto de memoria visible | Marca la localización; el minijuego sigue siendo necesario | ~20% |
-| **Aliado** | Eco de un aliado conocido | Beneficio temporal (reducción de tasa, pulso de calma…) | ~15% |
+| Tipo | Comportamiento | Restricción de sala |
+|---|---|---|
+| **Threat** | Patrulla activa; sube inquietud en el cono | Solo rooms con `supportsThreats=true` |
+| **Wanderer** | Deambula sin propósito; no afecta al jugador | Sin restricción |
+| **Fragment** | Punto de memoria interactuable | Rooms con `supportsFragments=true` |
+| **Ally echo** | Beneficio temporal al acercarse | Solo si hay aliados activos en la run |
 
-Las frecuencias son configurables en `GameConfig`. El objetivo de diseño es que el jugador nunca automatice la decisión de mirar.
+Distribución ponderada por `dangerLevel`: las rooms más peligrosas reciben proporcionalmente más amenazas.
 
-### NPCs errantes como entidades visibles
+El primer fragmento de memoria está **garantizado** en una room de tipo `Memory`. Fallback a cualquier room con `supportsFragments` si no hay posición libre.
 
-Algunos NPCs errantes pueden **no ser neblinas** — ya son visibles desde el principio, sin revelación. Son ruido ambiental del sueño: figuras que deambulan sin propósito, ignoran al protagonista, y refuerzan la atmósfera de espacio habitado pero ajeno. Su presencia hace que el jugador no pueda fiarse de que "lo que ya se ve" sea siempre inofensivo.
+### `WanderingNPC`
 
----
+Presencia inofensiva con movimiento por waypoints aleatorios dentro de los spawn bounds de la sala. No interactúa con el jugador, no afecta a la inquietud. Refuerza la sensación de espacio habitado.
 
-## Tareas
+### Integración con GameConfig
 
-### E1 — Sistema base de neblina y revelación
-
-**Problema:** las entidades actuales son estáticamente visibles y predecibles. No hay incertidumbre sobre qué son.
-
-**Solución:** Crear un componente `DreamFog` que envuelve cualquier entidad del sueño. En estado sin revelar, muestra un sprite translúcido genérico. Al entrar en el cono de visión el tiempo suficiente, dispara la revelación y activa el comportamiento real del objeto subyacente.
-
-**Criterios de salida:**
-- [ ] Componente `DreamFog` implementado con estados: `Hidden`, `Revealing`, `Revealed`
-- [ ] Dwell time configurable en `GameConfig`
-- [ ] Efecto visual de transición (fade / materialización) al revelar
-- [ ] Compatible con los cuatro tipos de revelación
-- [ ] Las entidades ya existentes (estatua/DreamPresence) pueden funcionar como neblina o sin ella
+Todas las frecuencias, conteos y parámetros de distribución viven en `GameConfig` y se copian a `RunConfig` al iniciar la run. Sin hardcoding.
 
 ---
 
-### E2 — Tipo: Amenaza (integración con sistema existente)
+## Criterios de salida
 
-**Solución:** La entidad `DreamPresence` existente puede arrancar como neblina. Al revelarse, activa su comportamiento de patrulla normal. El sistema de detección y subida de inquietud no cambia.
-
-**Criterios de salida:**
-- [ ] `DreamPresence` puede configurarse para aparecer como neblina o directamente visible
-- [ ] Al revelar una amenaza, la transición visual comunica claramente el peligro
-- [ ] El comportamiento post-revelación es idéntico al actual
-
----
-
-### E3 — Tipo: NPC errante
-
-**Solución:** Nueva entidad `WanderingNPC` — presencia inofensiva que deambula por el nivel con movimiento suave e irregular. No interactúa con el jugador, no afecta a la inquietud. Puede aparecer como neblina (revelándose como NPC) o ya visible desde el principio.
-
-**Criterios de salida:**
-- [ ] Componente `WanderingNPC` con movimiento de deambulación (waypoints aleatorios o steering suave)
-- [ ] Sprite / apariencia diferenciable de las amenazas una vez revelado
-- [ ] Configurable: neblina o visible desde el inicio
-- [ ] No afecta al sistema de inquietud ni a la detección
-
----
-
-### E4 — Tipo: Fragmento revelable
-
-**Solución:** Un `MemoryPoint` puede iniciarse oculto bajo una neblina. Al revelarla, el punto de memoria se hace visible e interactuable. El minijuego sigue siendo necesario para extraer el fragmento.
-
-**Criterios de salida:**
-- [ ] `MemoryPoint` puede configurarse con estado inicial oculto (neblina)
-- [ ] Al revelar, la transición visual indica claramente que es un punto de memoria
-- [ ] El flujo de interacción y minijuego no cambia
-- [ ] El jugador no puede interactuar con el punto hasta que esté revelado
-
----
-
-### E5 — Tipo: Eco de aliado
-
-**Solución:** Nueva entidad `AllyEcho` — aparece como neblina. Al revelarse, muestra brevemente la silueta del aliado correspondiente y aplica un beneficio temporal al protagonista.
-
-**Criterios de salida:**
-- [ ] Componente `AllyEcho` con tipo de aliado configurable (o aleatorio entre los aliados activos de la run)
-- [ ] Beneficio temporal implementado: al menos reducción de tasa de inquietud durante N segundos
-- [ ] Duración y magnitud del beneficio configurables en `GameConfig`
-- [ ] Visualmente distinguible del resto de revelaciones
-- [ ] Solo aparece si el jugador tiene aliados activos en la run
-
----
-
-### E6 — Spawner y distribución en escena
-
-**Solución:** Sistema `DreamFogSpawner` que instancia neblinas en el nivel según las frecuencias configuradas, en posiciones predefinidas o con cierta aleatoriedad controlada.
-
-**Criterios de salida:**
-- [ ] `DreamFogSpawner` con tabla de frecuencias configurable en `GameConfig`
-- [ ] Puede colocar neblinas en posiciones fijas (designer-placed) o en puntos aleatorios dentro de una zona
-- [ ] Garantiza mínimo 1 fragmento revelable por nivel (para que el sistema tenga propósito)
-- [ ] No coloca neblinas solapadas ni demasiado cerca del punto de inicio
-
----
-
-## Orden sugerido
-
-1. **E1** — sistema base (todo lo demás depende de él)
-2. **E2** — integración con amenaza existente (valida el sistema con contenido ya funcional)
-3. **E3** — NPC errante (el más sencillo, da cuerpo al nivel)
-4. **E4** — fragmento revelable (impacto directo en el loop de exploración)
-5. **E6** — spawner (para poder probar la distribución en juego)
-6. **E5** — eco de aliado (el más complejo, puede dejarse para el final del sprint)
-
----
-
-## Lo que se implementó
-
-- [x] `DreamPresenceSpawner` gestiona presencias tipadas (Threat, Wanderer, Fragment, Ally) por run
-- [x] `SetRooms(rooms, graph)` — el spawner lee las rooms instanciadas y sus zonas de spawn
-- [x] Respeta `supportsThreats` y `supportsFragments` por room
-- [x] Distribución ponderada por `dangerLevel` — rooms más peligrosas reciben más amenazas
-- [x] Primer fragmento garantizado en room tipo `memory`; fallback a cualquier room con `supportsFragments`
-- [x] `WanderingNPC` — presencia inofensiva con movimiento de deambulación por waypoints
-- [x] Todas las frecuencias y parámetros en `GameConfig`, sin hardcoding
-
-## Criterios de salida del sprint
-
-- [x] Las presencias se distribuyen respetando la metadata de las rooms
-- [x] Hay siempre al menos 1 fragmento de memoria colocable por run
-- [x] Los NPCs errantes se mueven sin afectar a la inquietud
+- [x] Las presencias se distribuyen respetando la metadata de cada room
+- [x] Siempre hay al menos 1 fragmento de memoria colocable por run
+- [x] Los NPCs errantes se mueven sin afectar a la inquietud ni al sistema de detección
 - [x] Sin hardcoding: todo configurable desde `GameConfig`
 - [x] Sin regresiones en el loop principal (minijuego, inquietud, timer, despertar)
+
+---
+
+## Plan original — no implementado
+
+El plan inicial contemplaba un sistema de **niebla y revelación** (`DreamFog`): presencias que aparecen como formas translúcidas indefinidas y solo revelan su naturaleza al entrar en el cono de visión del jugador el tiempo suficiente.
+
+Se aplazó para priorizar la generación procedural (S4), que requería que el spawner funcionara sobre rooms dinámicas antes que añadir una capa visual encima. El sistema de niebla es candidato directo para la **Fase 2 — Atmósfera**.
+
+El diseño original sigue siendo válido: [ver concepto en el GDD](../GDD/02_DREAM_MECHANICS/Condiciones%20mentales%20en%20el%20sue%C3%B1o.md).

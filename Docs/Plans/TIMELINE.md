@@ -1,65 +1,65 @@
 # Restless — Timeline de desarrollo
 
-## Cómo usar este documento
-
-- Cada hito tiene su propio plan detallado en esta misma carpeta. Los hitos M0–M6 están en la subcarpeta [MOC/](MOC/).
-- Un hito se marca como **completado** cuando el resultado es jugable y verificado, no cuando el código existe.
-- Los hitos son secuenciales: no empieza el siguiente hasta dar por bueno el anterior.
-- A partir de S1 los hitos se llaman Sprints (S1, S2…) para reflejar que el MOC ya está cerrado.
-- Dentro de cada hito puede haber sub-tareas en paralelo, pero el hito en sí es la condición de salida.
+Un hito se marca como **completado** cuando el resultado es jugable y verificado por alguien ajeno al código, no cuando el sistema existe.
 
 ---
 
-## Hitos
+## Fases
 
-| # | Hito | Estado | Plan |
-|---|------|--------|------|
-| M0 | Definir el loop del MOC | ✅ Completado | [MOC/M0-Definir-Loop-MOC.md](MOC/M0-Definir-Loop-MOC.md) |
-| M1 | Setup técnico del proyecto | ✅ Completado | [MOC/M1-Setup-Tecnico.md](MOC/M1-Setup-Tecnico.md) |
-| M2 | Prototipo gris del loop core | ✅ Completado | [MOC/M2-Prototipo-Loop.md](MOC/M2-Prototipo-Loop.md) |
-| M3 | Identidad visual base | ✅ Completado | [MOC/M3-Identidad-Visual.md](MOC/M3-Identidad-Visual.md) |
-| M4 | Hub de Vigilia completo | ✅ Completado | [MOC/M4-Hub-Vigilia.md](MOC/M4-Hub-Vigilia.md) |
-| M5 | Primer aliado end-to-end | ✅ Completado | [MOC/M5-Primer-Aliado.md](MOC/M5-Primer-Aliado.md) |
-| M6 | MOC completo y jugable | ✅ Completado | [MOC/M6-MOC-Completo.md](MOC/M6-MOC-Completo.md) |
-| S1 | RunConfig: parámetros modificables por run | ✅ Completado | [Sprint01-RunConfig.md](Sprint01-RunConfig.md) |
-| S2 | UX Polish: feedback, HUD ojo y tileset | ✅ Completado | [Sprint02-UX-Polish.md](Sprint02-UX-Polish.md) |
-| S3 | Entidades del sueño: neblinas y revelación | ✅ Completado | [Sprint03-Entities.md](Sprint03-Entities.md) |
-| S4 | Generación procedural de escenarios | ✅ Completado | [Sprint04-ProceduralGen.md](Sprint04-ProceduralGen.md) |
-
-**Leyenda:** ⬜ Pendiente · 🔄 En curso · ✅ Completado
+| Fase | Objetivo | Estado | Cierre |
+|---|---|---|---|
+| **Fase 0 — MOC** | Demostrar que el concepto es jugable | ✅ Completado | 2026-05-08 |
+| **Fase 1 — Infraestructura del Sueño** | Convertir el prototipo en un sistema que aguante iteración | ✅ Completado | 2026-05-15 |
+| **Fase 2 — Atmósfera** | Que el mundo generado se sienta como Restless, no como una demo técnica | ⬜ Por empezar | — |
 
 ---
 
-## Visión general del arco
+## Fase 0 — MOC
 
-```
-M0  ──►  M1  ──►  M2  ──►  M3
-Diseño   Setup   Loop gris  Visuals
-                    │
-                    ▼
-              M4 ──► M5 ──► M6
-             Vigilia  Aliado  MOC
-```
+> Objetivo: que el concepto sea jugable de principio a fin por alguien externo.
 
-### ¿Por qué este orden?
+| Hito | Estado | Plan |
+|---|---|---|
+| M0 — Definir el loop | ✅ | [MOC/M0-Definir-Loop-MOC.md](MOC/M0-Definir-Loop-MOC.md) |
+| M1 — Setup técnico | ✅ | [MOC/M1-Setup-Tecnico.md](MOC/M1-Setup-Tecnico.md) |
+| M2 — Prototipo gris del loop core | ✅ | [MOC/M2-Prototipo-Loop.md](MOC/M2-Prototipo-Loop.md) |
+| M3 — Identidad visual base | ✅ | [MOC/M3-Identidad-Visual.md](MOC/M3-Identidad-Visual.md) |
+| M4 — Hub de Vigilia completo | ✅ | [MOC/M4-Hub-Vigilia.md](MOC/M4-Hub-Vigilia.md) |
+| M5 — Primer aliado end-to-end | ✅ | [MOC/M5-Primer-Aliado.md](MOC/M5-Primer-Aliado.md) |
+| M6 — MOC completo y jugable | ✅ | [MOC/M6-MOC-Completo.md](MOC/M6-MOC-Completo.md) |
 
-- **M0 antes de M1**: no hay nada que implementar si no sabemos qué loop vamos a construir.
-- **M2 antes de M3**: el loop gris tiene que funcionar antes de vestirlo. El arte sobre mecánicas rotas es tiempo perdido.
-- **M3 antes de M4/M5**: la identidad visual define cómo se ve la habitación, los aliados y los efectos de inquietud. Mejor tenerla resuelta antes de construir esas pantallas.
-- **M5 antes de M6**: el sistema de aliados es el corazón del juego. El MOC no tiene sentido sin al menos un aliado que modifique el loop.
+**Cerrado 2026-05-08.** Playtest con 3 jugadores externos. Experiencia jugable satisfactoria.
 
 ---
 
-## Criterios de salida globales (MOC)
+## Fase 1 — Infraestructura del Sueño
 
-Al finalizar M6, el juego debe poder ser jugado de principio a fin por alguien que no ha visto el código:
+> Objetivo: RunConfig configurable, entidades vivas, world procedural. El sueño deja de ser un nivel estático.
 
-- [x] El jugador puede iniciar una run desde la Vigilia.
-- [x] El Sueño tiene un loop reconocible con inicio, tensión y salida.
-- [x] El Medidor de Inquietud afecta visualmente al entorno y tiene consecuencias reales.
-- [x] Despertar tranquilo y abrupto producen resultados distintos en la Vigilia.
-- [x] Al menos 2 aliados con builds diferentes cambian cómo se juega el Sueño.
-- [x] La paleta monocromática con acento de color está implementada.
-- [x] El juego no crashea en las rutas principales.
+| Sprint | Contenido | Estado | Plan |
+|---|---|---|---|
+| S1 — RunConfig | Parámetros modificables por run vía GameConfig | ✅ | [Sprint01-RunConfig.md](Sprint01-RunConfig.md) |
+| S2 — UX Polish | Feedback visual, HUD ojo, tileset dungeon | ✅ | [Sprint02-UX-Polish.md](Sprint02-UX-Polish.md) |
+| S3 — Presencias | Spawner de entidades tipadas, WanderingNPC, distribución por metadata | ✅ | [Sprint03-Entities.md](Sprint03-Entities.md) |
+| S4 — Generación procedural | Grafo, ensamblador, 11 rooms handcrafted, mutación, lying connections | ✅ | [Sprint04-ProceduralGen.md](Sprint04-ProceduralGen.md) |
 
-**MOC cerrado — 2026-05-08.** Playtest con 3 jugadores externos (8, 8 y 13 años). Resultado: experiencia jugable satisfactoria. Feedback recogido en Sprint 01.
+**Cerrado 2026-05-15.**
+
+---
+
+## Fase 2 — Atmósfera
+
+> Objetivo: que una partida completa produzca tensión, incertidumbre y sensación onírica reconocibles. El jugador no debe poder predecir lo que va a encontrar, ni visual ni narrativamente.
+
+Candidatos para esta fase (a priorizar juntos antes de arrancar):
+
+- **Sistema de niebla y revelación** — presencias que no revelan su naturaleza hasta que el jugador las mira (plan original S3, aplazado)
+- **Narrativa ambiental mínima** — props, notas, indicios del hijo en las rooms
+- **Audio por room** — ambiente sonoro diferenciado según el tipo de sala
+- **Más rooms con identidad propia** — ampliar el catálogo del biome dungeon
+
+Sprints concretos: por definir al empezar la fase.
+
+---
+
+**Leyenda:** ⬜ Por empezar · 🔄 En curso · ✅ Completado
