@@ -1,4 +1,4 @@
-# Sprint 03 — Presencias espectrales
+# Sprint 03 — Presencias espectrales y sistema de niebla
 
 **Estado:** ✅ Completado  
 **Fase:** 1 — Infraestructura del Sueño  
@@ -8,53 +8,55 @@
 
 ## Objetivo
 
-Poblar el sueño con entidades que respondan al contexto: qué tipo de sala es, qué nivel de peligro tiene, qué aliados lleva el jugador. Las entidades dejan de ser decorado estático y pasan a ser parte del sistema.
+Transformar las entidades del sueño de obstáculos visibles y predecibles en elementos de incertidumbre activa. El jugador no sabe qué es lo que tiene delante hasta que lo mira el tiempo suficiente. Mirar tiene coste potencial; no mirar también.
 
 ---
 
 ## Lo que se construyó
 
-### `DreamPresenceSpawner`
+### `DreamFog` — capa de niebla con revelación por dwell time
 
-Gestiona la distribución de presencias por run. Recibe la lista de rooms instanciadas y el grafo (`SetRooms(rooms, graph)`) y coloca entidades según la metadata de cada sala.
+Cualquier entidad del sueño puede arrancarse envuelta en una niebla translúcida azulada. Al entrar en el cono de visión del protagonista durante el tiempo mínimo (`fogRevealDwellTime`), la niebla se desvanece en crossfade y el contenido subyacente se activa.
 
-Tipos de presencia:
+El timer drena lentamente cuando el jugador aparta la vista (no se resetea bruscamente), manteniendo la tensión sin penalizar el movimiento natural.
 
-| Tipo | Comportamiento | Restricción de sala |
-|---|---|---|
-| **Threat** | Patrulla activa; sube inquietud en el cono | Solo rooms con `supportsThreats=true` |
-| **Wanderer** | Deambula sin propósito; no afecta al jugador | Sin restricción |
-| **Fragment** | Punto de memoria interactuable | Rooms con `supportsFragments=true` |
-| **Ally echo** | Beneficio temporal al acercarse | Solo si hay aliados activos en la run |
+Tipos de contenido soportados (auto-detectados en el mismo GO):
 
-Distribución ponderada por `dangerLevel`: las rooms más peligrosas reciben proporcionalmente más amenazas.
+| Tipo | Al revelarse |
+|---|---|
+| `Threat` | `DreamEntity` haunted se activa con su patrulla normal |
+| `Wanderer` | `WanderingNPC` empieza a deambular |
+| `Fragment` | `MemoryPoint` se vuelve interactuable (el minijuego sigue siendo necesario) |
+| `AllyEcho` | Beneficio temporal al protagonista |
 
-El primer fragmento de memoria está **garantizado** en una room de tipo `Memory`. Fallback a cualquier room con `supportsFragments` si no hay posición libre.
+### `FocusReveal` — silhouette hasta que el cono ilumina
 
-### `WanderingNPC`
+Componente complementario para elementos de escenario (no presencias). Renderiza el objeto como una silueta oscura sin iluminar. Al entrar en el cono de visión del jugador, hace un swap de material al original y lerp de color a blanco. La revelación es permanente.
 
-Presencia inofensiva con movimiento por waypoints aleatorios dentro de los spawn bounds de la sala. No interactúa con el jugador, no afecta a la inquietud. Refuerza la sensación de espacio habitado.
+### `DreamFogSpawner` — distribución por zonas
 
-### Integración con GameConfig
+Spawner basado en zonas (`FogSpawnZone[]`) que instancia las presencias al inicio de la run:
 
-Todas las frecuencias, conteos y parámetros de distribución viven en `GameConfig` y se copian a `RunConfig` al iniciar la run. Sin hardcoding.
+| Categoría | Implementación |
+|---|---|
+| Threat (con niebla) | `DreamEntity` haunted + `DreamFog` |
+| Wanderer (con niebla) | `DreamEntity` inerte + `DreamFog` |
+| Wanderer visible | `DreamEntity` inerte sin niebla — ruido ambiental puro |
+| Fragment (con niebla) | `MemoryPoint` + `DreamFog` |
+
+Distribución configurable vía `GameConfig`: `fogThreatFraction`, `fogWandererFraction`, `fogWandererVisibleFraction`, `fogFragmentCount`. El número de fragmentos se aleatoriza entre `_minFragments` y `_maxFragments`.
+
+**Nota:** en Sprint 04 se añadió `DreamPresenceSpawner` como sistema paralelo que distribuye presencias según la metadata de las rooms procedurales. `DreamFogSpawner` opera sobre la escena Dream con zonas fijas; `DreamPresenceSpawner` opera sobre el grafo de rooms generado.
 
 ---
 
 ## Criterios de salida
 
-- [x] Las presencias se distribuyen respetando la metadata de cada room
-- [x] Siempre hay al menos 1 fragmento de memoria colocable por run
-- [x] Los NPCs errantes se mueven sin afectar a la inquietud ni al sistema de detección
-- [x] Sin hardcoding: todo configurable desde `GameConfig`
+- [x] Presencias envueltas en niebla hasta que el jugador las mira el tiempo suficiente
+- [x] Revelación con crossfade visual; el contenido se activa al completarse
+- [x] El timer de dwell drena lentamente — no se resetea de golpe al apartar la vista
+- [x] Cuatro tipos de presencia: Threat, Wanderer, Fragment, AllyEcho
+- [x] Wanderers visibles sin niebla para refuerzo ambiental
+- [x] `FocusReveal` para elementos de escenario (silhouette → material normal)
+- [x] Distribución configurable desde `GameConfig`, sin hardcoding
 - [x] Sin regresiones en el loop principal (minijuego, inquietud, timer, despertar)
-
----
-
-## Plan original — no implementado
-
-El plan inicial contemplaba un sistema de **niebla y revelación** (`DreamFog`): presencias que aparecen como formas translúcidas indefinidas y solo revelan su naturaleza al entrar en el cono de visión del jugador el tiempo suficiente.
-
-Se aplazó para priorizar la generación procedural (S4), que requería que el spawner funcionara sobre rooms dinámicas antes que añadir una capa visual encima. El sistema de niebla es candidato directo para la **Fase 2 — Atmósfera**.
-
-El diseño original sigue siendo válido: [ver concepto en el GDD](../GDD/02_DREAM_MECHANICS/Condiciones%20mentales%20en%20el%20sue%C3%B1o.md).
