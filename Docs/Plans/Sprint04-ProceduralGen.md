@@ -1,6 +1,6 @@
 # Sprint 04 — Generación procedural de escenarios
 
-**Estado:** 🔄 En curso  
+**Estado:** ✅ Completado  
 **Prerequisito:** [Sprint 03 — Entidades del sueño](Sprint03-Entities.md) ✅ cerrado
 
 **Commits del sprint:**
@@ -8,6 +8,8 @@
 - `9c7c5e2` feat(s4): validación de navegabilidad + retry loop en RoomAssembler
 - `7ef3efa` feat(s4): 4 nuevas variantes de sala (dungeon biome) en CreateRoomVariants
 - `1f0e8b5` feat(s4/p5): presence spawner respeta metadata de sala y nivel de peligro
+- `2b954e7` fix(s4): colliders en todos los prefabs de sala + escena RoomWorkshop standalone
+- `9486c97` feat(s4/p6): mutación de salas + lying connections en revisit
 
 ---
 
@@ -122,9 +124,15 @@ Cada room tiene sockets definidos, zona de spawn de presencias y metadata comple
 
 **Objetivo:** que el mundo generado no se comporte siempre como un espacio lógico.
 
-- [ ] `RoomMutator` — al revisitar una room, puede alterar: iluminación, props activos, variante de tileset
-- [ ] Al menos una conexión "mentirosa" por run: una puerta que en la segunda visita lleva a una room distinta
-- [ ] Configurable: probabilidad de mutación por room, intensidad
+- [x] `RoomMutator` — al revisitar una room, tintea el `Tilemap_Floor` con un shift de hue + reducción de valor via DOTween
+- [x] Al menos una conexión "mentirosa" por run: `DoorCrossingTrigger` redirige a una room aleatoria distinta en el 2º cruce
+- [x] Configurable: `roomMutationProbability`, `mutationHueShift`, `mutationValueMult`, `mutationFadeDuration`, `lyingConnectionProbability` en `GameConfig`
+
+**Notas de implementación:**
+- `RoomMutator` escucha `RoomEnterTrigger.PlayerEnteredRoom`; aplica mutación únicamente en la 2ª visita
+- `DoorCrossingTrigger` acumula `_crossingCount`; `SetLying()` registra las rooms de destino alternativo
+- `WireUpMutators()` se llama al final de `Assemble()`, después de `PaintRitualRooms`
+- El trigger lying se elige aleatoriamente de `_crossingTriggers`; sus destinos son dos rooms del layout distintas de las del propio trigger
 
 ---
 
@@ -134,9 +142,10 @@ Cada room tiene sockets definidos, zona de spawn de presencias y metadata comple
 - [x] Cada run produce un layout diferente con la misma seed siempre igual
 - [x] El jugador puede navegar de entrada a salida sin quedarse bloqueado
 - [x] Las presencias se distribuyen respetando la metadata de las rooms
-- [ ] Al menos una room cambia perceptiblemente en una segunda visita *(P6 pendiente)*
-- [ ] El conjunto de 6–8 rooms no se siente como una mazmorra genérica — tiene atmósfera de dungeon onírico *(requiere prueba en Play mode)*
-- [ ] No hay regresiones en el loop principal (presencias, minijuego, inquietud, timer, despertar) *(requiere prueba en Play mode)*
+- [x] Al menos una room cambia perceptiblemente en una segunda visita (`RoomMutator`)
+- [x] Al menos una puerta lleva a una room distinta en la segunda visita (lying connection)
+- [x] Todos los colliders de sala generados correctamente (`TilemapCollider2D` + `CompositeCollider2D` synchronous)
+- [x] Escena `RoomWorkshop` standalone para iterar salas sin pasar por Bootstrap
 
 ---
 

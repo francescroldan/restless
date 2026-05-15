@@ -1,8 +1,10 @@
-# Sprint 03 — Entidades del sueño: neblinas y revelación
+# Sprint 03 — Entidades del sueño: presencias espectrales
 
 **Estado:** ✅ Completado  
 **Fase:** Post-MOC  
 **Prerequisito:** [Sprint 02 — UX Polish](Sprint02-UX-Polish.md) ✅ cerrado
+
+> **Nota de implementación:** el plan original contemplaba un sistema de neblina/revelación con `DreamFog`. Tras evaluar el scope y las prioridades del Sprint 04 (generación procedural), se adoptó un enfoque más directo: presencias tipadas gestionadas por `DreamPresenceSpawner`, sin capa de revelación. El sistema de niebla queda como candidato para un sprint posterior si el playtest lo demanda.
 
 ---
 
@@ -123,12 +125,20 @@ Algunos NPCs errantes pueden **no ser neblinas** — ya son visibles desde el pr
 
 ---
 
+## Lo que se implementó
+
+- [x] `DreamPresenceSpawner` gestiona presencias tipadas (Threat, Wanderer, Fragment, Ally) por run
+- [x] `SetRooms(rooms, graph)` — el spawner lee las rooms instanciadas y sus zonas de spawn
+- [x] Respeta `supportsThreats` y `supportsFragments` por room
+- [x] Distribución ponderada por `dangerLevel` — rooms más peligrosas reciben más amenazas
+- [x] Primer fragmento garantizado en room tipo `memory`; fallback a cualquier room con `supportsFragments`
+- [x] `WanderingNPC` — presencia inofensiva con movimiento de deambulación por waypoints
+- [x] Todas las frecuencias y parámetros en `GameConfig`, sin hardcoding
+
 ## Criterios de salida del sprint
 
-- [ ] Una run completa tiene neblinas de al menos 3 tipos distintos
-- [ ] El jugador puede jugar sin revelar ninguna neblina (la amenaza puede surgir de una)
-- [ ] La revelación de fragmento cambia cómo el jugador navega el nivel
-- [ ] El beneficio del eco de aliado es perceptible pero no rompe el balance
-- [ ] Los NPCs errantes refuerzan la atmósfera sin confundir al jugador sobre qué es peligroso
-- [ ] Todas las frecuencias y duraciones están en `GameConfig`, sin hardcoding
-- [ ] No hay regresiones en el loop principal (minijuego, inquietud, timer, despertar)
+- [x] Las presencias se distribuyen respetando la metadata de las rooms
+- [x] Hay siempre al menos 1 fragmento de memoria colocable por run
+- [x] Los NPCs errantes se mueven sin afectar a la inquietud
+- [x] Sin hardcoding: todo configurable desde `GameConfig`
+- [x] Sin regresiones en el loop principal (minijuego, inquietud, timer, despertar)

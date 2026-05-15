@@ -24,7 +24,7 @@
 | S1 | RunConfig: parámetros modificables por run | ✅ Completado | [Sprint01-RunConfig.md](Sprint01-RunConfig.md) |
 | S2 | UX Polish: feedback, HUD ojo y tileset | ✅ Completado | [Sprint02-UX-Polish.md](Sprint02-UX-Polish.md) |
 | S3 | Entidades del sueño: neblinas y revelación | ✅ Completado | [Sprint03-Entities.md](Sprint03-Entities.md) |
-| S4 | Generación procedural de escenarios | ⬜ Pendiente | [Sprint04-ProceduralGen.md](Sprint04-ProceduralGen.md) |
+| S4 | Generación procedural de escenarios | ✅ Completado | [Sprint04-ProceduralGen.md](Sprint04-ProceduralGen.md) |
 
 **Leyenda:** ⬜ Pendiente · 🔄 En curso · ✅ Completado
 

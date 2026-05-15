@@ -94,7 +94,7 @@ El jugador mantiene pulsado un botón/tecla. Una barra de "concentración" sube 
 - Sueño lúcido vs sueño profundo
 - Rituales y drogas funcionales (solo slots vacíos en el MOC)
 - Mascota funcional
-- Generación procedural del nivel
+- ~~Generación procedural del nivel~~ → **implementado en Sprint 04** ([ver GDD](../02_DREAM_MECHANICS/Generacion%20procedural%20de%20escenarios.md))
 - Múltiples biomas
 - Puzles de entorno
 - Combate
